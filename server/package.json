@@ -1,0 +1,23 @@
+{
+  "name": "skyblog",
+  "version": "1.0.0",
+  "description": "a server made with node.js, express, mongodb and mongoose",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guselas/skyblog.git"
+  },
+  "author": "fr.ruizf@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/guselas/skyblog/issues"
+  },
+  "homepage": "https://github.com/guselas/skyblog#readme",
+  "dependencies": {
+    "mongoose": "^5.8.3",
+    "node.js": "0.0.0"
+  }
+}
