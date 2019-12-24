@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
-var {Schema} = mongoose;
+var {
+    Schema
+} = mongoose;
 
 const PostSchema = new Schema({
-    title:String,
-    text:String,
-    authorEmail:String,
-    authorName:String,
-    date:Date,
-    commentId: mongoose.Types.ObjectId
+    postTitle: String,
+    postText: String,
+    authorId: mongoose.Types.ObjectId,
+    postDate: Date
 });
 
 const PostDAO = mongoose.model('Posts', PostSchema);
