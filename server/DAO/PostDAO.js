@@ -7,7 +7,8 @@ const PostSchema = new Schema({
     postTitle: String,
     postText: String,
     authorId: mongoose.Types.ObjectId,
-    postDate: Date
+    postDate: Date,
+    lastUpdate : Date
 });
 
 const PostDAO = mongoose.model('Posts', PostSchema);

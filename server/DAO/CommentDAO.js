@@ -7,7 +7,8 @@ const CommentSchema = new Schema({
     postId: mongoose.Types.ObjectId,
     commentDate: Date,
     userId: mongoose.Types.ObjectId,
-    commentText: String
+    commentText: String,
+    lastUpdate : Date
 });
 
 const CommentDAO = mongoose.model('Comments', CommentSchema);

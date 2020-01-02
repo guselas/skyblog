@@ -1,86 +1,52 @@
 const BaseAPI = require('./BaseAPI');
 
 class BlogAPI extends BaseAPI {
-    constructor(uri, app, nameAPI, blogService) {
-        super(uri, app, nameAPI);
-        this.blogService = blogService;
+    constructor(uri, app, services) {
+        super(uri, app, 'Blog');
+        this.blogService = services.blogService;
 
         app.get(`${uri}/blog`, this.getAll.bind(this));
-        app.get(`${uri}/blog/:blogid`, this.getOne.bind(this));
+        app.get(`${uri}/blog/:blogid`, this.getBlog.bind(this));
 
-        app.post(`${uri}/blog/:authorid`, this.newBlog.bind(this));
+        app.post(`${uri}/blog/login`, this.bearerLogin.bind(this));
+
+
+        app.post(`${uri}/blog`, this.newBlog.bind(this));
         app.put(`${uri}/blog/:blogid`, this.updateBlog.bind(this));
-        app.delete(`${uri}/blog/:blogid`, this.removeBlog.bind(this));
+        app.delete(`${uri}/blog/:blogid`, this.deleteBlog.bind(this));
 
-        app.post(`${uri}/blog/:blogid/comment/:authorid`, this.addComment.bind(this));
+        app.post(`${uri}/blog/:blogid/comment`, this.newComment.bind(this));
         app.put(`${uri}/blog/:blogid/comment/:commentid`, this.updateComment.bind(this));
-        app.delete(`${uri}/blog/comment/:commentid`, this.removeComment.bind(this));
+        app.delete(`${uri}/blog/comment/:commentid`, this.deleteComment.bind(this));
 
 
     }
-//#region 
-  //Login 
-    //HACER LOGIN
-    async login(req, res) {
-        console.log("API Users: userLogin(): ");
-        const email = req.body.email;
-        const password = req.body.password;
-        if (!email) {
-            this.sendError(res, this.ST_BadRequest, "email mandatory");
-        }
-        else if (!password) {
-            this.sendError(res, this.ST_BadRequest, "password mandatory");
-        }
-        else {
-            var users = await this.crudService.findUsersByEmail(email);
-            if (users.length == 0) {
-                this.sendError(res, this.ST_NotFound, "email not found");
-            }
-            else if (users.length > 1) {
-                this.sendError(res, this.ST_Conflict, "invalid email");
-            }
-            else {
-                var result = await this.crudService.matchPassword(users[0].id, password);
-                if (!result) {
-                    this.sendError(res, this.ST_BadRequest, "invalid password");
-                }
-                else {
-                    this.sendData(res, users[0]);
-                }
-            }
-        }
-    }
+    //#region Login
 
-    async bearerLogin(req,res){
+    async bearerLogin(req, res) {
         const email = req.body.email;
         const password = req.body.password;
         const description = req.body.description;
         if (!email) {
             this.sendError(res, this.ST_BadRequest, "email mandatory");
-        }
-        else if (!password) {
+        } else if (!password) {
             this.sendError(res, this.ST_BadRequest, "password mandatory");
-        }
-        else {
-            var users = await this.crudService.findUsersByEmail(email);
+        } else {
+            var users = await this.blogService.findUsersByEmail(email);
             if (users.length == 0) {
                 this.sendError(res, this.ST_NotFound, "email not found");
-            }
-            else if (users.length > 1) {
+            } else if (users.length > 1) {
                 this.sendError(res, this.ST_Conflict, "invalid email");
-            }
-            else {
-                var result = await this.crudService.matchPassword(users[0].id, password);
-                if (!result) {              
+            } else {
+                var result = await this.blogService.matchPassword(users[0].id, password);
+                if (!result) {
                     this.sendError(res, this.ST_BadRequest, "invalid password");
-                }
-                else {
+                } else {
                     var errors = [];
-                    var bearerDTO = await this.crudService.createBearer(users[0].id,description,errors);
-                    if(bearerDTO){
-                        this.sendData(res,bearerDTO);
-                    }
-                    else{
+                    var bearerDTO = await this.blogService.createBearer(users[0].id, description, errors);
+                    if (bearerDTO) {
+                        this.sendData(res, bearerDTO);
+                    } else {
                         this.sendError(res, this.ST_Conflict, errors);
                     }
                 }
@@ -88,12 +54,12 @@ class BlogAPI extends BaseAPI {
         }
     }
 
-    async getLoggedUser(req, res){
+    async getLoggedUser(req, res) {
         var userDTO = new this.crudService.classDTO();
         userDTO.fromDAO(req.currentUser);
         this.sendData(res, userDTO);
     }
-//#endregion
+    //#endregion
 
 
 
@@ -101,7 +67,7 @@ class BlogAPI extends BaseAPI {
         console.log(`API ${this.nameAPI}: getAll(): `);
         //Normalize filterValues from query
         const filter = {};
-        let recordDAO = new this.blogService.DAO.CoffeeShopDAO();
+        let recordDAO = new this.blogService.DAO.PostDAO();
         for (let prop in req.query) {
             if (prop in recordDAO) {
                 if (typeof recordDAO[prop] == "string") {
@@ -123,23 +89,23 @@ class BlogAPI extends BaseAPI {
         }
         try {
             let errors = [];
-            const recordsDTO = await this.blogService.services.coffeeShopsService.readAll(filter, errors);
+            const recordsDTO = await this.blogService.getAll(filter, errors);
             if (recordsDTO) {
                 this.sendData(res, recordsDTO);
             } else {
-                this.sendError(res, this.ST_BadRequest, "readAll()", errors);
+                this.sendError(res, this.ST_BadRequest, "getAll()", errors);
             }
         } catch (err) {
-            this.sendError(res, this.ST_InternalServerError, "readAll()", err.message);
+            this.sendError(res, this.ST_InternalServerError, "getAll()", err.message);
         };
     }
 
-    async getShop(req, res) {
-        console.log(`API ${this.nameAPI}: getShop(): `);
-        const id = req.params.coffeeShopId;
+    async getBlog(req, res) {
+        console.log(`API ${this.nameAPI}: getBlog(): `);
+        const blogId = req.params.blogid;
         try {
             const errors = [];
-            const fullRecordDTO = await this.blogService.services.coffeeShopsService.readFullOne(id, errors);
+            const fullRecordDTO = await this.blogService.services.postsService.readFullOne(blogId, errors);
             if (fullRecordDTO) {
                 this.sendData(res, fullRecordDTO)
             } else {
@@ -152,10 +118,10 @@ class BlogAPI extends BaseAPI {
 
     async newBlog(req, res) {
         console.log(`API blog newBlog()`);
-        const coffeeShopId = req.params.coffeeShopId;
+        const authorid = req.currentUser._id;
         try {
             const errors = [];
-            const blogDTO = await this.blogService.newBlog(coffeeShopId, errors);
+            const blogDTO = await this.blogService.newBlog(authorid, errors);
             if (blogDTO) {
                 this.sendData(res, blogDTO)
             } else {
@@ -166,73 +132,99 @@ class BlogAPI extends BaseAPI {
         };
     }
 
-    async closeBlog(req, res) {
-        console.log(`API blog closeBlog()`);
-        const blogId = req.params.blogId;
+    async updateBlog(req, res) {
+        console.log(`API blog updateBlog()`);
+        const updaterId = req.currentUser._id;
+        const blogId = req.params.blogid;
         try {
             const errors = [];
-            const orderDTO = await this.blogService.closeBlog(blogId, errors);
-            if (orderDTO) {
-                this.sendData(res, orderDTO)
-            } else {
-                this.sendError(res, this.ST_NotFound, "closeBlog()", errors);
-            }
-        } catch (err) {
-            this.sendError(res, this.ST_InternalServerError, "closeBlog()", err.message);
-        };
-    }
-
-    async addProduct(req, res) {
-        console.log(`API blog addProduct()`);
-        const blogId = req.params.blogId;
-        try {
-            var errors = [];
-            var docDetailDTO = new this.blogService.DTO.DocDetailDTO();
-            this.loadDTOFromBody(docDetailDTO, req.body);
-            const blogDTO = await this.blogService.addProduct(blogId, docDetailDTO, errors);
+            let blogDTO = await this.blogService.updateBlog(updaterId, req.body, blogId, errors);
             if (blogDTO) {
                 this.sendData(res, blogDTO)
             } else {
-                this.sendError(res, this.ST_NotFound, "addProduct()", errors);
+                this.sendError(res, this.ST_NotFound, "updateBlog()", errors);
             }
         } catch (err) {
-            this.sendError(res, this.ST_InternalServerError, "addProduct()", err.message);
+            this.sendError(res, this.ST_InternalServerError, "updateBlog()", err.message);
         };
     }
 
-    async removeProduct(req, res) {
-        console.log(`API blog removeProduct()`);
-        const blogId = req.params.blogId;
+
+    async deleteBlog(req, res) {
+        console.log(`API blog deleteBlog()`);
+        const updaterId = req.currentUser._id;
+        const blogId = req.params.blogid;
         try {
-            var errors = [];
-            var docDetailDTO = new this.blogService.DTO.DocDetailDTO();
-            this.loadDTOFromBody(docDetailDTO, req.body);
-            const blogDTO = await this.blogService.removeProduct(blogId, docDetailDTO, errors);
+            const errors = [];
+            const blogDTO = await this.blogService.deleteBlog(updaterId, blogId, errors);
             if (blogDTO) {
                 this.sendData(res, blogDTO)
             } else {
-                this.sendError(res, this.ST_NotFound, "removeProduct()", errors);
+                this.sendError(res, this.ST_NotFound, "deleteBlog()", errors);
             }
         } catch (err) {
-            this.sendError(res, this.ST_InternalServerError, "removeProduct()", err.message);
+            this.sendError(res, this.ST_InternalServerError, "deleteBlog()", err.message);
         };
     }
 
-    async removeSelection(req, res) {
-        console.log(`API blog removeSelection()`);
-        const docDetailId = req.params.docDetailId;
+    async newComment(req, res) {
+        console.log(`API blog newComment()`);
+        const updaterId = req.currentUser._id;
+        const blogId = req.params.blogid;
         try {
             var errors = [];
-            const blogDTO = await this.blogService.removeSelection(docDetailId, errors);
+            var commentDTO = new this.blogService.DTO.CommentDTO();
+            this.loadDTOFromBody(commentDTO, req.body);
+            const blogDTO = await this.blogService.newComment(updaterId, blogId, commentDTO, errors);
             if (blogDTO) {
                 this.sendData(res, blogDTO)
             } else {
-                this.sendError(res, this.ST_NotFound, "removeSelection()", errors);
+                this.sendError(res, this.ST_NotFound, "newComment()", errors);
             }
         } catch (err) {
-            this.sendError(res, this.ST_InternalServerError, "removeSelection()", err.message);
+            this.sendError(res, this.ST_InternalServerError, "newComment()", err.message);
         };
     }
+
+
+    async updateComment(req, res) {
+        console.log(`API blog updateComment()`);
+        const updaterId = req.currentUser._id;
+        const blogId = req.params.blogid;
+        const commentId = req.params.commentid;
+        try {
+            var errors = [];
+            var commentDTO = new this.blogService.DTO.CommentDTO();
+            this.loadDTOFromBody(commentDTO, req.body);
+            const blogDTO = await this.blogService.updateComment(updaterId, blogId, commentDTO, commentId, errors);
+            if (blogDTO) {
+                this.sendData(res, blogDTO)
+            } else {
+                this.sendError(res, this.ST_NotFound, "updateComment()", errors);
+            }
+        } catch (err) {
+            this.sendError(res, this.ST_InternalServerError, "updateComment()", err.message);
+        };
+    }
+
+    async deleteComment(req, res) {
+        console.log(`API blog removeComment()`);
+        const updaterId = req.currentUser._id;
+        const blogId = req.params.blogid;
+        const commentId = req.params.commentid;
+        try {
+            var errors = [];
+            const blogDTO = await this.blogService.removeComment(updaterId, blogId, commentId, errors);
+            if (blogDTO) {
+                this.sendData(res, blogDTO)
+            } else {
+                this.sendError(res, this.ST_NotFound, "removeComment()", errors);
+            }
+        } catch (err) {
+            this.sendError(res, this.ST_InternalServerError, "removeComment()", err.message);
+        };
+    }
+
 }
 
 module.exports = BlogAPI;

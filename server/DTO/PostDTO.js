@@ -9,6 +9,7 @@ class PostDTO extends BaseDTO {
         this.postText = "";
         this.authorId = "";
         this.postDate = new Date();
+        this.lastUpdate = new Date();
     }
 }
 

@@ -9,6 +9,7 @@ class CommentDTO extends BaseDTO {
         this.commentDate = new Date();
         this.userId = "";
         this.commentText = "";
+        this.lastUpdate = new Date();
 
     }
 }

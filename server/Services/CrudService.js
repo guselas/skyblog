@@ -79,7 +79,7 @@ class CrudService extends BaseService {
 
     //Virtual method
     async checkFieldsId(recordDTO, errors) {
-        var ok = true;
+    var ok = true;
         //TO Be override by the derived service 
         return ok;
     }
