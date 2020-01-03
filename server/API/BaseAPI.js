@@ -138,6 +138,10 @@ class BaseAPI {
         res.status(this.ST_Ok).send(data);
     }
 
+    sendCreated(res, data) {
+        res.status(this.ST_Created).send(data);
+    }
+
     sendError(res, statusCode, error, messages) {
         if (Array.isArray(messages)) {
             messages = messages.join(`\r\n`);

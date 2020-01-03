@@ -1,4 +1,5 @@
 const BaseService = require('./BaseService');
+const fetch = require('node-fetch');
 
 class BlogService extends BaseService {
     constructor(services) {
@@ -7,6 +8,7 @@ class BlogService extends BaseService {
         this.services = services.services;
         this.DAO = services.DAO;
         this.DTO = services.DTO;
+        this.badWords = [{}, {}, {}, {}, {}, {}];
     }
 
     /*
@@ -24,26 +26,34 @@ class BlogService extends BaseService {
     */
 
 
-    async login(email, password, description, errors) {
-        if (!email) {
-            errors.push("email mandatory");
-        } else if (!password) {
-            errors.push("password mandatory");
+    async login(loginDTO, description, errors) {
+        if (!loginDTO.email) {
+            errors.push("email is mandatory");
+        } else if (!loginDTO.password) {
+            errors.push("password is mandatory");
         } else {
-            var users = await this.findUsersByEmail(email);
+            var users = await this.findUsersByEmail(loginDTO.email);
             if (users.length == 0) {
                 errors.push("email not found");
             } else if (users.length > 1) {
                 errors.push("invalid email");
             } else {
-                var result = await this.matchPassword(users[0].id, password);
+                var result = await this.matchPassword(users[0].id, loginDTO.password);
                 if (!result) {
                     errors.push("invalid password");
                 } else {
                     var errors = [];
                     var bearerDTO = await this.createBearer(users[0].id, description, errors);
                     if (bearerDTO) {
-                        return bearerDTO;
+                        let userDAO = await this.DAO.UserDAO.findById(bearerDTO.userId);
+                        if (userDAO) {
+                            userDAO.lastLogin = new Date();
+                            await userDAO.save();
+                            let whoAmIDTO = new this.DTO.WhoAmIDTO();
+                            whoAmIDTO.fromDAO(userDAO);
+                            whoAmIDTO.fromDAO(bearerDTO);
+                            return whoAmIDTO;
+                        }
                     }
                 }
             }
@@ -51,7 +61,25 @@ class BlogService extends BaseService {
         return null;
     }
 
-
+    async register(registerDTO, errors) {
+        if (!registerDTO.email) {
+            errors.push("email is mandatory");
+        } else
+        if (!registerDTO.nickName) {
+            errors.push("NickName is mandatory");
+        } else
+        if (!registerDTO.password) {
+            errors.push("password is mandatory");
+        } else {
+            let userDTO = new this.DTO.UserDTO();
+            userDTO.fromDAO(registerDTO);
+            userDTO = await this.services.usersService.createOne(userDTO, errors);
+            if (userDTO) {
+                return userDTO;
+            }
+        }
+        return null;
+    }
 
     async createBearer(userId, description, errors) {
         try {
@@ -73,6 +101,7 @@ class BlogService extends BaseService {
                 bearerDAO.userId = userId;
                 bearerDAO.description = description;
                 bearerDAO.validUntil = until;
+                bearerDAO.lastAccess = new Date();
                 bearerDAO = await bearerDAO.save();
             }
             var bearerDTO = new this.DTO.BearerDTO();
@@ -85,13 +114,66 @@ class BlogService extends BaseService {
     }
 
     async getAll(filter, errors) {
-        return await this.services.postsService.readAll(filter, errors);
+        let postsDTO = await this.services.postsService.readAll(filter, errors);
+        let blogsDTO = [];
+        for (let postDTO of postsDTO) {
+            let blogDTO = new this.DTO.BlogDTO();
+            let userDAO = await this.DAO.UserDAO.findById(postDTO.userId);
+            if (userDAO) {
+                blogDTO.fromDAO(userDAO);
+            }
+            //Find Comments
+            var comments = await this.DAO.CommentDAO.find({
+                postId: postDTO.id
+            }).limit(1);
+            if (comments) {
+                blogDTO.hasComments = (comments.length > 0);
+            }
+            //Fill post Fields
+            blogDTO.fromDAO(postDTO);
+            blogsDTO.push(blogDTO);
+        }
+        return blogsDTO;
     }
 
     async getOne(blogId, errors) {
-        return await this.services.postsService.readFullOne(blogId, errors);
-    }
+        //we create the result variable
+        let blogDTO = new this.DTO.BlogDTO();
 
+        //we look for the blogHeader fields
+        let postDAO = await this.DAO.PostDAO.findById(blogId);
+        //we look for the complementary blogDTO fields
+        let userDAO = await this.DAO.UserDAO.findById(postDAO.authorId);
+        if (userDAO) {
+            blogDTO.fromDAO(userDAO);
+        }
+        //Find Comments
+        var comments = await this.DAO.CommentDAO.find({
+            postId: postDAO._id
+        });
+        if (comments) {
+            blogDTO.hasComments = (comments.length > 0);
+            let blogCommentsDTO = [];
+            for (let comment of comments) {
+                let blogCommentDTO = new this.DTO.BlogCommentDTO();
+                //we load the user fields 
+                userDAO = await this.DAO.UserDAO.findById(comment.userId);
+                if (userDAO) {
+                    blogCommentDTO.fromDAO(userDAO);
+                }
+                //we load the comment fields
+                blogCommentDTO.fromDAO(comment);
+                //we push into result
+                blogCommentsDTO.push(blogCommentDTO);
+            }
+            //we load the full comments 
+            blogDTO.comments = blogCommentsDTO;
+        }
+        //Fill post Fields
+        blogDTO.fromDAO(postDAO);
+
+        return blogDTO;
+    }
 
     async checkAuthor(authorId, errors) {
         let authorDAO = await this.DAO.UserDAO.findById(authorId);
@@ -110,49 +192,54 @@ class BlogService extends BaseService {
         return authorDAO;
     }
 
-    async newBlog(authorId, errors) {
+    async newBlog(authorId, blogDTO, errors) {
+        if (!this.validateText(blogDTO.postTitle + " " + blogDTO.postText, 5)) {
+            errors.push(`Post too offensive`);
+            return null;
+        }
         //Check author
         let authorDAO = await this.checkAuthor(authorId, errors);
         if (!authorDAO) {
-            return;
+            return null;
         }
         //add new post with field authorId = param
+
         let postDTO = new this.DTO.PostDTO();
-        postDTO.postTitle = "New Post";
-        postDTO.postText = "";
+        postDTO.fromDAO(blogDTO);
         postDTO.authorId = authorId;
         postDTO = await this.services.postsService.createOne(postDTO, errors);
         if (postDTO) {
-            return await this.services.postsService.readFullOne(postDTO.id, errors);
+            return await this.getOne(postDTO.id, errors);
         }
         return null;
     }
 
-    async updateBlog(updaterId, body, blogId, errors) {
+    async updateBlog(updaterId, blogDTO, blogId, errors) {
+        if (!this.validateText(blogDTO.postTitle + " " + blogDTO.postText, 5)) {
+            errors.push(`Post too offensive`);
+            return null;
+        }
         //Check updater
         let updaterDAO = await this.checkAuthor(updaterId, errors);
         if (!updaterDAO) {
-            return;
+            return null;
         }
-        let postDAO = await this.DAO.PostDAO.findById(blogId);
-        if (!postDAO) {
+        let postDTO = await this.services.postsService.readOne(blogId, errors);
+        if (!postDTO) {
             errors.push(`Blog '${blogId}' not found`);
             return null;
         }
         if (!updaterDAO.isAdmin) {
-            if (updaterDAO._id !== postDAO.authorId) {
+            if (updaterDAO._id !== postDTO.authorId) {
                 errors.push(`You're not the author of the post '${blogId}'`);
                 return null;
             }
         }
-        let postDTO = new this.DTO.PostDTO();
-        postDTO.fromDAO(postDAO);
-        postDTO.fromDAO(body);
+        postDTO.fromDAO(blogDTO);
         postDTO.lastUpdate = new Date();
-
         postDTO = await this.services.postsService.updateOne(postDTO, blogId, errors);
         if (postDTO) {
-            return await this.services.postsService.readFullOne(postDTO.id, errors);
+            return await this.getOne(blogId, errors);
         }
         return null;
     }
@@ -160,7 +247,7 @@ class BlogService extends BaseService {
     async deleteBlog(updaterId, blogId, errors) {
         //Check updater
         let updaterDAO = await this.checkAuthor(updaterId, errors);
-        if (!authorDAO) {
+        if (!updaterDAO) {
             return;
         }
         let blogDTO = await this.services.postsService.readOne(blogId, errors);
@@ -193,11 +280,15 @@ class BlogService extends BaseService {
         return await this.services.postsService.deleteOne(blogId, errors);
     }
 
-    async newComment(authorId, blogId, commentDTO, errors) {
+    async newComment(authorId, blogId, blogCommentDTO, errors) {
+        if (!this.validateText(blogCommentDTO.commentText, 5)) {
+            errors.push(`Comment too offensive`);
+            return null;
+        }
         //Check author
         let authorDAO = await this.checkAuthor(authorId, errors);
         if (!authorDAO) {
-            return;
+            return null;
         }
         let postDAO = await this.DAO.PostDAO.findById(blogId);
         if (!postDAO) {
@@ -210,21 +301,26 @@ class BlogService extends BaseService {
                 return null;
             }
         }
+        let commentDTO = new this.DTO.CommentDTO();
+        commentDTO.fromDAO(blogCommentDTO);
         commentDTO.postId = blogId;
         commentDTO.userId = authorId;
-        commentDTO.commentDate = new Date();
         commentDTO = await this.services.commentsService.createOne(commentDTO, errors);
         if (!commentDTO) {
             return null;
         }
-        return this.services.commentsService.readFullOne(commentDTO.id, errors);
+        return await this.getOne(blogId, errors);
     }
 
-    async updateComment(updaterId, blogId, commentDTO, commentId, errors) {
+    async updateComment(updaterId, blogId, blogCommentDTO, commentId, errors) {
+        if (!this.validateText(blogCommentDTO.commentText, 5)) {
+            errors.push(`Comment too offensive`);
+            return null;
+        }
         //Check updater
         let updaterDAO = await this.checkAuthor(updaterId, errors);
-        if (!authorDAO) {
-            return;
+        if (!updaterDAO) {
+            return null;
         }
         let currentCommentDTO = await this.services.commentsService.readOne(commentId, errors);
         if (!currentCommentDTO) {
@@ -242,13 +338,12 @@ class BlogService extends BaseService {
                 return null;
             }
         }
-        currentCommentDTO.commentText = commentDTO.commentText;
-        currentCommentDTO.userId = commentDTO.userId;
-        currentCommentDTO, lastUpdate = new Date();
+        currentCommentDTO.fromDAO(blogCommentDTO);
+        currentCommentDTO.lastUpdate = new Date();
 
-        commentDTO = await this.services.commentsService.updateOne(currentCommentDTO, commentId, errors);
-        if (commentDTO) {
-            return await this.services.commentsService.readFullOne(commentDTO.id, errors);
+        currentCommentDTO = await this.services.commentsService.updateOne(currentCommentDTO, commentId, errors);
+        if (currentCommentDTO) {
+            return await this.getOne(blogId, errors);
         }
         return null;
     }
@@ -256,8 +351,8 @@ class BlogService extends BaseService {
     async deleteComment(updaterId, blogId, commentId, errors) {
         //Check updater
         let updaterDAO = await this.checkAuthor(updaterId, errors);
-        if (!authorDAO) {
-            return;
+        if (!updaterDAO) {
+            return null;
         }
         let commentDTO = await this.services.commentsService.readOne(commentId, errors);
         if (!commentDTO) {
@@ -274,16 +369,74 @@ class BlogService extends BaseService {
                 return null;
             }
         }
-        return await this.services.postsService.deleteOne(commentId, errors);
+        if (await this.services.commentsService.deleteOne(commentId, errors)) {
+            return await this.getOne(blogId, errors);
+        }
+        return null;
     }
 
     //#region Aux methods
+    async seedBadWords() {
+
+        let badWordsDAO = await this.DAO.BadWordDAO.find({}).limit(1);
+        if (badWordsDAO) {
+            if (badWordsDAO.length == 0) {
+                var data = require('../assets/badWords.json');
+                for (let item of data) {
+                    let badWordDAO = new this.DAO.BadWordDAO();
+                    badWordDAO.word = item.word.trim().toLowerCase();
+                    badWordDAO.level = item.level;
+                    await badWordDAO.save();
+                }
+            }
+        }
+        badWordsDAO = await this.DAO.BadWordDAO.find({});
+        for (let badWordDAO of badWordsDAO) {
+            switch (badWordDAO.level) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    this.badWords[badWordDAO.level][badWordDAO.word] = true;
+                    break;
+
+            }
+        }
+
+    }
+
+    async seed() {
+        //seed bad Words
+        await this.seedBadWords()
+    }
+
     async findUsersByEmail(email, errors) {
         return this.services.usersService.findUsersByEmail(email, errors);
     }
 
     async matchPassword(id, password) {
         return this.services.usersService.matchPassword(id, password);
+    }
+
+    validateText(value, level) {
+        if (level > 5) {
+            level = 5;
+        }
+        if (level < 0) {
+            level = 0;
+        }
+        value = value.toLowerCase();
+        let words = value.split(" ");
+        for (let word of words) {
+            for (let n = 0; n <= level; n++) {
+                if (word in this.badWords[n]) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     //#endregion
 

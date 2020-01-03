@@ -5,8 +5,8 @@ const WhoAmIDTO = require('../DTO/WhoAmIDTO');
 
 
 class BlogBearerMW {
-    constructor() {
-        this.currentLogins = [];
+    constructor(currentLogins) {
+        this.currentLogins = currentLogins;
         this.ST_Forbidden = 403;
     }
 
@@ -14,7 +14,11 @@ class BlogBearerMW {
         var ok = false;
         if (req.path == "/api/blog/login") {
             next();
+        } else
+        if (req.path == "/api/blog/register") {
+            next();
         } else {
+
             var authorization = req.headers.authorization;
             if (authorization) {
                 var items = authorization.split(" ");
@@ -25,7 +29,7 @@ class BlogBearerMW {
                             //Clear out of date logins
                             let index = 0;
                             while (index < this.currentLogins.length) {
-                                let item = this.currentLogin[index];
+                                let item = this.currentLogins[index];
                                 if (item.validUntil < new Date()) {
                                     //delete currentLogin
                                     this.currentLogins.splice(index, 1);
@@ -44,33 +48,35 @@ class BlogBearerMW {
                                 }
                             }
                         }
-                        if (!ok) {
-                            var bearerDAO = await BearerDAO.findById(bearerId);
-                            if (bearerDAO) {
+                        var bearerDAO = await BearerDAO.findById(bearerId);
+                        if (bearerDAO) {
+                            if (!ok) {
                                 var userDAO = await UserDAO.findById(bearerDAO.userId);
                                 if (userDAO) {
-                                    let whoAmIDTO = new
-
-                                    bearerDAO.user = userDAO;
-                                    req.currentUser = userDAO;
-                                    this.currentLogins.push(bearerDAO);
+                                    let whoAmIDTO = new WhoAmIDTO();
+                                    whoAmIDTO.fromDAO(userDAO);
+                                    whoAmIDTO.fromDAO(bearerDAO);
+                                    whoAmIDTO.lastAccess = new Date();
+                                    req.currentLogin = whoAmIDTO;
+                                    this.currentLogins.push(whoAmIDTO);
                                     ok = true;
-
                                 }
                             }
+                            bearerDAO.lastAccess = new Date();
+                            bearerDAO.save();
                         }
                         if (ok) {
-
                             next();
                             return;
                         }
                     }
                 }
             }
+            res.status(this.ST_Forbidden).send("Unauthorized");
         }
-        res.status(this.ST_Forbidden).send("Unauthorized");
+
     }
 }
-}
+
 
 module.exports = BlogBearerMW;

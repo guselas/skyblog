@@ -29,7 +29,6 @@ services.DTO.BadWordDTO = BadWordDTO;
 services.DTO.FullBadWordDTO = FullBadWordDTO;
 //#endregion
 
-
 //#region Bearers
 const BearerDAO = require('./DAO/BearerDAO');
 const BearerDTO = require('./DTO/BearerDTO');
@@ -39,7 +38,6 @@ services.DAO.BearerDAO = BearerDAO;
 services.DTO.BearerDTO = BearerDTO;
 services.DTO.FullBearerDTO = FullBearerDTO;
 //#endregion
-
 
 //#region Comments
 const CommentDAO = require('./DAO/CommentDAO');
@@ -61,7 +59,6 @@ services.DTO.PostDTO = PostDTO;
 services.DTO.FullPostDTO = FullPostDTO;
 //#endregion
 
-
 //#region Users
 const UserDAO = require('./DAO/UserDAO');
 const UserDTO = require('./DTO/UserDTO');
@@ -72,11 +69,25 @@ services.DTO.UserDTO = UserDTO;
 services.DTO.FullUserDTO = FullUserDTO;
 //#endregion
 
-//#region Blog
+//#region BlogService
+const LoginDTO = require('./DTO/LoginDTO');
+const RegisterDTO = require('./DTO/RegisterDTO');
+
+const WhoAmIDTO = require('./DTO/WhoAmIDTO');
+const BlogDTO = require('./DTO/BlogDTO');
+const FullBlogDTO = require('./DTO/Full/FullBlogDTO');
+const BlogCommentDTO = require('./DTO/BlogCommentDTO');
+
+
 const BlogService = require('./Services/BlogService');
+services.DTO.LoginDTO = LoginDTO;
+services.DTO.RegisterDTO = RegisterDTO;
+services.DTO.WhoAmIDTO = WhoAmIDTO;
+services.DTO.BlogDTO = BlogDTO;
+services.DTO.FullBlogDTO = FullBlogDTO;
+services.DTO.BlogCommentDTO = BlogCommentDTO;
 
 //#endregion
-
 
 //#region Services
 //We add to the global variables 'services' the new instances of the blogApp Services.
@@ -95,7 +106,8 @@ services.services.blogService = new BlogService(services);
 blogApp.use(bodyParser.json());
 blogApp.use(cors());
 blogApp.use(useragent.express());
-var blogBearerMW = new BlogBearerMW();
+blogApp.currentLogins = [];
+var blogBearerMW = new BlogBearerMW(blogApp.currentLogins);
 blogApp.use(bodyParser.urlencoded({
     extended: false
 }));

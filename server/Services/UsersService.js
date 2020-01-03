@@ -20,6 +20,7 @@ class UserService extends CrudService {
             if (usersDAO.length == 0) {
                 let userDAO = new UserDAO();
                 userDAO.email = 'fr.ruizf@gmail.com';
+                userDAO.nickName = "Guselas";
                 userDAO.password = '123';
                 userDAO.isAuthor = true;
                 userDAO.isBlocked = false;
@@ -33,7 +34,6 @@ class UserService extends CrudService {
     }
 
     async readAll(filter, errors) {
-        this.seed();
         return super.readAll(filter, errors);
     }
 

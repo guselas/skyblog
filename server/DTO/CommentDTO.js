@@ -7,6 +7,7 @@ class CommentDTO extends BaseDTO {
         this.postId = "";
         this.commentDate = new Date();
         this.userId = "";
+        this.isApproved = false;
         this.commentText = "";
         this.lastUpdate = new Date();
 

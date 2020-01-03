@@ -6,8 +6,10 @@ class UserDTO extends BaseDTO {
         super("User");
         //Los inicializo para que cuando el user rellene un userForm si algun dato falta al menos hay un valor por defecto en la BD
         this.email = "";
+        this.nickName = "";
         this.password = "";
         this.isAuthor = false;
+        this.isCommentator = false;
         this.isBlocked = false;
         this.isAdmin = false;
         this.lastLogin = new Date();
