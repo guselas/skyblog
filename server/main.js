@@ -2,14 +2,19 @@
 var mongoose = require('mongoose');
 const express = require('express')
 const bodyParser = require('body-parser');
-const app = express();
+var useragent = require('express-useragent');
+//Used for the blogAPI
+const blogApp = express();
+//Used for the crudAPI
+const crudAppV0 = express();
 
 const cors = require('cors');
-const BearerMiddleWare = require('./middlewares/BearerMiddleWare');
+const BlogBearerMW = require('./middlewares/BlogBearerMW');
+const CrudBearerMW = require('./middlewares/CrudBearerMW');
 //#endregion
 const BaseService = require('./Services/BaseService');
 
-//Aux Variable to kepp the list of all DAOs, DTOs and Services of the app
+//Aux Variable to kepp the list of all DAOs, DTOs and Services of the blogApp
 const Services = require('./Services/Services');
 var services = new Services();
 
@@ -74,7 +79,7 @@ const BlogService = require('./Services/BlogService');
 
 
 //#region Services
-//We add to the global variables 'services' the new instances of the app Services.
+//We add to the global variables 'services' the new instances of the blogApp Services.
 services.services.badWordsService = new BadWordsService(services);
 services.services.bearersService = new BearersService(services);
 services.services.commentsService = new CommentsService(services);
@@ -86,63 +91,79 @@ services.services.blogService = new BlogService(services);
 
 //#endregion
 
-//#region Middlewares
-var bearerMiddleWare = new BearerMiddleWare();
-app.use(bodyParser.urlencoded({
+//#region BlogMW
+blogApp.use(bodyParser.json());
+blogApp.use(cors());
+blogApp.use(useragent.express());
+var blogBearerMW = new BlogBearerMW();
+blogApp.use(bodyParser.urlencoded({
     extended: false
 }));
-app.use(bodyParser.json());
-app.use(cors());
+blogApp.use(blogBearerMW.validate.bind(blogBearerMW));
+//#endregion
 
-app.use(bearerMiddleWare.validate.bind(bearerMiddleWare));
-
+//#region CrudMW
+crudAppV0.use(bodyParser.json());
+crudAppV0.use(cors());
+crudAppV0.use(useragent.express());
+var crudBearerMW = new CrudBearerMW();
+crudAppV0.use(bodyParser.urlencoded({
+    extended: false
+}));
+crudAppV0.use(crudBearerMW.validate.bind(crudBearerMW));
 //#endregion
 
 
 //#region APIs
 //CRUDs APIs
 const BadWordsAPI = require('./API/BadWordsAPI');
+const badWordsAPI = new BadWordsAPI('/api/V0', crudAppV0, services.services);
+
 const BearersAPI = require('./API/BearersAPI');
-const BlogAPI = require('./API/BlogAPI');
+const bearersAPI = new BearersAPI('/api/V0', crudAppV0, services.services);
+
 const CommentsAPI = require('./API/CommentsAPI');
+const commentsAPI = new CommentsAPI('/api/V0', crudAppV0, services.services);
+
 const PostsAPI = require('./API/PostsAPI');
+const postsAPI = new PostsAPI('/api/V0', crudAppV0, services.services);
+
 const UsersAPI = require('./API/UsersAPI');
+const usersAPI = new UsersAPI('/api/V0', crudAppV0, services.services);
 
-//CRUD APIS
-const badWordsAPI = new BadWordsAPI('/api', app, services.services);
-const bearersAPI = new BearersAPI('/api', app, services.services);
-const commentsAPI = new CommentsAPI('/api', app, services.services);
-const postsAPI = new PostsAPI('/api', app, services.services);
-const usersAPI = new UsersAPI('/api', app, services.services);
-
-//BLOG (app) API
-const blogAPI = new BlogAPI('/api', app, services.services);
-
+//BLOG (blogApp) API
+const BlogAPI = require('./API/BlogAPI');
+const blogAPI = new BlogAPI('/api', blogApp, services.services);
 
 //#endregion
 
+async function crudAppInit() {
+    console.log("CrudApp Server listening on port 3001");
+    await crudAppV0.listen(3001);
+    crudAppV0._router.stack.forEach(function (r) {
+        if (r.route && r.route.path) {
+            console.log(`${r.route.stack[0].method}:${r.route.path}`);
+        }
+    })
+}
 
-
-async function appInit() {
+async function blogAppInit() {
     for (let service in services.services) {
-        
         if (services.services[service] instanceof BaseService) {
             await services.services[service].seed();
         }
     }
-    console.log("Server listening on port 3000");
-    await app.listen(3000);
-  
-
+    console.log("BlogApp Server listening on port 3000");
+    await blogApp.listen(3000);
+    blogApp._router.stack.forEach(function (r) {
+        if (r.route && r.route.path) {
+            console.log(`${r.route.stack[0].method}:${r.route.path}`);
+        }
+    })
 }
 
 async function startApp() {
     try {
-        app._router.stack.forEach(function (r) {
-            if (r.route && r.route.path) {
-                console.log(`${r.route.stack[0].method}:${r.route.path}`);
-            }
-        })
         let dbName = 'skyBlog';
         if (process.argv.includes('test')) {
             dbName = 'skyBlogTest';
@@ -153,8 +174,10 @@ async function startApp() {
             useUnifiedTopology: true
         });
         console.log("Mongoose Connected!");
-        appInit();
+        crudAppInit();
+        blogAppInit();
     } catch (error) {
+        console.log(error);
         console.log("Couldn't connect to Mongoose/skyBlog");
     }
 }

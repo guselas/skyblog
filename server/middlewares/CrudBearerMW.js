@@ -2,17 +2,16 @@ const BearerDAO = require('../DAO/BearerDAO');
 const UserDAO = require('../DAO/UserDAO');
 
 
-class BearerMiddleWare {
+class CrudBearerMW {
     constructor() {
         this.currentBearers = [];
         this.ST_Forbidden = 403;
     }
 
     async validate(req, res, next) {
-        if (req.path == "/api/blog/login") {
+        if (req.path == "/api/V0/login") {
             next();
-        }
-        else {
+        } else {
             var authorization = req.headers.authorization;
             if (authorization) {
                 var items = authorization.split(" ");
@@ -33,10 +32,12 @@ class BearerMiddleWare {
                                 if (bearerDAO) {
                                     var userDAO = await UserDAO.findById(bearerDAO.userId);
                                     if (userDAO) {
-                                        bearerDAO.user = userDAO;
-                                        req.currentUser = userDAO;
-                                        this.currentBearers.push(bearerDAO);
-                                        ok = true;
+                                        if (userDAO.isAdmin) {
+                                            bearerDAO.user = userDAO;
+                                            req.currentUser = userDAO;
+                                            this.currentBearers.push(bearerDAO);
+                                            ok = true;
+                                        }
                                     }
                                 }
                             }
@@ -53,4 +54,4 @@ class BearerMiddleWare {
     }
 }
 
-module.exports = BearerMiddleWare;
+module.exports = CrudBearerMW;

@@ -5,11 +5,27 @@ class BlogAPI extends BaseAPI {
         super(uri, app, 'Blog');
         this.blogService = services.blogService;
 
+        //#region Endpoints Model
+        app.get(`${uri}/blog/model/login`, this.loginModel.bind(this));
+        app.get(`${uri}/blog/model/currentuser`, this.currentUserModel.bind(this));
+
+        app.get(`${uri}/blog/model/all`, this.getAllModel.bind(this));
+        app.get(`${uri}/blog/model`, this.getBlogModel.bind(this));
+        app.get(`${uri}/blog/model/post`, this.newBlogModel.bind(this));
+        app.get(`${uri}/blog/model/put`, this.updateBlogModel.bind(this));
+        app.get(`${uri}/blog/model/delete`, this.deleteBlogModel.bind(this));
+
+        app.get(`${uri}/blog/comment/model/post`, this.newCommentModel.bind(this));
+        app.get(`${uri}/blog/comment/model/put`, this.updateCommentModel.bind(this));
+        app.get(`${uri}/blog/comment/model/delete`, this.deleteCommentModel.bind(this));
+        //#endregion
+        //#region Endpoints BlogApp
+
+        app.post(`${uri}/blog/login`, this.login.bind(this));
+        app.get(`${uri}/blog/whoami`, this.getLoggedUser.bind(this));
+
         app.get(`${uri}/blog`, this.getAll.bind(this));
         app.get(`${uri}/blog/:blogid`, this.getBlog.bind(this));
-
-        app.post(`${uri}/blog/login`, this.bearerLogin.bind(this));
-
 
         app.post(`${uri}/blog`, this.newBlog.bind(this));
         app.put(`${uri}/blog/:blogid`, this.updateBlog.bind(this));
@@ -19,45 +35,77 @@ class BlogAPI extends BaseAPI {
         app.put(`${uri}/blog/:blogid/comment/:commentid`, this.updateComment.bind(this));
         app.delete(`${uri}/blog/comment/:commentid`, this.deleteComment.bind(this));
 
+        //#endregion
+    }
+    //#region Models
+
+    async loginModel(req, res) {
+        this.sendData(res, {
+            email: "email",
+            password: "password"
+        });
+    }
+
+    async currentUserModel(req,res){
 
     }
-    //#region Login
 
-    async bearerLogin(req, res) {
+    async getAllModel(req,res){
+
+    }
+
+    async getBlogModel(req,res){
+
+    }
+
+    async newBlogModel(req,res){
+
+    }
+
+    async updateBlogModel(req,res){
+
+    }
+
+    async deleteBlogModel(req,res){
+
+    }
+
+    async newCommentModel(req,res){
+
+    }
+
+    async updateCommentModel(req,res){
+
+    }
+
+    async deleteCommentModel(req,res){
+
+    }
+    //#endregion
+
+    //#region Login
+    async login(req, res) {
         const email = req.body.email;
         const password = req.body.password;
-        const description = req.body.description;
-        if (!email) {
-            this.sendError(res, this.ST_BadRequest, "email mandatory");
-        } else if (!password) {
-            this.sendError(res, this.ST_BadRequest, "password mandatory");
+        const description = JSON.stringify({
+            ip: req.ip,
+            agent: req.useragent
+        });
+        var errors = [];
+        var bearerDTO = await this.blogService.login(email, password, description, errors);
+        if (bearerDTO) {
+            this.sendData(res, {
+                Authorization: `Bearer ${bearerDTO.id}`
+            });
         } else {
-            var users = await this.blogService.findUsersByEmail(email);
-            if (users.length == 0) {
-                this.sendError(res, this.ST_NotFound, "email not found");
-            } else if (users.length > 1) {
-                this.sendError(res, this.ST_Conflict, "invalid email");
-            } else {
-                var result = await this.blogService.matchPassword(users[0].id, password);
-                if (!result) {
-                    this.sendError(res, this.ST_BadRequest, "invalid password");
-                } else {
-                    var errors = [];
-                    var bearerDTO = await this.blogService.createBearer(users[0].id, description, errors);
-                    if (bearerDTO) {
-                        this.sendData(res, bearerDTO);
-                    } else {
-                        this.sendError(res, this.ST_Conflict, errors);
-                    }
-                }
-            }
+            this.sendError(res, this.ST_Conflict, errors);
         }
     }
 
     async getLoggedUser(req, res) {
-        var userDTO = new this.crudService.classDTO();
+        var userDTO = new this.blogService.DTO.UserDTO();
         userDTO.fromDAO(req.currentUser);
-        this.sendData(res, userDTO);
+        this.sendData(res, userDTO.putModel());
     }
     //#endregion
 

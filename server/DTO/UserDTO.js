@@ -3,8 +3,7 @@ const BaseDTO = require('./BaseDTO');
 
 class UserDTO extends BaseDTO {
     constructor() {
-        super();
-        this["$type"] = "UserDTO";
+        super("User");
         //Los inicializo para que cuando el user rellene un userForm si algun dato falta al menos hay un valor por defecto en la BD
         this.email = "";
         this.password = "";
@@ -13,6 +12,12 @@ class UserDTO extends BaseDTO {
         this.isAdmin = false;
         this.lastLogin = new Date();
         this.registerDate = new Date();
+    }
+
+    putModel() {
+        this["$type"] = "Put" + this.getName();
+        delete this.password;
+        return this;
     }
 
     postModel() {

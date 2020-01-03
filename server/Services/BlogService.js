@@ -23,44 +23,66 @@ class BlogService extends BaseService {
 
     */
 
-   async findUsersByEmail(email, errors) {
-       return this.services.usersService.findUsersByEmail(email,errors);
-   }
 
-   async matchPassword(id, password) {
-    return this.services.usersService.matchPassword(id,password);
-   }
-
-   async createBearer(userId, description, errors) {
-    try {
-        var filter = {
-            userId: userId,
-            description: description
-        };
-        var bearersDAO = await this.DAO.BearerDAO.find(filter);
-        var bearerDAO;
-        if (bearersDAO) {
-            if (bearersDAO.length > 0) {
-                bearerDAO = bearersDAO[0];
+    async login(email, password, description, errors) {
+        if (!email) {
+            errors.push("email mandatory");
+        } else if (!password) {
+            errors.push("password mandatory");
+        } else {
+            var users = await this.findUsersByEmail(email);
+            if (users.length == 0) {
+                errors.push("email not found");
+            } else if (users.length > 1) {
+                errors.push("invalid email");
+            } else {
+                var result = await this.matchPassword(users[0].id, password);
+                if (!result) {
+                    errors.push("invalid password");
+                } else {
+                    var errors = [];
+                    var bearerDTO = await this.createBearer(users[0].id, description, errors);
+                    if (bearerDTO) {
+                        return bearerDTO;
+                    }
+                }
             }
         }
-        if (!bearerDAO) {
-            bearerDAO = new this.DAO.BearerDAO();
-            var until = new Date();
-            until.setFullYear(until.getFullYear() + 1);
-            bearerDAO.userId = userId;
-            bearerDAO.description = description;
-            bearerDAO.validUntil = until;
-            bearerDAO = await bearerDAO.save();
-        }
-        var bearerDTO = new this.DTO.BearerDTO();
-        bearerDTO.fromDAO(bearerDAO);
-        return bearerDTO;
-    } catch (err) {
-        errors.push(err.message);
+        return null;
     }
-    return null;
-}
+
+
+
+    async createBearer(userId, description, errors) {
+        try {
+            var filter = {
+                userId: userId,
+                description: description
+            };
+            var bearersDAO = await this.DAO.BearerDAO.find(filter);
+            var bearerDAO;
+            if (bearersDAO) {
+                if (bearersDAO.length > 0) {
+                    bearerDAO = bearersDAO[0];
+                }
+            }
+            if (!bearerDAO) {
+                bearerDAO = new this.DAO.BearerDAO();
+                var until = new Date();
+                until.setFullYear(until.getFullYear() + 1);
+                bearerDAO.userId = userId;
+                bearerDAO.description = description;
+                bearerDAO.validUntil = until;
+                bearerDAO = await bearerDAO.save();
+            }
+            var bearerDTO = new this.DTO.BearerDTO();
+            bearerDTO.fromDAO(bearerDAO);
+            return bearerDTO;
+        } catch (err) {
+            errors.push(err.message);
+        }
+        return null;
+    }
 
     async getAll(filter, errors) {
         return await this.services.postsService.readAll(filter, errors);
@@ -71,7 +93,7 @@ class BlogService extends BaseService {
     }
 
 
-    async checkAuthor(authorId,errors){
+    async checkAuthor(authorId, errors) {
         let authorDAO = await this.DAO.UserDAO.findById(authorId);
         if (!authorDAO) {
             errors.push(`Author '${authorId}' not found`);
@@ -90,8 +112,8 @@ class BlogService extends BaseService {
 
     async newBlog(authorId, errors) {
         //Check author
-        let authorDAO = await this.checkAuthor(authorId,errors);
-        if(!authorDAO){
+        let authorDAO = await this.checkAuthor(authorId, errors);
+        if (!authorDAO) {
             return;
         }
         //add new post with field authorId = param
@@ -108,8 +130,8 @@ class BlogService extends BaseService {
 
     async updateBlog(updaterId, body, blogId, errors) {
         //Check updater
-        let updaterDAO  = await this.checkAuthor(updaterId,errors);
-        if(!updaterDAO){
+        let updaterDAO = await this.checkAuthor(updaterId, errors);
+        if (!updaterDAO) {
             return;
         }
         let postDAO = await this.DAO.PostDAO.findById(blogId);
@@ -137,8 +159,8 @@ class BlogService extends BaseService {
 
     async deleteBlog(updaterId, blogId, errors) {
         //Check updater
-        let updaterDAO =await this.checkAuthor(updaterId,errors);
-        if(!authorDAO){
+        let updaterDAO = await this.checkAuthor(updaterId, errors);
+        if (!authorDAO) {
             return;
         }
         let blogDTO = await this.services.postsService.readOne(blogId, errors);
@@ -168,13 +190,13 @@ class BlogService extends BaseService {
             return null;
         }
         //delete Blog
-        return await this.services.postsService.deleteOne(blogId,errors);
+        return await this.services.postsService.deleteOne(blogId, errors);
     }
 
     async newComment(authorId, blogId, commentDTO, errors) {
         //Check author
-        let authorDAO = await this.checkAuthor(authorId,errors);
-        if(!authorDAO){
+        let authorDAO = await this.checkAuthor(authorId, errors);
+        if (!authorDAO) {
             return;
         }
         let postDAO = await this.DAO.PostDAO.findById(blogId);
@@ -200,8 +222,8 @@ class BlogService extends BaseService {
 
     async updateComment(updaterId, blogId, commentDTO, commentId, errors) {
         //Check updater
-        let updaterDAO = await this.checkAuthor(updaterId,errors);
-        if(!authorDAO){
+        let updaterDAO = await this.checkAuthor(updaterId, errors);
+        if (!authorDAO) {
             return;
         }
         let currentCommentDTO = await this.services.commentsService.readOne(commentId, errors);
@@ -233,8 +255,8 @@ class BlogService extends BaseService {
 
     async deleteComment(updaterId, blogId, commentId, errors) {
         //Check updater
-        let updaterDAO = await this.checkAuthor(updaterId,errors);
-        if(!authorDAO){
+        let updaterDAO = await this.checkAuthor(updaterId, errors);
+        if (!authorDAO) {
             return;
         }
         let commentDTO = await this.services.commentsService.readOne(commentId, errors);
@@ -252,8 +274,18 @@ class BlogService extends BaseService {
                 return null;
             }
         }
-        return await this.services.postsService.deleteOne(commentId,errors);
+        return await this.services.postsService.deleteOne(commentId, errors);
     }
+
+    //#region Aux methods
+    async findUsersByEmail(email, errors) {
+        return this.services.usersService.findUsersByEmail(email, errors);
+    }
+
+    async matchPassword(id, password) {
+        return this.services.usersService.matchPassword(id, password);
+    }
+    //#endregion
 
 
 }

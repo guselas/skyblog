@@ -1,19 +1,21 @@
 var mongoose = require('mongoose');
 
 class BaseDTO {
-    constructor() {
-        this["$type"] = "BaseDTO";
+    constructor(className) {
+        var name = className + "DTO";
+        this["$type"] = name;
         this.id = "";
         this.rowVersion = 0;
+        this.getName = () => name;
     }
 
     putModel() {
-        this["$type"] = "Put" + this["$type"];
+        this["$type"] = "Put" + this.getName();
         return this;
     }
 
     postModel() {
-        this["$type"] = "Post" + this["$type"];
+        this["$type"] = "Post" + this.getName();
         delete this.id;
         delete this.rowVersion;
         return this;
