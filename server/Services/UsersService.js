@@ -8,11 +8,9 @@ class UserService extends CrudService {
     constructor(services) {
         super('UserService', UserDAO, UserDTO, FullUserDTO, services);
         this.verifyUsers = true;
-
     }
 
     async seed() {
-        console.log(`User seed()`);
         let usersDAO = await UserDAO.find({
             email: 'fr.ruizf@gmail.com'
         }).limit(1);
@@ -28,7 +26,6 @@ class UserService extends CrudService {
                 userDAO.lastLogin = new Date();
                 userDAO.registerDate = new Date();
                 await userDAO.save();
-                console.log(`User seed() fr.ruizf@gmail.com`);
             }
         }
     }
@@ -71,7 +68,6 @@ class UserService extends CrudService {
         return false;
     }
 
-
     async createOne(userDTO, errors) {
         userDTO.normalizeEmail();
         if (await this.canCreateOne(userDTO, errors)) {
@@ -85,7 +81,6 @@ class UserService extends CrudService {
         }
         return null;
     }
-
 
     async canUpdateOne(userDTO, errors) {
         userDTO.normalizeEmail();
@@ -141,7 +136,6 @@ class UserService extends CrudService {
         //end verificaton
         return !hasBearers && !hasPosts && !hasComments;
     }
-
 
     //Aux user's methods
 

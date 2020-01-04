@@ -131,7 +131,6 @@ class BlogAPI extends BaseAPI {
         }
     }
 
-
     async getLoggedUser(req, res) {
         this.sendData(res, req.currentLogin);
     }
@@ -146,30 +145,11 @@ class BlogAPI extends BaseAPI {
     async getAll(req, res) {
         console.log(`API ${this.nameAPI}: getAll(): `);
         //Normalize filterValues from query
-        const filter = {};
-        let recordDAO = new this.blogService.DAO.PostDAO();
-        for (let prop in req.query) {
-            if (prop in recordDAO) {
-                if (typeof recordDAO[prop] == "string") {
-                    filter[prop] = {
-                        $regex: req.query[prop]
-                    };
-                } else if (recordDAO[prop] instanceof Date) {
-                    try {
-                        var dateDirty = new Date(req.query[prop]);
-                        var dateClean = new Date(dateDirty.getFullYear(), dateDirty.getMonth(), dateDirty.getDay());
-                        filter[prop] = dateClean.toISOString();
-                    } catch (error) {
-
-                    }
-                } else {
-                    filter[prop] = req.query[prop];
-                }
-            }
-        }
+        let level = req.query.level;
+        const filter = this.getFilterFromQuery(req);
         try {
             let errors = [];
-            const recordsDTO = await this.blogService.getAll(filter, errors);
+            const recordsDTO = await this.blogService.getAll(level, filter, errors);
             if (recordsDTO) {
                 this.sendData(res, recordsDTO);
             } else {
@@ -315,6 +295,31 @@ class BlogAPI extends BaseAPI {
             this.sendError(res, this.ST_InternalServerError, "removeComment()", err.message);
         };
     }
+
+    getFilterFromQuery(req) {
+        const filter = {};
+        let obj = new this.blogService.DTO.PostDTO().postModel();
+        for (let prop in req.query) {
+            if (prop in obj) {
+                let value = obj[prop];
+                if (typeof value == "string") {
+                    filter[prop] = {
+                        $regex: req.query[prop]
+                    };
+                } else if (value instanceof Date) {
+                    try {
+                        var dateDirty = new Date(req.query[prop]);
+                        var dateClean = new Date(dateDirty.getFullYear(), dateDirty.getMonth(), dateDirty.getDay());
+                        filter[prop] = dateClean.toISOString();
+                    } catch (error) {}
+                } else {
+                    filter[prop] = req.query[prop];
+                }
+            }
+        }
+        return filter;
+    }
+
 
 }
 

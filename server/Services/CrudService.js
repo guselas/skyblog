@@ -7,6 +7,8 @@ class CrudService extends BaseService {
         this.classDAO = classDAO;
         this.classDTO = classDTO;
         this.fullClassDTO = fullClassDTO;
+
+        
         this.services = services.services;
         this.DAO = services.DAO;
         this.DTO = services.DTO;

@@ -4,7 +4,10 @@
   "description": "a server made with node.js, express, mongodb and mongoose",
   "main": "server/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "testCovert": "jest --collect-coverage"
   },
   "repository": {
     "type": "git",
@@ -24,5 +27,12 @@
     "mongoose": "^5.8.3",
     "node-fetch": "^2.6.0",
     "node.js": "0.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "babel-install": "2.1.0",
+    "babel-jest": "^24.9.0",
+    "jest": "^24.9.0"
   }
 }

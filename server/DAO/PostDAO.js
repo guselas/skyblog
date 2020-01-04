@@ -12,4 +12,5 @@ const PostSchema = new Schema({
 });
 
 const PostDAO = mongoose.model('Posts', PostSchema);
+PostDAO.postSchema = PostSchema;
 module.exports = PostDAO;

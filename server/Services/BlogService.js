@@ -113,25 +113,33 @@ class BlogService extends BaseService {
         return null;
     }
 
-    async getAll(filter, errors) {
+    async getAll(level, filter, errors) {
         let postsDTO = await this.services.postsService.readAll(filter, errors);
         let blogsDTO = [];
         for (let postDTO of postsDTO) {
-            let blogDTO = new this.DTO.BlogDTO();
-            let userDAO = await this.DAO.UserDAO.findById(postDTO.userId);
-            if (userDAO) {
-                blogDTO.fromDAO(userDAO);
+            let ok = true;
+            //Filter level
+            if (level) {
+                ok = this.validateText([postDTO.postText, postDTO.postTitle].join(" "), level);
             }
-            //Find Comments
-            var comments = await this.DAO.CommentDAO.find({
-                postId: postDTO.id
-            }).limit(1);
-            if (comments) {
-                blogDTO.hasComments = (comments.length > 0);
+            //Filter passed
+            if (ok) {
+                let blogDTO = new this.DTO.BlogDTO();
+                let userDAO = await this.DAO.UserDAO.findById(postDTO.userId);
+                if (userDAO) {
+                    blogDTO.fromDAO(userDAO);
+                }
+                //Find Comments
+                var comments = await this.DAO.CommentDAO.find({
+                    postId: postDTO.id
+                }).limit(1);
+                if (comments) {
+                    blogDTO.hasComments = (comments.length > 0);
+                }
+                //Fill post Fields
+                blogDTO.fromDAO(postDTO);
+                blogsDTO.push(blogDTO);
             }
-            //Fill post Fields
-            blogDTO.fromDAO(postDTO);
-            blogsDTO.push(blogDTO);
         }
         return blogsDTO;
     }
@@ -377,11 +385,11 @@ class BlogService extends BaseService {
 
     //#region Aux methods
     async seedBadWords() {
-
+        //if the database is empty we load badwords from assets/badwords2.json
         let badWordsDAO = await this.DAO.BadWordDAO.find({}).limit(1);
         if (badWordsDAO) {
             if (badWordsDAO.length == 0) {
-                var data = require('../assets/badWords.json');
+                var data = require('../assets/badWords2.json');
                 for (let item of data) {
                     let badWordDAO = new this.DAO.BadWordDAO();
                     badWordDAO.word = item.word.trim().toLowerCase();
@@ -390,6 +398,7 @@ class BlogService extends BaseService {
                 }
             }
         }
+        //we classify all the database badwords into blogService.badWords array for each level containing their badwords. 
         badWordsDAO = await this.DAO.BadWordDAO.find({});
         for (let badWordDAO of badWordsDAO) {
             switch (badWordDAO.level) {
