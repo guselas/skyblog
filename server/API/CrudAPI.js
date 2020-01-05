@@ -192,7 +192,7 @@ class CrudAPI extends BaseAPI {
             sorter[req.query.orderBy] = 1;
         }
         if (req.query.orderByDesc) {
-            sorter[req.query.orderBy] = -1;
+            sorter[req.query.orderByDesc] = -1;
         }
         for (let prop in req.query) {
             if (prop in recordDAO) {
