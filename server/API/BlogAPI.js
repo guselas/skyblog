@@ -26,7 +26,8 @@ class BlogAPI extends BaseAPI {
         app.get(`${uri}/blog/whoami`, this.getLoggedUser.bind(this));
         app.get(`${uri}/blog/who`, this.getLoggedUsers.bind(this));
 
-
+        app.get(`${uri}/blog/badwords/count`, this.getBadWordsCount.bind(this));
+        app.get(`${uri}/blog/badwords`, this.getBadWords.bind(this));
         app.get(`${uri}/blog`, this.getAll.bind(this));
         app.get(`${uri}/blog/:blogid`, this.getBlog.bind(this));
 
@@ -77,7 +78,6 @@ class BlogAPI extends BaseAPI {
         let model = new this.blogService.DTO.BlogDTO();
         this.sendData(res, model.putModel());
     }
-
 
     async postCommentModel(req, res) {
         let model = new this.blogService.DTO.BlogCommentDTO();
@@ -139,17 +139,23 @@ class BlogAPI extends BaseAPI {
         this.sendData(res, req.app.currentLogins);
     }
     //#endregion
-
-
-
     async getAll(req, res) {
         console.log(`API ${this.nameAPI}: getAll(): `);
         //Normalize filterValues from query
         let level = req.query.level;
+        let pageSize = req.query.pageSize;
+        let pageIndex = req.query.pageIndex;
+        let sorter = {};
+        if (req.query.orderBy) {
+            sorter[req.query.orderBy] = 1;
+        }
+        if (req.query.orderByDesc) {
+            sorter[req.query.orderBy] = -1;
+        }
         const filter = this.getFilterFromQuery(req);
         try {
             let errors = [];
-            const recordsDTO = await this.blogService.getAll(level, filter, errors);
+            const recordsDTO = await this.blogService.getAll(level, filter, sorter, pageSize, pageIndex, errors);
             if (recordsDTO) {
                 this.sendData(res, recordsDTO);
             } else {
@@ -157,6 +163,82 @@ class BlogAPI extends BaseAPI {
             }
         } catch (err) {
             this.sendError(res, this.ST_InternalServerError, "getAll()", err.message);
+        };
+    }
+
+    async getBadWordsCount(req, res) {
+        console.log(`API ${this.nameAPI}: getBadWordsCount(): `);
+        //Normalize filterValues from query
+        let level = req.query.level;
+        const filter = {};
+        let obj = new this.blogService.DTO.BadWordDTO().postModel();
+        for (let prop in req.query) {
+            if (prop in obj) {
+                let value = obj[prop];
+                if (typeof value == "string") {
+                    filter[prop] = {
+                        $regex: req.query[prop]
+                    };
+                } else if (value instanceof Date) {
+                    try {
+                        var dateDirty = new Date(req.query[prop]);
+                        var dateClean = new Date(dateDirty.getFullYear(), dateDirty.getMonth(), dateDirty.getDay());
+                        filter[prop] = dateClean.toISOString();
+                    } catch (error) {}
+                } else {
+                    filter[prop] = req.query[prop];
+                }
+            }
+        }
+        try {
+            let errors = [];
+            const count = await this.blogService.getBadWordsCount(level, filter, errors);
+            if (count) {
+                this.sendData(res, {
+                    total: count
+                });
+            } else {
+                this.sendError(res, this.ST_BadRequest, "getBadWordsCount()", errors);
+            }
+        } catch (err) {
+            this.sendError(res, this.ST_InternalServerError, "getBadWordsCount()", err.message);
+        };
+    }
+
+    async getBadWords(req, res) {
+        console.log(`API ${this.nameAPI}: getBadWords(): `);
+        //Normalize filterValues from query
+        let level = req.query.level;
+        const filter = {};
+        let obj = new this.blogService.DTO.BadWordDTO().postModel();
+        for (let prop in req.query) {
+            if (prop in obj) {
+                let value = obj[prop];
+                if (typeof value == "string") {
+                    filter[prop] = {
+                        $regex: req.query[prop]
+                    };
+                } else if (value instanceof Date) {
+                    try {
+                        var dateDirty = new Date(req.query[prop]);
+                        var dateClean = new Date(dateDirty.getFullYear(), dateDirty.getMonth(), dateDirty.getDay());
+                        filter[prop] = dateClean.toISOString();
+                    } catch (error) {}
+                } else {
+                    filter[prop] = req.query[prop];
+                }
+            }
+        }
+        try {
+            let errors = [];
+            const badWords = await this.blogService.getBadWords(level, filter, errors);
+            if (badWords) {
+                this.sendData(res, badWords);
+            } else {
+                this.sendError(res, this.ST_BadRequest, "getBadWords()", errors);
+            }
+        } catch (err) {
+            this.sendError(res, this.ST_InternalServerError, "getBadWords()", err.message);
         };
     }
 
@@ -215,7 +297,6 @@ class BlogAPI extends BaseAPI {
         };
     }
 
-
     async deleteBlog(req, res) {
         console.log(`API blog deleteBlog()`);
         const updaterId = req.currentLogin.userId;
@@ -255,7 +336,6 @@ class BlogAPI extends BaseAPI {
             this.sendError(res, this.ST_InternalServerError, "newComment()", err.message);
         };
     }
-
 
     async updateComment(req, res) {
         console.log(`API blog updateComment()`);
@@ -319,7 +399,6 @@ class BlogAPI extends BaseAPI {
         }
         return filter;
     }
-
 
 }
 

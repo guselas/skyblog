@@ -8,7 +8,7 @@ class CrudService extends BaseService {
         this.classDTO = classDTO;
         this.fullClassDTO = fullClassDTO;
 
-        
+
         this.services = services.services;
         this.DAO = services.DAO;
         this.DTO = services.DTO;
@@ -35,9 +35,39 @@ class CrudService extends BaseService {
         return new this.fullClassDTO();
     }
 
-    async readAll(filter, errors) {
+    async recordsCount(filter, errors) {
+        try {
+            let count = await this.classDAO.where(filter).countDocuments();
+            if (count) {
+                return count;
+            }
+        } catch (error) {
+            errors.push(errors.message);
+        }
+        return null;
+    }
+
+    async readAll(filter, sorter, pageSize, pageIndex, errors) {
+        sorter = this.checkSorter(sorter, this.classDTO);
+        if (!sorter) {
+            sorter = {
+                _id: 1
+            };
+        }
+        if (!pageSize) {
+            pageSize = 10;
+        }
+        if (!pageIndex) {
+            pageIndex = 0;
+        }
+        if ("pageSize" in filter) {
+            delete filter.pageSize;
+        }
+        if ("pageIndex" in filter) {
+            delete filter.pageIndex;
+        }
         let allRecordsDTO = [];
-        let allRecordsDAO = await this.classDAO.find(filter);
+        let allRecordsDAO = await this.classDAO.find(filter).sort(sorter).skip(pageIndex * pageSize).limit(Number(pageSize));
         if (allRecordsDAO) {
             for (let recordDAO of allRecordsDAO) {
                 let recordDTO = new this.classDTO();
@@ -46,8 +76,6 @@ class CrudService extends BaseService {
         }
         return allRecordsDTO;
     }
-
-
 
     async readOne(id, errors) {
         //Busco un registro DAO por su id y si se encuentra lo traspaso a un nuevo registro DTO y lo devuelvo.
@@ -81,7 +109,7 @@ class CrudService extends BaseService {
 
     //Virtual method
     async checkFieldsId(recordDTO, errors) {
-    var ok = true;
+        var ok = true;
         //TO Be override by the derived service 
         return ok;
     }
@@ -145,6 +173,25 @@ class CrudService extends BaseService {
             errors.push(`${this.nameService}.deleteOne(): Id "${id}" not found`);
         }
         return false;
+    }
+
+    checkSorter(sorter, classDTO) {
+        let ok = false;
+        if (sorter) {
+            let result = {};
+            let recordDTO = new classDTO();
+            recordDTO = recordDTO.postModel();
+            for (let field in sorter) {
+                if (field in recordDTO) {
+                    result[field] = sorter[field];
+                    ok = true;
+                }
+            }
+            if (ok) {
+                return result;
+            }
+        }
+        return null;
     }
 
 }

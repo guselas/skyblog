@@ -76,40 +76,39 @@ class BlogContext {
         if (!dbName) {
             dbName = this.dbName;
         }
-        this.connection = await this.mongoose.connect(`mongodb://${host}/${dbName}`, {
+        this.db = await this.mongoose.connect(`mongodb://${host}/${dbName}`, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             connectTimeoutMS: 4000
         });
-        return this.connection;
+        return this.db;
     }
 
-    async prepare() {
-        await this.connect();
-        await this.clearContextData();
+    disconnect() {
+
     }
+
 
     async clearContextData() {
-        if (this.connection) {
+        if (this.db) {
             for (let dao in this.DAO) {
                 await this.DAO[dao].deleteMany({});
             }
         }
     }
-}
 
-test('After clearing the database no records should be found', async () => {
-    let context = new BlogContext("localhost", "skyBlogTest");
-    await context.prepare();
-    expect(context.connection).not.toBe(null);
-    if (context.connection) {
-        for (let dao in context.DAO) {
-            let recordsDAO = await context.DAO[dao].find({}).limit(1);
-            expect(recordsDAO.length).toBe(0);
+    async execTest(fnToTest) {
+        await this.connect();
+        expect(this.db).not.toBe(null);
+        if (this.db) {
+            try {
+                await fnToTest(this);
+            } finally {
+                //await this.disconnect();
+            }
         }
     }
-});
-
+}
 
 async function testCRUDServiceBasic(classDTO, fnFillDummyRecord, crudService, fnCheckRecordFound) {
     let recordDTO = new classDTO();
@@ -118,237 +117,203 @@ async function testCRUDServiceBasic(classDTO, fnFillDummyRecord, crudService, fn
     recordDTO = await crudService.createOne(recordDTO, errors);
     expect(recordDTO).not.toBe(null);
     if (recordDTO) {
-        let recordsDTO = await crudService.readAll({}, errors);
-        expect(recordsDTO).not.toBe(null);
-        if (recordsDTO) {
-            expect(recordsDTO.length).toBe(1);
-            if (recordsDTO.length > 0) {
-                recordDTO = recordsDTO[0];
-                fnCheckRecordFound(recordDTO);
-            }
+        recordDTO = await crudService.readOne(recordDTO.id, errors);
+        expect(recordDTO).not.toBe(null);
+        if (recordDTO) {
+            fnCheckRecordFound(recordDTO);
+            let deleteResult = await crudService.deleteOne(recordDTO.id, errors);
+            expect(deleteResult).toBe(true);
         }
     }
 }
 
+beforeEach(async () => {
+    let context = new BlogContext("localhost", "skyBlogTest");
+    await context.connect();
+    await context.clearContextData();
+    await context.blogService.seed();
+    await context.usersService.seed();
+});
+
+afterAll(async () => {
+    let context = new BlogContext("localhost", "skyBlogTest");
+    await context.connect();
+    expect(context.db).not.toBe(null);
+    if (context.db) {
+        context.db.disconnect();
+    }
+});
+
+test('After doing the blogService.seed(), we should have all the bad words lists + count ', async () => {
+    let context = new BlogContext("localhost", "skyBlogTest");
+    try {
+        await context.execTest(async (context) => {
+            //----------------------------------
+            //code to test
+            //----------------------------------
+            //await context.blogService.seed();
+            let errors = [];
+            let count = await context.blogService.getBadWordsCount(5, {}, errors);
+            expect(count).not.toBe(null);
+            if (count) {
+                expect(count).not.toBe(0);
+            }
+            //----------------------------------
+            //end code to test
+            //----------------------------------
+        });
+    } finally {
+
+    }
+    context.disconnect();
+}, 30000);
 
 test('After inserting one record we should found it', async () => {
     let context = new BlogContext("localhost", "skyBlogTest");
-    await context.prepare();
-    expect(context.connection).not.toBe(null);
-    if (context.connection) {
-        //For badWords
-        await testCRUDServiceBasic(
-            context.DTO.BadWordDTO,
-            (recordDTO) => {
-                recordDTO.word = "asshole";
-                recordDTO.level = 3;
-            },
-            context.badWordsService,
-            (recordDTO) => {
-                expect(recordDTO.word).toBe("asshole");
-                expect(recordDTO.level).toBe(3);
-            });
-        // //For BearerTokens
-        // await testCRUDServiceBasic(
-        //     context.DTO.BadWordDTO,
-        //     (recordDTO) => {
-        //         recordDTO.word = "asshole";
-        //         recordDTO.level = 3;
-        //     },
-        //     context.badWordsService,
-        //     (recordDTO) => {
-        //         expect(recordDTO.word).toBe("asshole");
-        //         expect(recordDTO.level).toBe(3);
-        //     });
-        // //For comments
-        // await testCRUDServiceBasic(
-        //     context.DTO.BadWordDTO,
-        //     (recordDTO) => {
-        //         recordDTO.word = "asshole";
-        //         recordDTO.level = 3;
-        //     },
-        //     context.badWordsService,
-        //     (recordDTO) => {
-        //         expect(recordDTO.word).toBe("asshole");
-        //         expect(recordDTO.level).toBe(3);
-        //     });
-        // //For Posts
-        // await testCRUDServiceBasic(
-        //     context.DTO.BadWordDTO,
-        //     (recordDTO) => {
-        //         recordDTO.word = "asshole";
-        //         recordDTO.level = 3;
-        //     },
-        //     context.badWordsService,
-        //     (recordDTO) => {
-        //         expect(recordDTO.word).toBe("asshole");
-        //         expect(recordDTO.level).toBe(3);
-        //     });
-        // //For Users
-        // await testCRUDServiceBasic(
-        //     context.DTO.BadWordDTO,
-        //     (recordDTO) => {
-        //         recordDTO.word = "asshole";
-        //         recordDTO.level = 3;
-        //     },
-        //     context.badWordsService,
-        //     (recordDTO) => {
-        //         expect(recordDTO.word).toBe("asshole");
-        //         expect(recordDTO.level).toBe(3);
-        //     });
+    try {
+        await context.execTest(async (context) => {
+            //----------------------------------
+            //code to test
+            //----------------------------------
+            await testCRUDServiceBasic(
+                context.DTO.BadWordDTO,
+                (recordDTO) => {
+                    recordDTO.word = "*asshole";
+                    recordDTO.level = 3;
+                },
+                context.badWordsService,
+                (recordDTO) => {
+                    expect(recordDTO.word).toBe("*asshole");
+                    expect(recordDTO.level).toBe(3);
+                });
+            //----------------------------------
+            //end code to test
+            //----------------------------------
+        });
+    } finally {
+
     }
-});
+    context.disconnect();
+}, 30000);
 
 test('Insert a new blog entry without offensive words', async () => {
-    let errors = [];
     let context = new BlogContext("localhost", "skyBlogTest");
-    await context.prepare();
-    expect(context.connection).not.toBe(null);
-    if (context.connection) {
-        await context.blogService.seed();
-        await context.usersService.seed();
-        let usersDTO = await context.usersService.readAll({}, errors);
-        expect(usersDTO).not.toBe(null);
-        if (usersDTO) {
-            expect(usersDTO.length).not.toBe(0);
-            if (usersDTO.length > 0) {
-                let authorDTO = usersDTO[0];
-                let blogDTO = new context.DTO.BlogDTO();
-                let postBlogDTO = blogDTO.postModel();
-                postBlogDTO.postTitle = "Hello World";
-                postBlogDTO.postText = "This post is great";
-                let newBlogDTO = await context.blogService.newBlog(authorDTO.id, postBlogDTO, errors);
-                expect(newBlogDTO).not.toBe(null);
-                expect(newBlogDTO.postTitle).toBe("Hello World");
-                expect(newBlogDTO.postText).toBe("This post is great");
-                expect(newBlogDTO.email).toBe(authorDTO.email);
-                expect(newBlogDTO.nickName).toBe(authorDTO.nickName);
-                expect(newBlogDTO.comments.length).toBe(0);
-
-            }
-        }
-
-    }
-});
-
-test('When insert a blog with an offensive word in the postTittle or in the postText we get "Post too offensive"', async () => {
-    let errors = [];
-    let context = new BlogContext("localhost", "skyBlogTest");
-    await context.prepare();
-    expect(context.connection).not.toBe(null);
-    if (context.connection) {
-        await context.blogService.seed();
-        await context.usersService.seed();
-        let usersDTO = await context.usersService.readAll({}, errors);
-        expect(usersDTO).not.toBe(null);
-        if (usersDTO) {
-            expect(usersDTO.length).not.toBe(0);
-            if (usersDTO.length > 0) {
-                let badWord = "";
-                //we grant that for each level of the offensive words we get at least one offensive word
-                for (let level in context.blogService.badWords) {
-                    for (let word in context.blogService.badWords[level]) {
-                        badWord = word;
-                        break;
-                    }
-                    if (badWord) {
-                        break;
-                    }
-                }
-                expect(badWord).not.toBe("");
-                if (badWord) {
+    try {
+        await context.execTest(async (context) => {
+            //----------------------------------
+            //code to test
+            //----------------------------------
+            let errors = [];
+            await context.blogService.seed();
+            await context.usersService.seed();
+            let usersDTO = await context.usersService.readAll({}, errors);
+            expect(usersDTO).not.toBe(null);
+            if (usersDTO) {
+                expect(usersDTO.length).not.toBe(0);
+                if (usersDTO.length > 0) {
                     let authorDTO = usersDTO[0];
                     let blogDTO = new context.DTO.BlogDTO();
                     let postBlogDTO = blogDTO.postModel();
-                    //Test for postTitle
-                    postBlogDTO.postTitle = `Hello ${badWord}`;
+                    postBlogDTO.postTitle = "Hello World";
                     postBlogDTO.postText = "This post is great";
                     let newBlogDTO = await context.blogService.newBlog(authorDTO.id, postBlogDTO, errors);
-                    expect(newBlogDTO).toBe(null);
-                    expect(errors.length).not.toBe(0);
-                    if (errors.length > 0) {
-                        expect(errors[0]).toBe("Post too offensive");
-                    }
-                    //Test for postText
-                    postBlogDTO.postTitle = `Hello World`;
-                    postBlogDTO.postText = `This post ${badWord} is great`;
-                    newBlogDTO = await context.blogService.newBlog(authorDTO.id, postBlogDTO, errors);
-                    expect(newBlogDTO).toBe(null);
-                    expect(errors.length).not.toBe(0);
-                    if (errors.length > 0) {
-                        expect(errors[0]).toBe("Post too offensive");
-                    }
+                    expect(newBlogDTO).not.toBe(null);
+                    expect(newBlogDTO.postTitle).toBe("Hello World");
+                    expect(newBlogDTO.postText).toBe("This post is great");
+                    expect(newBlogDTO.email).toBe(authorDTO.email);
+                    expect(newBlogDTO.nickName).toBe(authorDTO.nickName);
+                    expect(newBlogDTO.comments.length).toBe(0);
+                    let deleteResult = await context.blogService.deleteBlog(authorDTO.id, newBlogDTO.id, errors);
+                    expect(deleteResult).toBe(true);
                 }
             }
-        }
+            //----------------------------------
+            //end code to test
+            //----------------------------------
+        });
+    } finally {
 
     }
-});
+    context.disconnect();
+}, 30000);
 
-test('When we insert a comment (not offensive) to a blog entry we can read that comment in the blog comments list', async () => {
-    let errors = [];
+test('When insert a blog with an offensive word in the postTittle or in the postText we get "Post too offensive"', async () => {
     let context = new BlogContext("localhost", "skyBlogTest");
-    await context.prepare();
-    expect(context.connection).not.toBe(null);
-    if (context.connection) {
-        await context.blogService.seed();
-        await context.usersService.seed();
-        let usersDTO = await context.usersService.readAll({}, errors);
-        expect(usersDTO).not.toBe(null);
-        if (usersDTO) {
-            expect(usersDTO.length).not.toBe(0);
-            if (usersDTO.length > 0) {
-                let authorDTO = usersDTO[0];
-                let blogDTO = new context.DTO.BlogDTO();
-                let postBlogDTO = blogDTO.postModel();
-                postBlogDTO.postTitle = "Hello World";
-                postBlogDTO.postText = "This post is great";
-                let newBlogDTO = await context.blogService.newBlog(authorDTO.id, postBlogDTO, errors);
-                expect(newBlogDTO).not.toBe(null);
-                if (newBlogDTO) {
-                    let blogCommentDTO = new context.DTO.BlogCommentDTO();
-                    postBlogCommentDTO = blogCommentDTO.postModel();
-                    postBlogCommentDTO.commentText = "This is a comment for this test post";
-                    let updatedBlogDTO = await context.blogService.newComment(authorDTO.id, newBlogDTO.id, postBlogCommentDTO, errors);
-                    expect(updatedBlogDTO).not.toBe(null);
-                    if (updatedBlogDTO) {
-                        expect(updatedBlogDTO.comments.length).not.toBe(0);
-                        if (updatedBlogDTO.comments.length > 0) {
-                            expect(updatedBlogDTO.comments[0].commentText).toBe("This is a comment for this test post");
+    try {
+        await context.execTest(async (context) => {
+            //----------------------------------
+            //code to test
+            //----------------------------------
+            let errors = [];
+            await context.blogService.seed();
+            await context.usersService.seed();
+            let usersDTO = await context.usersService.readAll({}, errors);
+            expect(usersDTO).not.toBe(null);
+            if (usersDTO) {
+                expect(usersDTO.length).not.toBe(0);
+                if (usersDTO.length > 0) {
+                    let badWord = "";
+                    //we grant that for each level of the offensive words we get at least one offensive word
+                    for (let level in context.blogService.badWords) {
+                        for (let word in context.blogService.badWords[level]) {
+                            badWord = word;
+                            break;
+                        }
+                        if (badWord) {
+                            break;
+                        }
+                    }
+                    expect(badWord).not.toBe("");
+                    if (badWord) {
+                        let authorDTO = usersDTO[0];
+                        let blogDTO = new context.DTO.BlogDTO();
+                        let postBlogDTO = blogDTO.postModel();
+                        //Test for postTitle
+                        postBlogDTO.postTitle = `Hello ${badWord}`;
+                        postBlogDTO.postText = "This post is great";
+                        let newBlogDTO = await context.blogService.newBlog(authorDTO.id, postBlogDTO, errors);
+                        expect(newBlogDTO).toBe(null);
+                        expect(errors.length).not.toBe(0);
+                        if (errors.length > 0) {
+                            expect(errors[0]).toBe("Post too offensive");
+                        }
+                        //Test for postText
+                        postBlogDTO.postTitle = `Hello World`;
+                        postBlogDTO.postText = `This post ${badWord} is great`;
+                        newBlogDTO = await context.blogService.newBlog(authorDTO.id, postBlogDTO, errors);
+                        expect(newBlogDTO).toBe(null);
+                        expect(errors.length).not.toBe(0);
+                        if (errors.length > 0) {
+                            expect(errors[0]).toBe("Post too offensive");
                         }
                     }
                 }
             }
-        }
-    }
-});
+            //----------------------------------
+            //end code to test
+            //----------------------------------
+        });
+    } finally {
 
-test('When we insert an OFFENSIVE comment to a blog entry we get "Comment too offensive"', async () => {
-    let errors = [];
+    }
+    context.disconnect();
+}, 30000);
+
+test('When we insert a comment (not offensive) to a blog entry we can read that comment in the blog comments list', async () => {
     let context = new BlogContext("localhost", "skyBlogTest");
-    await context.prepare();
-    expect(context.connection).not.toBe(null);
-    if (context.connection) {
-        await context.blogService.seed();
-        await context.usersService.seed();
-        let usersDTO = await context.usersService.readAll({}, errors);
-        expect(usersDTO).not.toBe(null);
-        if (usersDTO) {
-            expect(usersDTO.length).not.toBe(0);
-            if (usersDTO.length > 0) {
-                let badWord = "";
-                //we grant that for each level of the offensive words we get at least one offensive word
-                for (let level in context.blogService.badWords) {
-                    for (let word in context.blogService.badWords[level]) {
-                        badWord = word;
-                        break;
-                    }
-                    if (badWord) {
-                        break;
-                    }
-                }
-                expect(badWord).not.toBe("");
-                if (badWord) {
+    try {
+        await context.execTest(async (context) => {
+            //----------------------------------
+            //code to test
+            //----------------------------------
+            let errors = [];
+            await context.blogService.seed();
+            await context.usersService.seed();
+            let usersDTO = await context.usersService.readAll({}, errors);
+            expect(usersDTO).not.toBe(null);
+            if (usersDTO) {
+                expect(usersDTO.length).not.toBe(0);
+                if (usersDTO.length > 0) {
                     let authorDTO = usersDTO[0];
                     let blogDTO = new context.DTO.BlogDTO();
                     let postBlogDTO = blogDTO.postModel();
@@ -359,16 +324,87 @@ test('When we insert an OFFENSIVE comment to a blog entry we get "Comment too of
                     if (newBlogDTO) {
                         let blogCommentDTO = new context.DTO.BlogCommentDTO();
                         postBlogCommentDTO = blogCommentDTO.postModel();
-                        postBlogCommentDTO.commentText = `This is a comment ${badWord} for this test post`;
+                        postBlogCommentDTO.commentText = "This is a comment for this test post";
                         let updatedBlogDTO = await context.blogService.newComment(authorDTO.id, newBlogDTO.id, postBlogCommentDTO, errors);
-                        expect(updatedBlogDTO).toBe(null);
-                        expect(errors.length).not.toBe(0);
-                        if (errors.length > 0) {
-                            expect(errors[0]).toBe("Comment too offensive");
+                        expect(updatedBlogDTO).not.toBe(null);
+                        if (updatedBlogDTO) {
+                            expect(updatedBlogDTO.comments.length).not.toBe(0);
+                            if (updatedBlogDTO.comments.length > 0) {
+                                expect(updatedBlogDTO.comments[0].commentText).toBe("This is a comment for this test post");
+                            }
+                            let deleteResult = await context.blogService.deleteBlog(authorDTO.id, updatedBlogDTO.id, errors);
+                            expect(deleteResult).toBe(true);
                         }
                     }
                 }
             }
-        }
+            //----------------------------------
+            //end code to test
+            //----------------------------------
+        });
+    } finally {
+
     }
-});
+    context.disconnect();
+}, 30000);
+
+test('When we insert an OFFENSIVE comment to a blog entry we get "Comment too offensive"', async () => {
+    let context = new BlogContext("localhost", "skyBlogTest");
+    try {
+        await context.execTest(async (context) => {
+            //----------------------------------
+            //code to test
+            //----------------------------------
+            let errors = [];
+            await context.blogService.seed();
+            await context.usersService.seed();
+            let usersDTO = await context.usersService.readAll({}, errors);
+            expect(usersDTO).not.toBe(null);
+            if (usersDTO) {
+                expect(usersDTO.length).not.toBe(0);
+                if (usersDTO.length > 0) {
+                    let badWord = "";
+                    //we grant that for each level of the offensive words we get at least one offensive word
+                    for (let level in context.blogService.badWords) {
+                        for (let word in context.blogService.badWords[level]) {
+                            badWord = word;
+                            break;
+                        }
+                        if (badWord) {
+                            break;
+                        }
+                    }
+                    expect(badWord).not.toBe("");
+                    if (badWord) {
+                        let authorDTO = usersDTO[0];
+                        let blogDTO = new context.DTO.BlogDTO();
+                        let postBlogDTO = blogDTO.postModel();
+                        postBlogDTO.postTitle = "Hello World";
+                        postBlogDTO.postText = "This post is great";
+                        let newBlogDTO = await context.blogService.newBlog(authorDTO.id, postBlogDTO, errors);
+                        expect(newBlogDTO).not.toBe(null);
+                        if (newBlogDTO) {
+                            let blogCommentDTO = new context.DTO.BlogCommentDTO();
+                            postBlogCommentDTO = blogCommentDTO.postModel();
+                            postBlogCommentDTO.commentText = `This is a comment ${badWord} for this test post`;
+                            let updatedBlogDTO = await context.blogService.newComment(authorDTO.id, newBlogDTO.id, postBlogCommentDTO, errors);
+                            expect(updatedBlogDTO).toBe(null);
+                            expect(errors.length).not.toBe(0);
+                            if (errors.length > 0) {
+                                expect(errors[0]).toBe("Comment too offensive");
+                            }
+                            let deleteResult = await context.blogService.deleteBlog(authorDTO.id, newBlogDTO.id, errors);
+                            expect(deleteResult).toBe(true);
+                        }
+                    }
+                }
+            }
+            //----------------------------------
+            //end code to test
+            //----------------------------------
+        });
+    } finally {
+
+    }
+    context.disconnect();
+}, 30000);

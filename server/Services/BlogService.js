@@ -113,8 +113,8 @@ class BlogService extends BaseService {
         return null;
     }
 
-    async getAll(level, filter, errors) {
-        let postsDTO = await this.services.postsService.readAll(filter, errors);
+    async getAll(level, filter, sorter, pageSize, pageIndex, errors) {
+        let postsDTO = await this.services.postsService.readAll(filter, sorter, pageSize, pageIndex, errors);
         let blogsDTO = [];
         for (let postDTO of postsDTO) {
             let ok = true;
@@ -144,43 +144,78 @@ class BlogService extends BaseService {
         return blogsDTO;
     }
 
+    async getBadWordsCount(level, filter, errors) {
+        if (!level) {
+            level = 5;
+        }
+        filter.level = {
+            $lte: level
+        };
+        let count = await this.services.badWordsService.recordsCount(filter, errors);
+        if (count) {
+            return count;
+        }
+        return null;
+    }
+
+
+    async getBadWords(level, filter, errors) {
+        if (!level) {
+            level = 5;
+        }
+        filter.level = {
+            $lte: level
+        };
+        let badWordsDAO = await this.DAO.BadWordDAO.find(filter);
+        if (badWordsDAO) {
+            let result = badWordsDAO.map((item) => item.word);
+            return result;
+        }
+        return null;
+    }
+
     async getOne(blogId, errors) {
         //we create the result variable
         let blogDTO = new this.DTO.BlogDTO();
 
         //we look for the blogHeader fields
         let postDAO = await this.DAO.PostDAO.findById(blogId);
-        //we look for the complementary blogDTO fields
-        let userDAO = await this.DAO.UserDAO.findById(postDAO.authorId);
-        if (userDAO) {
-            blogDTO.fromDAO(userDAO);
-        }
-        //Find Comments
-        var comments = await this.DAO.CommentDAO.find({
-            postId: postDAO._id
-        });
-        if (comments) {
-            blogDTO.hasComments = (comments.length > 0);
-            let blogCommentsDTO = [];
-            for (let comment of comments) {
-                let blogCommentDTO = new this.DTO.BlogCommentDTO();
-                //we load the user fields 
-                userDAO = await this.DAO.UserDAO.findById(comment.userId);
-                if (userDAO) {
-                    blogCommentDTO.fromDAO(userDAO);
-                }
-                //we load the comment fields
-                blogCommentDTO.fromDAO(comment);
-                //we push into result
-                blogCommentsDTO.push(blogCommentDTO);
+        if (!postDAO) {
+            errors.push(`blogId "${blogId}" not found`);
+        } else {
+            //we look for the complementary blogDTO fields
+            let userDAO = await this.DAO.UserDAO.findById(postDAO.authorId);
+            if (userDAO) {
+                blogDTO.fromDAO(userDAO);
             }
-            //we load the full comments 
-            blogDTO.comments = blogCommentsDTO;
-        }
-        //Fill post Fields
-        blogDTO.fromDAO(postDAO);
+            //Find Comments
+            var comments = await this.DAO.CommentDAO.find({
+                postId: postDAO._id
+            });
+            if (comments) {
+                blogDTO.hasComments = (comments.length > 0);
+                let blogCommentsDTO = [];
+                for (let comment of comments) {
+                    let blogCommentDTO = new this.DTO.BlogCommentDTO();
+                    //we load the user fields 
+                    userDAO = await this.DAO.UserDAO.findById(comment.userId);
+                    if (userDAO) {
+                        blogCommentDTO.fromDAO(userDAO);
+                    }
+                    //we load the comment fields
+                    blogCommentDTO.fromDAO(comment);
+                    //we push into result
+                    blogCommentsDTO.push(blogCommentDTO);
+                }
+                //we load the full comments 
+                blogDTO.comments = blogCommentsDTO;
+            }
+            //Fill post Fields
+            blogDTO.fromDAO(postDAO);
 
-        return blogDTO;
+            return blogDTO;
+        }
+        return null;
     }
 
     async checkAuthor(authorId, errors) {
@@ -437,7 +472,7 @@ class BlogService extends BaseService {
             level = 0;
         }
         value = value.toLowerCase();
-        let words = value.split(" ");
+        let words = value.split(/[;!:, ]/).filter(Boolean);
         for (let word of words) {
             for (let n = 0; n <= level; n++) {
                 if (word in this.badWords[n]) {

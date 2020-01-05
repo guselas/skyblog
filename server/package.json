@@ -33,6 +33,7 @@
     "@babel/preset-env": "^7.7.4",
     "babel-install": "2.1.0",
     "babel-jest": "^24.9.0",
-    "jest": "^24.9.0"
+    "jest": "^24.9.0",
+    "jest-serial-runner": "^1.1.0"
   }
 }

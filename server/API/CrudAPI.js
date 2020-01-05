@@ -6,8 +6,8 @@ class CrudAPI extends BaseAPI {
         this.crudService = crudService;
 
         //Aux endPoints
-        app.post(`${this.uri}/seed`, this.seed.bind(this)); 
-        app.post(`${this.uri}/unseed`, this.unseed.bind(this)); 
+        app.post(`${this.uri}/seed`, this.seed.bind(this));
+        app.post(`${this.uri}/unseed`, this.unseed.bind(this));
 
         app.get(`${this.uri}/model/full`, this.fullModel.bind(this));
         app.get(`${this.uri}/model/get`, this.model.bind(this));
@@ -17,13 +17,14 @@ class CrudAPI extends BaseAPI {
         app.get(`${this.uri}/model`, this.model.bind(this));
 
         //CRUD Endpoints
-        app.get(`${this.uri}/:id/full`, this.readFullOne.bind(this)); 
-        app.post(`${this.uri}/`, this.createOne.bind(this)); 
+        app.get(`${this.uri}/:id/full`, this.readFullOne.bind(this));
+        app.post(`${this.uri}/`, this.createOne.bind(this));
 
-        app.get(`${this.uri}/`, this.readAll.bind(this)); 
-        app.get(`${this.uri}/:id`, this.readOne.bind(this)); 
-        app.put(`${this.uri}/:id`, this.updateOne.bind(this)); 
-        app.delete(`${this.uri}/:id`, this.deleteOne.bind(this)); 
+        app.get(`${this.uri}/`, this.readAll.bind(this));
+        app.get(`${this.uri}/count`, this.recordsCount.bind(this));
+        app.get(`${this.uri}/:id`, this.readOne.bind(this));
+        app.put(`${this.uri}/:id`, this.updateOne.bind(this));
+        app.delete(`${this.uri}/:id`, this.deleteOne.bind(this));
 
     }
 
@@ -141,8 +142,8 @@ class CrudAPI extends BaseAPI {
     }
 
     //#region CRUD
-    async readAll(req, res) {
-        console.log(`API ${this.nameAPI}: readAll(): `);
+    async recordsCount(req, res) {
+        console.log(`API ${this.nameAPI}: recordsCount(): `);
         //Normalize filterValues from query
         const filter = {};
         let recordDAO = new this.crudService.classDAO();
@@ -167,7 +168,54 @@ class CrudAPI extends BaseAPI {
         }
         try {
             let errors = [];
-            const recordsDTO = await this.crudService.readAll(filter, errors);
+            const count = await this.crudService.recordsCount(filter, errors);
+            if (count) {
+                this.sendData(res, count);
+            } else {
+                this.sendError(res, this.ST_BadRequest, "recordsCount()", errors);
+            }
+        } catch (err) {
+            this.sendError(res, this.ST_InternalServerError, "recordsCount()", err.message);
+        };
+    }
+
+
+    async readAll(req, res) {
+        console.log(`API ${this.nameAPI}: readAll(): `);
+        //Normalize filterValues from query
+        const filter = {};
+        let recordDAO = new this.crudService.classDAO();
+        let pageSize = req.query.pageSize;
+        let pageIndex = req.query.pageIndex;
+        let sorter = {};
+        if (req.query.orderBy) {
+            sorter[req.query.orderBy] = 1;
+        }
+        if (req.query.orderByDesc) {
+            sorter[req.query.orderBy] = -1;
+        }
+        for (let prop in req.query) {
+            if (prop in recordDAO) {
+                if (recordDAO.schema.obj[prop] == String) {
+                    filter[prop] = {
+                        $regex: req.query[prop]
+                    };
+                } else if (recordDAO.schema.obj[prop] == Date) {
+                    try {
+                        var dateDirty = new Date(req.query[prop]);
+                        var dateClean = new Date(dateDirty.getFullYear(), dateDirty.getMonth(), dateDirty.getDay());
+                        filter[prop] = dateClean.toISOString();
+                    } catch (error) {
+
+                    }
+                } else {
+                    filter[prop] = req.query[prop];
+                }
+            }
+        }
+        try {
+            let errors = [];
+            const recordsDTO = await this.crudService.readAll(filter, sorter, pageSize, pageIndex, errors);
             if (recordsDTO) {
                 this.sendData(res, recordsDTO);
             } else {

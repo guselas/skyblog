@@ -4,6 +4,8 @@ const UserDAO = require('../DAO/UserDAO');
 const UserDTO = require('../DTO/UserDTO');
 const FullUserDTO = require('../DTO/Full/FullUserDTO');
 
+const WhoAmIDTO = require('../DTO/WhoAmIDTO');
+
 class UserService extends CrudService {
     constructor(services) {
         super('UserService', UserDAO, UserDTO, FullUserDTO, services);
@@ -29,6 +31,42 @@ class UserService extends CrudService {
             }
         }
     }
+
+    async login(loginDTO, description, errors) {
+        if (!loginDTO.email) {
+            errors.push("email is mandatory");
+        } else if (!loginDTO.password) {
+            errors.push("password is mandatory");
+        } else {
+            var users = await this.findUsersByEmail(loginDTO.email);
+            if (users.length == 0) {
+                errors.push("email not found");
+            } else if (users.length > 1) {
+                errors.push("invalid email");
+            } else {
+                var result = await this.matchPassword(users[0].id, loginDTO.password);
+                if (!result) {
+                    errors.push("invalid password");
+                } else {
+                    var errors = [];
+                    var bearerDTO = await this.createBearer(users[0].id, description, errors);
+                    if (bearerDTO) {
+                        let userDAO = await this.DAO.UserDAO.findById(bearerDTO.userId);
+                        if (userDAO) {
+                            userDAO.lastLogin = new Date();
+                            await userDAO.save();
+                            let whoAmIDTO = new this.DTO.WhoAmIDTO();
+                            whoAmIDTO.fromDAO(userDAO);
+                            whoAmIDTO.fromDAO(bearerDTO);
+                            return whoAmIDTO;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
     async readAll(filter, errors) {
         return super.readAll(filter, errors);
@@ -181,6 +219,38 @@ class UserService extends CrudService {
             // return await bcrypt.compare(password, userDAO.password);
             return password == userDAO.password;
         }
+    }
+
+    async createBearer(userId, description, errors) {
+        try {
+            var filter = {
+                userId: userId,
+                description: description
+            };
+            var bearersDAO = await this.DAO.BearerDAO.find(filter);
+            var bearerDAO;
+            if (bearersDAO) {
+                if (bearersDAO.length > 0) {
+                    bearerDAO = bearersDAO[0];
+                }
+            }
+            if (!bearerDAO) {
+                bearerDAO = new this.DAO.BearerDAO();
+                var until = new Date();
+                until.setFullYear(until.getFullYear() + 1);
+                bearerDAO.userId = userId;
+                bearerDAO.description = description;
+                bearerDAO.validUntil = until;
+                bearerDAO.lastAccess = new Date();
+                bearerDAO = await bearerDAO.save();
+            }
+            var bearerDTO = new this.DTO.BearerDTO();
+            bearerDTO.fromDAO(bearerDAO);
+            return bearerDTO;
+        } catch (err) {
+            errors.push(err.message);
+        }
+        return null;
     }
 
 }

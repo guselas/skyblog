@@ -118,7 +118,8 @@ blogApp.use(blogBearerMW.validate.bind(blogBearerMW));
 crudAppV0.use(bodyParser.json());
 crudAppV0.use(cors());
 crudAppV0.use(useragent.express());
-var crudBearerMW = new CrudBearerMW();
+crudAppV0.currentLogins = [];
+var crudBearerMW = new CrudBearerMW(crudAppV0.currentLogins);
 crudAppV0.use(bodyParser.urlencoded({
     extended: false
 }));
