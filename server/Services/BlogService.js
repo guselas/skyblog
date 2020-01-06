@@ -120,7 +120,7 @@ class BlogService extends BaseService {
             let ok = true;
             //Filter level
             if (level) {
-                ok = this.validateText([postDTO.postText, postDTO.postTitle].join(" "), level);
+                ok = this.validateText(this.badWords, [postDTO.postText, postDTO.postTitle].join(" "), level);
             }
             //Filter passed
             if (ok) {
@@ -236,7 +236,7 @@ class BlogService extends BaseService {
     }
 
     async newBlog(authorId, blogDTO, errors) {
-        if (!this.validateText(blogDTO.postTitle + " " + blogDTO.postText, 5)) {
+        if (!this.validateText(this.badWords, blogDTO.postTitle + " " + blogDTO.postText, 5)) {
             errors.push(`Post too offensive`);
             return null;
         }
@@ -258,7 +258,7 @@ class BlogService extends BaseService {
     }
 
     async updateBlog(updaterId, blogDTO, blogId, errors) {
-        if (!this.validateText(blogDTO.postTitle + " " + blogDTO.postText, 5)) {
+        if (!this.validateText(this.badWords, blogDTO.postTitle + " " + blogDTO.postText, 5)) {
             errors.push(`Post too offensive`);
             return null;
         }
@@ -324,7 +324,7 @@ class BlogService extends BaseService {
     }
 
     async newComment(authorId, blogId, blogCommentDTO, errors) {
-        if (!this.validateText(blogCommentDTO.commentText, 5)) {
+        if (!this.validateText(this.badWords, blogCommentDTO.commentText, 5)) {
             errors.push(`Comment too offensive`);
             return null;
         }
@@ -356,7 +356,7 @@ class BlogService extends BaseService {
     }
 
     async updateComment(updaterId, blogId, blogCommentDTO, commentId, errors) {
-        if (!this.validateText(blogCommentDTO.commentText, 5)) {
+        if (!this.validateText(this.badWords, blogCommentDTO.commentText, 5)) {
             errors.push(`Comment too offensive`);
             return null;
         }
@@ -419,6 +419,25 @@ class BlogService extends BaseService {
     }
 
     //#region Aux methods
+
+    loadBadWords(fileName) {
+        let badWords = [{}, {}, {}, {}, {}, {}];
+        var data = require(fileName);
+        for (let item of data) {
+            switch (item.level) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    badWords[item.level][item.word] = true;
+                    break;
+            }
+        }
+        return badWords;
+    }
+
     async seedBadWords() {
         //if the database is empty we load badwords from assets/badwords2.json
         let badWordsDAO = await this.DAO.BadWordDAO.find({}).limit(1);
@@ -464,7 +483,7 @@ class BlogService extends BaseService {
         return this.services.usersService.matchPassword(id, password);
     }
 
-    validateText(value, level) {
+    validateText(badWords, value, level) {
         if (level > 5) {
             level = 5;
         }
@@ -475,7 +494,7 @@ class BlogService extends BaseService {
         let words = value.split(/[;!:, ]/).filter(Boolean);
         for (let word of words) {
             for (let n = 0; n <= level; n++) {
-                if (word in this.badWords[n]) {
+                if (word in badWords[n]) {
                     return false;
                 }
             }

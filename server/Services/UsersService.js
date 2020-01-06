@@ -93,15 +93,13 @@ class UserService extends CrudService {
     }
 
     async canCreateOne(userDTO, errors) {
-        userDTO.normalizeEmail();
-        if (await this.checkFieldsId(userDTO, errors)) {
-            var usersByEmail = await this.findUsersByEmail(userDTO.email, errors);
-            if (usersByEmail) {
-                if (usersByEmail.length == 0) {
-                    return true;
-                }
-                errors.push(`${this.nameService}.canCreateOne(): Email "${userDTO.email}" duplicated`);
+        if (await super.canCreateOne(userDTO, errors)) {
+            userDTO.normalizeEmail();
+            var result = await this.areThereUsersByEmail(userDTO.email);
+            if (!result) {
+                return true;
             }
+            errors.push(`${this.nameService}.canCreateOne(): Email "${userDTO.email}" duplicated`);
         }
         return false;
     }
@@ -194,6 +192,19 @@ class UserService extends CrudService {
             }
         }
         return true;
+    }
+
+    async areThereUsersByEmail(email) {
+        email = email.toLowerCase().trim().split(' ').join('');
+        let usersDAO = await this.DAO.UserDAO.find({
+            email: email
+        }).limit(1);
+        if (usersDAO) {
+            if (usersDAO.length > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     async findUsersByEmail(email, errors) {

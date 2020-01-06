@@ -110,24 +110,8 @@ class BlogContext {
     }
 }
 
-async function testCRUDServiceBasic(classDTO, fnFillDummyRecord, crudService, fnCheckRecordFound) {
-    let recordDTO = new classDTO();
-    fnFillDummyRecord(recordDTO);
-    let errors = [];
-    recordDTO = await crudService.createOne(recordDTO, errors);
-    expect(recordDTO).not.toBe(null);
-    if (recordDTO) {
-        recordDTO = await crudService.readOne(recordDTO.id, errors);
-        expect(recordDTO).not.toBe(null);
-        if (recordDTO) {
-            fnCheckRecordFound(recordDTO);
-            let deleteResult = await crudService.deleteOne(recordDTO.id, errors);
-            expect(deleteResult).toBe(true);
-        }
-    }
-}
 
-beforeEach(async () => {
+beforeAll(async () => {
     let context = new BlogContext("localhost", "skyBlogTest");
     await context.connect();
     await context.clearContextData();
@@ -158,34 +142,6 @@ test('After doing the blogService.seed(), we should have all the bad words lists
             if (count) {
                 expect(count).not.toBe(0);
             }
-            //----------------------------------
-            //end code to test
-            //----------------------------------
-        });
-    } finally {
-
-    }
-    context.disconnect();
-}, 30000);
-
-test('After inserting one record we should found it', async () => {
-    let context = new BlogContext("localhost", "skyBlogTest");
-    try {
-        await context.execTest(async (context) => {
-            //----------------------------------
-            //code to test
-            //----------------------------------
-            await testCRUDServiceBasic(
-                context.DTO.BadWordDTO,
-                (recordDTO) => {
-                    recordDTO.word = "*asshole";
-                    recordDTO.level = 3;
-                },
-                context.badWordsService,
-                (recordDTO) => {
-                    expect(recordDTO.word).toBe("*asshole");
-                    expect(recordDTO.level).toBe(3);
-                });
             //----------------------------------
             //end code to test
             //----------------------------------

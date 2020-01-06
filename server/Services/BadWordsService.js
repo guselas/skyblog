@@ -22,9 +22,9 @@ class BadWordsService extends CrudService {
 
     async canUpdateOne(badWordDTO, errors) {
         badWordDTO.normalizeWord();
-        var badWordDAO = await this.DAO.BadWordDAO.findById(id);
+        var badWordDAO = await this.DAO.BadWordDAO.findById(badWordDTO.id);
         if (badWordDAO) {
-            if (await this.verifyWord(badWordDTO, badWordDAO)) {
+            if (await this.verifyUpdatedBadWord(badWordDTO, badWordDAO)) {
                 return true;
             }
             errors.push(`${this.nameService}.canUpdateOne(): word ${badWordDTO.word} already exists`)
@@ -49,7 +49,7 @@ class BadWordsService extends CrudService {
         return badWordsDTO;
     }
 
-    async verifyWord(badWordDTO, badWordDAO) {
+    async verifyUpdatedBadWord(badWordDTO, badWordDAO) {
         if (badWordDTO.word != badWordDAO.word) {
             let words = await this.DAO.BadWordDAO.find({
                 word: badWordDTO.word

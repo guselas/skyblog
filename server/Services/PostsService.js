@@ -20,6 +20,5 @@ class PostService extends CrudService {
             postId: postId
         }, errors);
     }
-
 }
 module.exports = PostService;
