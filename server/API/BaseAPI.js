@@ -110,7 +110,7 @@ class BaseAPI {
             this.sendError(res, this.ST_InternalServerError, `${this.nameAPI}API.seed()`, errors);
         }
     }
-    
+
     async unseed(req, res) {
         console.log(`${this.nameAPI}API: unseed(): `);
         let errors = [];
@@ -160,4 +160,16 @@ class ErrorEventAPI {
     }
 }
 
-module.exports = BaseAPI, ErrorEventAPI;
+class DataBrowseAPI{
+    constructor(){
+        this.pageSize = 10;
+        this.pageNumber = 0;
+        this.totalRecords = 0;
+        this.sorter = {};
+        this.filter = {};
+        this.data = [];
+    }
+
+}
+
+module.exports = {BaseAPI, ErrorEventAPI, DataBrowseAPI};

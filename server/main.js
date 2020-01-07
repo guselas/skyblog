@@ -79,7 +79,6 @@ const BlogDTO = require('./DTO/BlogDTO');
 const FullBlogDTO = require('./DTO/Full/FullBlogDTO');
 const BlogCommentDTO = require('./DTO/BlogCommentDTO');
 
-
 const BlogService = require('./Services/BlogService');
 services.DTO.LoginDTO = LoginDTO;
 services.DTO.RegisterDTO = RegisterDTO;
@@ -97,7 +96,6 @@ services.services.bearersService = new BearersService(services);
 services.services.commentsService = new CommentsService(services);
 services.services.postsService = new PostsService(services);
 services.services.usersService = new UsersService(services);
-
 
 services.services.blogService = new BlogService(services);
 

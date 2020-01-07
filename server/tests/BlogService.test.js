@@ -201,8 +201,10 @@ test('When insert a blog with an offensive word in the postTittle or in the post
             //code to test
             //----------------------------------
             let errors = [];
-            await context.blogService.seed();
             await context.usersService.seed();
+
+            await context.blogService.seed();
+            await context.blogService.checkValidator();
             let usersDTO = await context.usersService.readAll({}, errors);
             expect(usersDTO).not.toBe(null);
             if (usersDTO) {
@@ -210,8 +212,8 @@ test('When insert a blog with an offensive word in the postTittle or in the post
                 if (usersDTO.length > 0) {
                     let badWord = "";
                     //we grant that for each level of the offensive words we get at least one offensive word
-                    for (let level in context.blogService.badWords) {
-                        for (let word in context.blogService.badWords[level]) {
+                    for (let level in context.blogService.validator.badWords) {
+                        for (let word in context.blogService.validator.badWords[level]) {
                             badWord = word;
                             break;
                         }
@@ -231,7 +233,7 @@ test('When insert a blog with an offensive word in the postTittle or in the post
                         expect(newBlogDTO).toBe(null);
                         expect(errors.length).not.toBe(0);
                         if (errors.length > 0) {
-                            expect(errors[0]).toBe("Post too offensive");
+                            expect(errors[0].indexOf("Post too offensive")).toBe(0);
                         }
                         //Test for postText
                         postBlogDTO.postTitle = `Hello World`;
@@ -240,7 +242,7 @@ test('When insert a blog with an offensive word in the postTittle or in the post
                         expect(newBlogDTO).toBe(null);
                         expect(errors.length).not.toBe(0);
                         if (errors.length > 0) {
-                            expect(errors[0]).toBe("Post too offensive");
+                            expect(errors[0].indexOf("Post too offensive")).toBe(0);
                         }
                     }
                 }
@@ -312,8 +314,10 @@ test('When we insert an OFFENSIVE comment to a blog entry we get "Comment too of
             //code to test
             //----------------------------------
             let errors = [];
-            await context.blogService.seed();
             await context.usersService.seed();
+
+            await context.blogService.seed();
+            await context.blogService.checkValidator();
             let usersDTO = await context.usersService.readAll({}, errors);
             expect(usersDTO).not.toBe(null);
             if (usersDTO) {
@@ -321,8 +325,8 @@ test('When we insert an OFFENSIVE comment to a blog entry we get "Comment too of
                 if (usersDTO.length > 0) {
                     let badWord = "";
                     //we grant that for each level of the offensive words we get at least one offensive word
-                    for (let level in context.blogService.badWords) {
-                        for (let word in context.blogService.badWords[level]) {
+                    for (let level in context.blogService.validator.badWords) {
+                        for (let word in context.blogService.validator.badWords[level]) {
                             badWord = word;
                             break;
                         }
@@ -347,7 +351,7 @@ test('When we insert an OFFENSIVE comment to a blog entry we get "Comment too of
                             expect(updatedBlogDTO).toBe(null);
                             expect(errors.length).not.toBe(0);
                             if (errors.length > 0) {
-                                expect(errors[0]).toBe("Comment too offensive");
+                                expect(errors[0].indexOf("Comment too offensive")).toBe(0);
                             }
                             let deleteResult = await context.blogService.deleteBlog(authorDTO.id, newBlogDTO.id, errors);
                             expect(deleteResult).toBe(true);

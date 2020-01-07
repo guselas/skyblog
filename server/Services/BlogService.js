@@ -1,5 +1,5 @@
 const BaseService = require('./BaseService');
-const fetch = require('node-fetch');
+const Validator = require('../Validator/Validator');
 
 class BlogService extends BaseService {
     constructor(services) {
@@ -8,7 +8,7 @@ class BlogService extends BaseService {
         this.services = services.services;
         this.DAO = services.DAO;
         this.DTO = services.DTO;
-        this.badWords = [{}, {}, {}, {}, {}, {}];
+        this.validator = null;
     }
 
     /*
@@ -25,6 +25,12 @@ class BlogService extends BaseService {
 
     */
 
+    async checkValidator() {
+        if (!this.validator) {
+            this.validator = new Validator();
+            await this.validator.loadBadWordsFromDB(this.DAO.BadWordDAO);
+        }
+    }
 
     async login(loginDTO, description, errors) {
         if (!loginDTO.email) {
@@ -113,6 +119,23 @@ class BlogService extends BaseService {
         return null;
     }
 
+    async postsCount(level, filter, errors) {
+        let count = 0;
+        let postsDTO = await this.services.postsService.readAll(filter, errors);
+        for (let postDTO of postsDTO) {
+            let ok = true;
+            //Filter level
+            if (level) {
+                let result = await this.validateText(level, [postDTO.postText, postDTO.postTitle].join(" "));
+                ok = result.ok;
+            }
+            //Filter passed
+            if (ok) {
+                count++;
+            }
+        }
+        return count;
+    }
     async getAll(level, filter, sorter, pageSize, pageIndex, errors) {
         let postsDTO = await this.services.postsService.readAll(filter, sorter, pageSize, pageIndex, errors);
         let blogsDTO = [];
@@ -120,7 +143,8 @@ class BlogService extends BaseService {
             let ok = true;
             //Filter level
             if (level) {
-                ok = this.validateText(this.badWords, [postDTO.postText, postDTO.postTitle].join(" "), level);
+                let result = await this.validateText(level, [postDTO.postText, postDTO.postTitle].join(" "));
+                ok = result.ok;
             }
             //Filter passed
             if (ok) {
@@ -235,8 +259,9 @@ class BlogService extends BaseService {
     }
 
     async newBlog(authorId, blogDTO, errors) {
-        if (!this.validateText(this.badWords, blogDTO.postTitle + " " + blogDTO.postText, 5)) {
-            errors.push(`Post too offensive`);
+        let result = await this.validateText(5,blogDTO.postTitle + " " + blogDTO.postText);
+        if(!result.ok){
+            errors.push(`Post too offensive: ${result.words.join()}`);
             return null;
         }
         //Check author
@@ -257,8 +282,9 @@ class BlogService extends BaseService {
     }
 
     async updateBlog(updaterId, blogDTO, blogId, errors) {
-        if (!this.validateText(this.badWords, blogDTO.postTitle + " " + blogDTO.postText, 5)) {
-            errors.push(`Post too offensive`);
+        let result = await this.validateText(5,blogDTO.postTitle + " " + blogDTO.postText);
+        if(!result.ok){
+            errors.push(`Post too offensive: ${result.words.join()}`);
             return null;
         }
         //Check updater
@@ -323,8 +349,9 @@ class BlogService extends BaseService {
     }
 
     async newComment(authorId, blogId, blogCommentDTO, errors) {
-        if (!this.validateText(this.badWords, blogCommentDTO.commentText, 5)) {
-            errors.push(`Comment too offensive`);
+        let result = await this.validateText(5,blogCommentDTO.commentText);
+        if(!result.ok){
+            errors.push(`Comment too offensive: ${result.words.join()}`);
             return null;
         }
         //Check author
@@ -355,8 +382,9 @@ class BlogService extends BaseService {
     }
 
     async updateComment(updaterId, blogId, blogCommentDTO, commentId, errors) {
-        if (!this.validateText(this.badWords, blogCommentDTO.commentText, 5)) {
-            errors.push(`Comment too offensive`);
+        let result = await this.validateText(5,blogCommentDTO.commentText);
+        if(!result.ok){
+            errors.push(`Comment too offensive: ${result.words.join()}`);
             return null;
         }
         //Check updater
@@ -418,31 +446,12 @@ class BlogService extends BaseService {
     }
 
     //#region Aux methods
-
-    loadBadWords(fileName) {
-        let badWords = [{}, {}, {}, {}, {}, {}];
-        var data = require(fileName);
-        for (let item of data) {
-            switch (item.level) {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                    badWords[item.level][item.word] = true;
-                    break;
-            }
-        }
-        return badWords;
-    }
-
     async seedBadWords() {
         //if the database is empty we load badwords from assets/badwords2.json
         let badWordsDAO = await this.DAO.BadWordDAO.find({}).limit(1);
         if (badWordsDAO) {
             if (badWordsDAO.length == 0) {
-                var data = require('../assets/badWords2.json');
+                var data = require('../Validator/badWords.json');
                 for (let item of data) {
                     let badWordDAO = new this.DAO.BadWordDAO();
                     badWordDAO.word = item.word.trim().toLowerCase();
@@ -451,22 +460,6 @@ class BlogService extends BaseService {
                 }
             }
         }
-        //we classify all the database badwords into blogService.badWords array for each level containing their badwords. 
-        badWordsDAO = await this.DAO.BadWordDAO.find({});
-        for (let badWordDAO of badWordsDAO) {
-            switch (badWordDAO.level) {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                    this.badWords[badWordDAO.level][badWordDAO.word] = true;
-                    break;
-
-            }
-        }
-
     }
 
     async seed() {
@@ -482,23 +475,9 @@ class BlogService extends BaseService {
         return this.services.usersService.matchPassword(id, password);
     }
 
-    validateText(badWords, value, level) {
-        if (level > 5) {
-            level = 5;
-        }
-        if (level < 0) {
-            level = 0;
-        }
-        value = value.toLowerCase();
-        let words = value.split(/[;!:, ]/).filter(Boolean);
-        for (let word of words) {
-            for (let n = 0; n <= level; n++) {
-                if (word in badWords[n]) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    async validateText(level, value) {
+        await this.checkValidator();
+        return this.validator.validate(level, value);
     }
     //#endregion
 }

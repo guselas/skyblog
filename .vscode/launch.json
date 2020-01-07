@@ -5,11 +5,13 @@
     "version": "0.2.0",
     "configurations": [
 
+
         {
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/server/main.js",
+            //"program": "${workspaceFolder}/server/main.js",
+            "program": "${workspaceFolder}/server/validate.js",
             "skipFiles": [
                 "<node_internals>/**"
             ]

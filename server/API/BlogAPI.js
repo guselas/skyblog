@@ -1,4 +1,7 @@
-const BaseAPI = require('./BaseAPI');
+const {
+    BaseAPI,
+    DataBrowseAPI
+} = require('./BaseAPI');
 
 class BlogAPI extends BaseAPI {
     constructor(uri, app, services) {
@@ -142,22 +145,31 @@ class BlogAPI extends BaseAPI {
     async getAll(req, res) {
         console.log(`API ${this.nameAPI}: getAll(): `);
         //Normalize filterValues from query
-        let level = req.query.level;
-        let pageSize = req.query.pageSize;
-        let pageIndex = req.query.pageIndex;
+        let level = !req.query.level ? 5 : req.query.level;
+        let pageSize = !req.query.pageSize ? 10 : req.query.pageSize;
+        let pageIndex = !req.query.pageIndex ? 0 : req.query.pageIndex;
         let sorter = {};
         if (req.query.orderBy) {
             sorter[req.query.orderBy] = 1;
         }
         if (req.query.orderByDesc) {
-            sorter[req.query.orderBy] = -1;
+            sorter[req.query.orderByDesc] = -1;
         }
         const filter = this.getFilterFromQuery(req);
         try {
             let errors = [];
+            const totalRecords = await this.blogService.postsCount(level,filter, errors);
             const recordsDTO = await this.blogService.getAll(level, filter, sorter, pageSize, pageIndex, errors);
             if (recordsDTO) {
-                this.sendData(res, recordsDTO);
+                let dataBrowseAPI = new DataBrowseAPI();
+                dataBrowseAPI.level = level;
+                dataBrowseAPI.filter = filter;
+                dataBrowseAPI.sorter = sorter;
+                dataBrowseAPI.pageSize = pageSize;
+                dataBrowseAPI.pageIndex = pageIndex;
+                dataBrowseAPI.totalRecords = totalRecords;
+                dataBrowseAPI.data = recordsDTO;
+                this.sendData(res, dataBrowseAPI);
             } else {
                 this.sendError(res, this.ST_BadRequest, "getAll()", errors);
             }
