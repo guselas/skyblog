@@ -41,8 +41,6 @@ class UserDTO extends BaseDTO {
         this.checkEmail();
     }
 
-
-
     toDAO(recordDAO) {
         this.normalizeEmail();
         this.normalizeDate("lastLogin");

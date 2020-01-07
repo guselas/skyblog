@@ -27,7 +27,6 @@ class BadWordDTO extends BaseDTO {
         this.normalizeWord();
         return super.toDAO(recordDAO);
     }
-
 }
 
 module.exports = BadWordDTO;

@@ -158,7 +158,6 @@ class BlogService extends BaseService {
         return null;
     }
 
-
     async getBadWords(level, filter, errors) {
         if (!level) {
             level = 5;
@@ -502,8 +501,6 @@ class BlogService extends BaseService {
         return true;
     }
     //#endregion
-
-
 }
 
 

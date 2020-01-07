@@ -94,6 +94,7 @@ class BaseAPI {
     async model(req, res) {
         this.sendData(res, new this.modelClass());
     }
+
     async fullModel(req, res) {
         this.sendData(res, new this.fullModelClass());
     }
@@ -109,6 +110,7 @@ class BaseAPI {
             this.sendError(res, this.ST_InternalServerError, `${this.nameAPI}API.seed()`, errors);
         }
     }
+    
     async unseed(req, res) {
         console.log(`${this.nameAPI}API: unseed(): `);
         let errors = [];

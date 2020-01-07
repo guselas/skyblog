@@ -67,7 +67,6 @@ class UserService extends CrudService {
         return null;
     }
 
-
     async readAll(filter, errors) {
         return super.readAll(filter, errors);
     }

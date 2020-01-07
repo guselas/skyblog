@@ -15,10 +15,9 @@ class ValidatorContext {
                 case 3:
                 case 4:
                 case 5:
-                    console.log(item);
-                    //TODO: arreglar la recuperacionde los bad words para poder ponerlos como bad words.
+                    //console.log(item);
                     badWords[item.level][item.word] = true;
-                    if(counter++ > 10){
+                    if (counter++ > 10) {
                         return badWords;
                     }
                     break;
@@ -56,7 +55,7 @@ function validateText(badWords, value, level) {
 }
 
 // beforeAll(() => {
-    
+
 // });
 
 test('ValidateText checks if the word is offensive', () => {
@@ -77,5 +76,5 @@ test('ValidateText checks if the word is offensive', () => {
     let result = validateText(validatorContext.badWords, `this text contains ${badWord} as offensive word`, 5);
     expect(result.ok).not.toBe(true);
     expect(result.words).toBe([badWord]);
-    
+
 });

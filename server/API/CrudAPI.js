@@ -179,7 +179,6 @@ class CrudAPI extends BaseAPI {
         };
     }
 
-
     async readAll(req, res) {
         console.log(`API ${this.nameAPI}: readAll(): `);
         //Normalize filterValues from query
@@ -274,7 +273,6 @@ class CrudAPI extends BaseAPI {
             this.sendError(res, this.ST_InternalServerError, "createOne()", err.message);
         }
     };
-
 
     async updateOne(req, res) {
         console.log(`API ${this.nameAPI}: updateOne(): `);

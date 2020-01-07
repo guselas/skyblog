@@ -32,7 +32,6 @@ class BadWordsService extends CrudService {
         return false;
     }
 
-
     //#region Aux Functions
     async findBadWordsByWord(word, errors) {
         word = word.toLowerCase().trim();

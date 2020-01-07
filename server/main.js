@@ -11,12 +11,13 @@ const crudAppV0 = express();
 const cors = require('cors');
 const BlogBearerMW = require('./middlewares/BlogBearerMW');
 const CrudBearerMW = require('./middlewares/CrudBearerMW');
-//#endregion
+
 const BaseService = require('./Services/BaseService');
 
 //Aux Variable to kepp the list of all DAOs, DTOs and Services of the blogApp
 const Services = require('./Services/Services');
 var services = new Services();
+//#endregion
 
 //#region BadWords
 const BadWordDAO = require('./DAO/BadWordDAO');
@@ -125,7 +126,6 @@ crudAppV0.use(bodyParser.urlencoded({
 }));
 crudAppV0.use(crudBearerMW.validate.bind(crudBearerMW));
 //#endregion
-
 
 //#region APIs
 //CRUDs APIs

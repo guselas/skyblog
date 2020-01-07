@@ -21,7 +21,6 @@ class BaseDTO {
         return this;
     }
 
-
     setId(recordDAO) {
         this.id = recordDAO._id;
         this.rowVersion = recordDAO.__v;
