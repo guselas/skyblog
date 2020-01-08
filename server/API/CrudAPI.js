@@ -1,15 +1,20 @@
 const {
     BaseAPI,
-    ErrorEventAPI,
     DataBrowseAPI
 } = require('./BaseAPI');
 
+
+//TODO: use router de express!!
+//TODO: Express REST API Generator & boilerPlate
+//TODO: Use passport for auth
+//TODO: Use BrcyptJs for hashing passwords in db
+//TODO: Use JWT token OR OAuth2
 class CrudAPI extends BaseAPI {
     constructor(uri, app, nameAPI, crudService) {
         super(uri, app, nameAPI);
         this.crudService = crudService;
 
-        //Aux endPoints
+        //#region Aux endPoints
         app.post(`${this.uri}/seed`, this.seed.bind(this));
         app.post(`${this.uri}/unseed`, this.unseed.bind(this));
 
@@ -19,8 +24,9 @@ class CrudAPI extends BaseAPI {
         app.get(`${this.uri}/model/put`, this.putModel.bind(this));
 
         app.get(`${this.uri}/model`, this.model.bind(this));
+        //#endregion
 
-        //CRUD Endpoints
+        //#region CRUD Endpoints
         app.get(`${this.uri}/:id/full`, this.readFullOne.bind(this));
         app.post(`${this.uri}/`, this.createOne.bind(this));
 
@@ -29,9 +35,9 @@ class CrudAPI extends BaseAPI {
         app.get(`${this.uri}/:id`, this.readOne.bind(this));
         app.put(`${this.uri}/:id`, this.updateOne.bind(this));
         app.delete(`${this.uri}/:id`, this.deleteOne.bind(this));
-
+        //#endregion
     }
-
+    //#region Crud Models
     async postModel(req, res) {
         console.log(`API ${this.nameAPI}: postModel(): `);
         try {
@@ -144,6 +150,7 @@ class CrudAPI extends BaseAPI {
         }
         return filter;
     }
+    //#endregion
 
     //#region CRUD
     async recordsCount(req, res) {

@@ -87,6 +87,18 @@ class BlogService extends BaseService {
         return null;
     }
 
+    async updateUser(userId, registerDTO, errors) {
+        let userDTO = await this.services.usersService.readOne(userId, errors);
+        if (userDTO) {
+            userDTO.fromDAO(registerDTO);
+            userDTO = await this.services.usersService.updateOne(userDTO, userId, errors);
+            if (userDTO) {
+                return userDTO;
+            }
+        }
+        return null;
+    }
+
     async createBearer(userId, description, errors) {
         try {
             var filter = {
@@ -136,6 +148,7 @@ class BlogService extends BaseService {
         }
         return count;
     }
+    
     async getAll(level, filter, sorter, pageSize, pageIndex, errors) {
         let postsDTO = await this.services.postsService.readAll(filter, sorter, pageSize, pageIndex, errors);
         let blogsDTO = [];

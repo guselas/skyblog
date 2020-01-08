@@ -10,8 +10,8 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            //"program": "${workspaceFolder}/server/main.js",
-            "program": "${workspaceFolder}/server/validate.js",
+            "program": "${workspaceFolder}/server/main.js",
+            //"program": "${workspaceFolder}/server/validate.js",
             "skipFiles": [
                 "<node_internals>/**"
             ]

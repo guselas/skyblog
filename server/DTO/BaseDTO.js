@@ -22,9 +22,14 @@ class BaseDTO {
     }
 
     setId(recordDAO) {
-        this.id = recordDAO._id;
-        this.rowVersion = recordDAO.__v;
+        if ("_id" in recordDAO) {
+            this.id = recordDAO._id;
+        }
+        if ("__v" in recordDAO) {
+            this.rowVersion = recordDAO.__v;
+        }
     }
+
 
     fromDAO(recordDAO) {
         this.setId(recordDAO);

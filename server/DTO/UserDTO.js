@@ -36,7 +36,6 @@ class UserDTO extends BaseDTO {
     normalizeEmail() {
         if (this.email) {
             this.email = this.email.toLowerCase().trim().split(' ').join('');
-
         }
         this.checkEmail();
     }
@@ -44,7 +43,10 @@ class UserDTO extends BaseDTO {
     toDAO(recordDAO) {
         this.normalizeEmail();
         this.normalizeDate("lastLogin");
-        return super.toDAO(recordDAO);
+
+        recordDAO = super.toDAO(recordDAO);
+        recordDAO.normalizedNickName = this.nickName.toLowerCase().trim();
+        return recordDAO;
     }
 
 }

@@ -4,7 +4,7 @@ const UserDAO = require('../DAO/UserDAO');
 const UserDTO = require('../DTO/UserDTO');
 const FullUserDTO = require('../DTO/Full/FullUserDTO');
 
-const WhoAmIDTO = require('../DTO/WhoAmIDTO');
+// const WhoAmIDTO = require('../DTO/WhoAmIDTO');
 
 class UserService extends CrudService {
     constructor(services) {
@@ -71,7 +71,7 @@ class UserService extends CrudService {
         return super.readAll(filter, errors);
     }
 
-    //Virtual method
+    //#region Virtual method 
     async fillFieldsFullDTO(fullUserDTO, errors) {
         fullUserDTO.posts = await this.loadUserPosts(fullUserDTO.id);
         fullUserDTO.comments = await this.loadUserComments(fullUserDTO.id);
@@ -92,15 +92,25 @@ class UserService extends CrudService {
     }
 
     async canCreateOne(userDTO, errors) {
+        let ok = false;
         if (await super.canCreateOne(userDTO, errors)) {
+            ok = true;
+            let result;
+            //Check Email Unique
             userDTO.normalizeEmail();
-            var result = await this.areThereUsersByEmail(userDTO.email);
-            if (!result) {
-                return true;
+            result = await this.areThereUsersByEmail(userDTO.email);
+            if (result) {
+                ok = false;
+                errors.push(`${this.nameService}.canCreateOne(): Email "${userDTO.email}" duplicated`);
             }
-            errors.push(`${this.nameService}.canCreateOne(): Email "${userDTO.email}" duplicated`);
+            //Check NickName Unique
+            result = await this.areThereUsersByNickName(userDTO.nickName);
+            if (result) {
+                ok = false;
+                errors.push(`${this.nameService}.canCreateOne(): NickName "${userDTO.nickName}" duplicated`);
+            }
         }
-        return false;
+        return ok;
     }
 
     async createOne(userDTO, errors) {
@@ -118,22 +128,30 @@ class UserService extends CrudService {
     }
 
     async canUpdateOne(userDTO, errors) {
+        let ok = false;
         userDTO.normalizeEmail();
         if (await this.checkFieldsId(userDTO, errors)) {
-            var userDAO = await this.DAO.UserDAO.findById(id);
+            ok = true;
+            var userDAO = await this.DAO.UserDAO.findById(userDTO.id);
             if (userDAO) {
-                if (await this.verifyEmail(userDTO, userDAO)) {
-                    return true;
+                //check for unique Email
+                if (!await this.verifyEmail(userDTO, userDAO)) {
+                    ok = false;
+                    errors.push(`${this.nameService}.canUpdateOne(): email ${userDTO.email} already exists`);
                 }
-                errors.push(`${this.nameService}.canUpdateOne(): email ${userDTO.email} already exists`)
+                //check for unique NickName
+                if (!await this.verifyNickName(userDTO, userDAO)) {
+                    ok = false;
+                    errors.push(`${this.nameService}.canUpdateOne(): NickName ${userDTO.nickName} already exists`);
+                }
             }
         }
-        return false;
+        return ok;
     }
 
     async canDeleteOne(userId, errors) {
         var hasBearers = false;
-        //Find Comments
+        //Find Bearers
         var bearers = await this.DAO.BearerDAO.find({
             userId: userId
         }).limit(1);
@@ -143,7 +161,6 @@ class UserService extends CrudService {
                 errors.push(`${this.nameService}.canDelete(): the user has Bearers associated`);
             }
         }
-
         var hasPosts = false;
         //Find Posts
         var posts = await this.DAO.PostDAO.find({
@@ -171,9 +188,9 @@ class UserService extends CrudService {
         //end verificaton
         return !hasBearers && !hasPosts && !hasComments;
     }
+    //#endregion
 
-    //Aux user's methods
-
+    //#region Aux user's methods 
     async verifyEmail(userDTO, userDAO) {
         if (userDTO.email != userDAO.email) {
             let emails = await this.DAO.UserDAO.find({
@@ -193,10 +210,42 @@ class UserService extends CrudService {
         return true;
     }
 
+    async verifyNickName(userDTO, userDAO) {
+        if (userDTO.nickName != userDAO.nickName) {
+            let nickNames = await this.DAO.UserDAO.find({
+                nickName: userDTO.nickName
+            }, {
+                nickName: 1,
+                _id: 1
+            });
+            if (nickNames) {
+                for (let nickName in nickNames) {
+                    if (nickName._id != userDAO._id) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     async areThereUsersByEmail(email) {
         email = email.toLowerCase().trim().split(' ').join('');
         let usersDAO = await this.DAO.UserDAO.find({
             email: email
+        }).limit(1);
+        if (usersDAO) {
+            if (usersDAO.length > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    async areThereUsersByNickName(nickName) {
+        let normalizedNickName = nickName.toLowerCase().trim();
+        let usersDAO = await this.DAO.UserDAO.find({
+            normalizedNickName: normalizedNickName
         }).limit(1);
         if (usersDAO) {
             if (usersDAO.length > 0) {
@@ -221,12 +270,27 @@ class UserService extends CrudService {
         return usersDTO;
     }
 
+    async findUsersByNickName(nickName, errors) {
+        let normalizedNickName = nickName.toLowerCase().trim();
+        let usersDTO = [];
+        let usersDAO = await this.DAO.UserDAO.find({
+            normalizedNickName: normalizedNickName
+        });
+        if (usersDAO) {
+            for (let userDAO of usersDAO) {
+                let userDTO = new this.DTO.UserDTO();
+                usersDTO.push(userDTO.fromDAO(userDAO));
+            }
+        }
+        return usersDTO;
+    }
+
     async matchPassword(id, password) {
         var userDAO = await this.DAO.UserDAO.findById(id);
         if (!userDAO) {
             return false;
         } else {
-            // return await bcrypt.compare(password, userDAO.password);
+            //TODO:// return await bcrypt.compare(password, userDAO.password);
             return password == userDAO.password;
         }
     }
@@ -262,6 +326,6 @@ class UserService extends CrudService {
         }
         return null;
     }
-
+    //#endregion
 }
 module.exports = UserService;

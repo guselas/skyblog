@@ -6,7 +6,7 @@ var {
 const CommentSchema = new Schema({
     postId: mongoose.Types.ObjectId,
     commentDate: Date,
-    userId: mongoose.Types.ObjectId,
+    authorId: mongoose.Types.ObjectId,
     isApproved : Boolean,
     commentText: String,
     lastUpdate : Date

@@ -26,6 +26,7 @@ class BlogAPI extends BaseAPI {
 
         app.post(`${uri}/blog/login`, this.login.bind(this));
         app.post(`${uri}/blog/register`, this.register.bind(this));
+        app.put(`${uri}/blog/profile`, this.updateUser.bind(this));
         app.get(`${uri}/blog/whoami`, this.getLoggedUser.bind(this));
         app.get(`${uri}/blog/who`, this.getLoggedUsers.bind(this));
 
@@ -134,6 +135,20 @@ class BlogAPI extends BaseAPI {
         }
     }
 
+    async updateUser(req, res) {
+        let errors = [];
+        let registerDTO = new this.blogService.DTO.RegisterDTO();
+        registerDTO.postModel();
+        this.loadDTOFromBody(registerDTO, req.body);
+        var userDTO = await this.blogService.updateUser(req.currentLogin.userId, registerDTO, errors);
+        if (userDTO) {
+            req.currentLogin.fromDAO(userDTO);
+            this.sendData(res, userDTO);
+        } else {
+            this.sendError(res, this.ST_Conflict, errors);
+        }
+    }
+
     async getLoggedUser(req, res) {
         this.sendData(res, req.currentLogin);
     }
@@ -142,6 +157,8 @@ class BlogAPI extends BaseAPI {
         this.sendData(res, req.app.currentLogins);
     }
     //#endregion
+
+    //#region Blog
     async getAll(req, res) {
         console.log(`API ${this.nameAPI}: getAll(): `);
         //Normalize filterValues from query
@@ -411,7 +428,7 @@ class BlogAPI extends BaseAPI {
         }
         return filter;
     }
-
+//#endregion
 }
 
 module.exports = BlogAPI;

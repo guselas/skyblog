@@ -6,7 +6,7 @@ class FullCommentDTO extends CommentDTO {
     constructor() {
         super();
         this["$type"] = "FullCommentDTO";
-        this.user = new UserDTO();
+        this.author = new UserDTO();
     }
 }
     

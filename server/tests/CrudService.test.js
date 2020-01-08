@@ -217,14 +217,12 @@ async function testCRUDServiceUniqueIndexesUpdating(classDTO, fnFillDummyRecord1
     }
 }
 
-
 beforeAll(async () => {
     let context = new CrudContext("localhost", "skyBlogTest");
     await context.connect();
     await context.clearContextData();
     await context.usersService.seed();
 });
-
 
 test('After inserting one record Bad Word we should found it', async () => {
     let context = new CrudContext("localhost", "skyBlogTest");
@@ -252,7 +250,7 @@ test('After inserting one record Bad Word we should found it', async () => {
 
     }
     context.disconnect();
-}, 30000);
+});
 
 test('Inserting twice the same bad word it fails', async () => {
     let context = new CrudContext("localhost", "skyBlogTest");
@@ -281,7 +279,7 @@ test('Inserting twice the same bad word it fails', async () => {
 
     }
     context.disconnect();
-}, 30000);
+});
 
 test('Updating twice the same bad word it fails', async () => {
     let context = new CrudContext("localhost", "skyBlogTest");
@@ -314,7 +312,7 @@ test('Updating twice the same bad word it fails', async () => {
 
     }
     context.disconnect();
-}, 30000);
+});
 
 test('Inserting a Bearer Token with userId dummy it fails, with new Id it fails, and with the first UserId it runs', async () => {
     let context = new CrudContext("localhost", "skyBlogTest");
@@ -373,7 +371,7 @@ test('Inserting a Bearer Token with userId dummy it fails, with new Id it fails,
 
     }
     context.disconnect();
-}, 30000);
+});
 
 test('Inserting twice the same user it fails', async () => {
     let context = new CrudContext("localhost", "skyBlogTest");
@@ -404,4 +402,4 @@ test('Inserting twice the same user it fails', async () => {
 
     }
     context.disconnect();
-}, 30000);
+});

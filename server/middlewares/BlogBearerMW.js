@@ -18,7 +18,6 @@ class BlogBearerMW {
         if (req.path == "/api/blog/register") {
             next();
         } else {
-
             var authorization = req.headers.authorization;
             if (authorization) {
                 var items = authorization.split(" ");

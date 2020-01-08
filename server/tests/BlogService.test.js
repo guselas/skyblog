@@ -42,7 +42,6 @@ class BlogContext {
         services.services.postsService = new PostsService(services);
         services.services.usersService = new UsersService(services);
 
-
         //Blog Service alone
         services.DTO.BlogDTO = require('../DTO/BlogDTO');
         services.DTO.BlogCommentDTO = require('../DTO/BlogCommentDTO');
@@ -51,7 +50,6 @@ class BlogContext {
         let BlogService = require('../Services/BlogService');
 
         services.services.blogService = new BlogService(services);
-
 
         //We catch the properties of variable services & paste in the context directly as properties. 
         this.services = services.services;
@@ -66,7 +64,6 @@ class BlogContext {
         this.usersService = services.services.usersService;
 
         this.blogService = services.services.blogService;
-
     }
 
     async connect(host, dbName) {
@@ -87,7 +84,6 @@ class BlogContext {
     disconnect() {
 
     }
-
 
     async clearContextData() {
         if (this.db) {
@@ -110,7 +106,6 @@ class BlogContext {
     }
 }
 
-
 beforeAll(async () => {
     let context = new BlogContext("localhost", "skyBlogTest");
     await context.connect();
@@ -128,6 +123,25 @@ afterAll(async () => {
     }
 });
 
+test('If no email at login we should receive "email is mandatory" message', async() => {
+    try {
+        await context.execTest(async (context) => {
+            //----------------------------------
+            //code to test
+            //----------------------------------
+            let errros = [];
+            let email = await context.blogService.login()
+
+            //----------------------------------
+            //end code to test
+            //----------------------------------
+        });
+    } finally {
+
+    }
+    context.disconnect();
+});
+
 test('After doing the blogService.seed(), we should have all the bad words lists + count ', async () => {
     let context = new BlogContext("localhost", "skyBlogTest");
     try {
@@ -135,7 +149,6 @@ test('After doing the blogService.seed(), we should have all the bad words lists
             //----------------------------------
             //code to test
             //----------------------------------
-            //await context.blogService.seed();
             let errors = [];
             let count = await context.blogService.getBadWordsCount(5, {}, errors);
             expect(count).not.toBe(null);
@@ -150,7 +163,7 @@ test('After doing the blogService.seed(), we should have all the bad words lists
 
     }
     context.disconnect();
-}, 30000);
+});
 
 test('Insert a new blog entry without offensive words', async () => {
     let context = new BlogContext("localhost", "skyBlogTest");
@@ -191,7 +204,7 @@ test('Insert a new blog entry without offensive words', async () => {
 
     }
     context.disconnect();
-}, 30000);
+});
 
 test('When insert a blog with an offensive word in the postTittle or in the postText we get "Post too offensive"', async () => {
     let context = new BlogContext("localhost", "skyBlogTest");
@@ -255,7 +268,7 @@ test('When insert a blog with an offensive word in the postTittle or in the post
 
     }
     context.disconnect();
-}, 30000);
+});
 
 test('When we insert a comment (not offensive) to a blog entry we can read that comment in the blog comments list', async () => {
     let context = new BlogContext("localhost", "skyBlogTest");
@@ -304,7 +317,7 @@ test('When we insert a comment (not offensive) to a blog entry we can read that 
 
     }
     context.disconnect();
-}, 30000);
+});
 
 test('When we insert an OFFENSIVE comment to a blog entry we get "Comment too offensive"', async () => {
     let context = new BlogContext("localhost", "skyBlogTest");
@@ -367,4 +380,4 @@ test('When we insert an OFFENSIVE comment to a blog entry we get "Comment too of
 
     }
     context.disconnect();
-}, 30000);
+});

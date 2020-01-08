@@ -16,7 +16,7 @@ class WhoAmIDTO extends BaseDTO {
         this.isAdmin = false;
         this.lastLogin = new Date();
         this.registerDate = new Date();
-
+        //this.BearerToken ??
     }
 
 }

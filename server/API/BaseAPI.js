@@ -3,11 +3,11 @@
 101 Switching Protocols
 102 Processing (WebDAV)
 2xx Success
- 200 OK
- 201 Created
+200 OK
+201 Created
 202 Accepted
 203 Non-Authoritative Information
- 204 No Content
+204 No Content
 205 Reset Content
 206 Partial Content
 207 Multi-Status (WebDAV)
@@ -18,22 +18,22 @@
 301 Moved Permanently
 302 Found
 303 See Other
- 304 Not Modified
+304 Not Modified
 305 Use Proxy
 306 (Unused)
 307 Temporary Redirect
 308 Permanent Redirect (experimental)
 4xx Client Error
- 400 Bad Request
- 401 Unauthorized
+400 Bad Request
+401 Unauthorized
 402 Payment Required
- 403 Forbidden
- 404 Not Found
+403 Forbidden
+404 Not Found
 405 Method Not Allowed
 406 Not Acceptable
 407 Proxy Authentication Required
 408 Request Timeout
- 409 Conflict
+409 Conflict
 410 Gone
 411 Length Required
 412 Precondition Failed
@@ -58,7 +58,7 @@
 451 Unavailable For Legal Reasons
 499 Client Closed Request (Nginx)
 5xx Server Error
- 500 Internal Server Error
+500 Internal Server Error
 501 Not Implemented
 502 Bad Gateway
 503 Service Unavailable
@@ -76,7 +76,7 @@
 
 class BaseAPI {
 
-    constructor(uri, app,nameAPI) {
+    constructor(uri, app, nameAPI) {
         this.ST_Ok = 200;
         this.ST_Created = 201;
         this.ST_Accepted = 202;
@@ -105,8 +105,7 @@ class BaseAPI {
         const result = true;
         if (result) {
             this.sendData(res, result);
-        }
-        else {
+        } else {
             this.sendError(res, this.ST_InternalServerError, `${this.nameAPI}API.seed()`, errors);
         }
     }
@@ -118,8 +117,7 @@ class BaseAPI {
         const result = true;
         if (result) {
             this.sendData(res, deleted)
-        }
-        else {
+        } else {
             this.sendError(res, this.ST_InternalServerError, `${this.nameAPI}API.unseed()`, errors);
         }
     }
@@ -160,8 +158,8 @@ class ErrorEventAPI {
     }
 }
 
-class DataBrowseAPI{
-    constructor(){
+class DataBrowseAPI {
+    constructor() {
         this.pageSize = 10;
         this.pageNumber = 0;
         this.totalRecords = 0;
@@ -172,4 +170,8 @@ class DataBrowseAPI{
 
 }
 
-module.exports = {BaseAPI, ErrorEventAPI, DataBrowseAPI};
+module.exports = {
+    BaseAPI,
+    ErrorEventAPI,
+    DataBrowseAPI
+};

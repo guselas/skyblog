@@ -9,7 +9,7 @@ class BearersService extends CrudService {
         super("BearerService", BearerDAO, BearerDTO, FullBearerDTO, services);
     }
 
-    //override method
+    //overrided method
     async checkFieldsId(bearerDTO, errors) {
         var ok = super.checkFieldsId(bearerDTO, errors);
         if(ok){

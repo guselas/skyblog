@@ -10,7 +10,6 @@ class BearerDTO extends BaseDTO {
         this.validUntil = new Date();
         this.lastAccess = new Date(); 
     }
-
 }
 
 module.exports = BearerDTO;

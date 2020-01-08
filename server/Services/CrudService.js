@@ -8,7 +8,6 @@ class CrudService extends BaseService {
         this.classDTO = classDTO;
         this.fullClassDTO = fullClassDTO;
 
-
         this.services = services.services;
         this.DAO = services.DAO;
         this.DTO = services.DTO;
@@ -19,7 +18,6 @@ class CrudService extends BaseService {
         var postModelDTO = new this.classDTO();
         return postModelDTO.postModel();
     }
-
 
     putModel() {
         //model to use when updateOne()
@@ -89,7 +87,8 @@ class CrudService extends BaseService {
         return null;
     }
 
-    //Virtual method
+    //Aux Methods
+    //#region  Virtual & generic method
     async fillFieldsFullDTO(recordFullDTO, errors) {
         //TO Be override by the derived service 
         return recordFullDTO;
@@ -107,14 +106,12 @@ class CrudService extends BaseService {
         return null;
     }
 
-    //Virtual method
     async checkFieldsId(recordDTO, errors) {
         var ok = true;
         //TO Be override by the derived service 
         return ok;
     }
 
-    //Virtual method
     async canCreateOne(recordDTO, errors) {
         return await this.checkFieldsId(recordDTO, errors);
     }
@@ -129,7 +126,6 @@ class CrudService extends BaseService {
         return null;
     }
 
-    //Virtual method
     async canUpdateOne(recordDTO, errors) {
         return await this.checkFieldsId(recordDTO, errors);
     }
@@ -154,7 +150,6 @@ class CrudService extends BaseService {
         return null;
     }
 
-    //Virtual method
     async canDeleteOne(id, errors) {
         //TO Be override by the derived service 
         var ok = true;
@@ -174,6 +169,7 @@ class CrudService extends BaseService {
         }
         return false;
     }
+    //#endregion
 
     checkSorter(sorter, classDTO) {
         let ok = false;

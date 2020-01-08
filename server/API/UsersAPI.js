@@ -1,8 +1,8 @@
 const CrudAPI = require('./CrudAPI');
 
 class UsersAPI extends CrudAPI {
-    constructor(uri, app,services) {
-        super(uri + '/users', app, "Users",services.usersService);
+    constructor(uri, app, services) {
+        super(uri + '/users', app, "Users", services.usersService);
         app.get(`${uri}/login/model`, this.loginModel.bind(this));
         app.post(`${uri}/login`, this.login.bind(this));
     }
@@ -36,6 +36,8 @@ class UsersAPI extends CrudAPI {
             this.sendError(res, this.ST_Conflict, errors);
         }
     }
+
+
 
 }
 

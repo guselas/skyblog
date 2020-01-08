@@ -14,7 +14,7 @@ class Validator {
                 case 3:
                 case 4:
                 case 5:
-                    this.badWords[item.level][item.word] = Math.random();
+                    this.badWords[item.level][item.word] = true;
                     break;
             }
         }
@@ -59,6 +59,7 @@ class Validator {
         let wordsInTense = value.split(/[;!:, ]/).filter(Boolean);
         for (let word of wordsInTense) {
             for (let n = 0; n <= level; n++) {
+                //is word included in the diccionary for each level?
                 if (word in this.badWords[n]) {
                     badWordsInTense.push(word);
                     break;

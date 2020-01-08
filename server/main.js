@@ -3,6 +3,8 @@ var mongoose = require('mongoose');
 const express = require('express')
 const bodyParser = require('body-parser');
 var useragent = require('express-useragent');
+const https = require('https');
+var fs = require('fs');
 //Used for the blogAPI
 const blogApp = express();
 //Used for the crudAPI
@@ -161,6 +163,7 @@ async function crudAppInit() {
 async function blogAppInit() {
     for (let service in services.services) {
         if (services.services[service] instanceof BaseService) {
+            //to refill the badWords if no badWords in DB
             await services.services[service].seed();
         }
     }
