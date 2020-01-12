@@ -23,7 +23,8 @@ class UserDTO extends BaseDTO {
     }
 
     postModel() {
-        this.password = "";
+        delete this.password;
+        // this.password = "";
         return super.postModel();
     }
 

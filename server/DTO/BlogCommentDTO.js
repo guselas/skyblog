@@ -16,14 +16,14 @@ class BlogCommentDTO extends BaseDTO {
     putModel() {
         this["$type"] = "Put" + this.getName();
         delete this.email;
-        delete this.nickName;
+        // delete this.nickName;
         delete this.lastUpdate;
         return this;
     }
 
     postModel() {
         delete this.email;
-        delete this.nickName;
+        // delete this.nickName;
         delete this.lastUpdate;
         delete this.commentDate;
         return super.postModel();

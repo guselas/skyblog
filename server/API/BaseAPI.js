@@ -90,7 +90,6 @@ class BaseAPI {
         this.nameAPI = nameAPI;
     }
 
-
     async model(req, res) {
         this.sendData(res, new this.modelClass());
     }

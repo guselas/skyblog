@@ -1,11 +1,13 @@
-
 var mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const BearerDAO = new Schema({
+const BearerSchema = new Schema({
     userId: mongoose.Types.ObjectId,
     description: String,
     validUntil : Date,
     lastAccess : Date
 })
-module.exports = mongoose.model('Bearers', BearerDAO);
+
+const BearerDAO =mongoose.model('Bearers', BearerSchema); 
+BearerDAO.postSchema = BearerSchema;
+module.exports = BearerDAO;

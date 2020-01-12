@@ -37,8 +37,6 @@ class UsersAPI extends CrudAPI {
         }
     }
 
-
-
 }
 
 module.exports = UsersAPI;

@@ -87,8 +87,7 @@ class CrudService extends BaseService {
         return null;
     }
 
-    //Aux Methods
-    //#region  Virtual & generic method
+    //#region Aux Virtual & generic methods
     async fillFieldsFullDTO(recordFullDTO, errors) {
         //TO Be override by the derived service 
         return recordFullDTO;

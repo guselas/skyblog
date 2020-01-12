@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const CrudService = require('./CrudService');
 
 const UserDAO = require('../DAO/UserDAO');
@@ -31,6 +32,7 @@ class UserService extends CrudService {
             }
         }
     }
+
 
     async login(loginDTO, description, errors) {
         if (!loginDTO.email) {
@@ -118,8 +120,8 @@ class UserService extends CrudService {
         if (await this.canCreateOne(userDTO, errors)) {
             var userDAO = new this.DAO.UserDAO();
             userDTO.toDAO(userDAO);
-            // userDAO.password = bcrypt.hashSync(userDTO.password);
-            userDAO.password = userDTO.password;
+            userDAO.password = bcrypt.hashSync(userDTO.password);
+            // userDAO.password = userDTO.password;
             userDAO = await userDAO.save();
             userDTO.fromDAO(userDAO);
             return userDTO.putModel();
@@ -290,8 +292,8 @@ class UserService extends CrudService {
         if (!userDAO) {
             return false;
         } else {
-            //TODO:// return await bcrypt.compare(password, userDAO.password);
-            return password == userDAO.password;
+            return await bcrypt.compare(password, userDAO.password);
+            // return password == userDAO.password;
         }
     }
 

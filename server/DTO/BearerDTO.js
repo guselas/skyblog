@@ -1,6 +1,4 @@
-
 const BaseDTO = require('./BaseDTO');
-
 
 class BearerDTO extends BaseDTO {
     constructor() {

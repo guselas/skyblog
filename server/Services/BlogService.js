@@ -10,7 +10,6 @@ class BlogService extends BaseService {
         this.DTO = services.DTO;
         this.validator = null;
     }
-
     /*
             app.get(`${uri}/blog`, this.getAll.bind(this));
             app.get(`${uri}/blog/:blogid`, this.getOne.bind(this));
@@ -24,7 +23,6 @@ class BlogService extends BaseService {
             app.delete(`${uri}/blog/comment/:commentid`, this.deleteComment.bind(this));
 
     */
-
     async checkValidator() {
         if (!this.validator) {
             this.validator = new Validator();
@@ -95,38 +93,6 @@ class BlogService extends BaseService {
             if (userDTO) {
                 return userDTO;
             }
-        }
-        return null;
-    }
-
-    async createBearer(userId, description, errors) {
-        try {
-            var filter = {
-                userId: userId,
-                description: description
-            };
-            var bearersDAO = await this.DAO.BearerDAO.find(filter);
-            var bearerDAO;
-            if (bearersDAO) {
-                if (bearersDAO.length > 0) {
-                    bearerDAO = bearersDAO[0];
-                }
-            }
-            if (!bearerDAO) {
-                bearerDAO = new this.DAO.BearerDAO();
-                var until = new Date();
-                until.setFullYear(until.getFullYear() + 1);
-                bearerDAO.userId = userId;
-                bearerDAO.description = description;
-                bearerDAO.validUntil = until;
-                bearerDAO.lastAccess = new Date();
-                bearerDAO = await bearerDAO.save();
-            }
-            var bearerDTO = new this.DTO.BearerDTO();
-            bearerDTO.fromDAO(bearerDAO);
-            return bearerDTO;
-        } catch (err) {
-            errors.push(err.message);
         }
         return null;
     }
@@ -252,23 +218,6 @@ class BlogService extends BaseService {
             return blogDTO;
         }
         return null;
-    }
-
-    async checkAuthor(authorId, errors) {
-        let authorDAO = await this.DAO.UserDAO.findById(authorId);
-        if (!authorDAO) {
-            errors.push(`Author '${authorId}' not found`);
-            return null;
-        }
-        if (authorDAO.isBlocked) {
-            errors.push(`Author '${authorId}' is blocked`);
-            return null;
-        }
-        if (!authorDAO.isAuthor) {
-            errors.push(`Author '${authorId}' is not an author`);
-            return null;
-        }
-        return authorDAO;
     }
 
     async newBlog(authorId, blogDTO, errors) {
@@ -491,6 +440,59 @@ class BlogService extends BaseService {
     async validateText(level, value) {
         await this.checkValidator();
         return this.validator.validate(level, value);
+    }
+
+    async createBearer(userId, description, errors) {
+        try {
+            var filter = {
+                userId: userId,
+                description: description
+            };
+            console.log("filter ",filter.userId, filter.description);
+            var bearersDAO = await this.DAO.BearerDAO.find(filter);
+            console.log("bearersDAO ",bearersDAO);
+            var bearerDAO;
+            if (bearersDAO) {
+                if (bearersDAO.length > 0) {
+                    bearerDAO = bearersDAO[0];
+                }
+            }
+            if (!bearerDAO) {
+                bearerDAO = new this.DAO.BearerDAO();
+                var until = new Date();
+                until.setFullYear(until.getFullYear() + 1);
+                bearerDAO.userId = userId;
+                bearerDAO.description = description;
+                bearerDAO.validUntil = until;
+                bearerDAO.lastAccess = new Date();
+                bearerDAO = await bearerDAO.save();
+                console.log("bearersDAO after saved: ", bearersDAO);
+            }
+            var bearerDTO = new this.DTO.BearerDTO();
+            bearerDTO.fromDAO(bearerDAO);
+            console.log("bearerDTO",bearerDTO);
+            return bearerDTO;
+        } catch (err) {
+            errors.push(err.message);
+        }
+        return null;
+    }
+
+    async checkAuthor(authorId, errors) {
+        let authorDAO = await this.DAO.UserDAO.findById(authorId);
+        if (!authorDAO) {
+            errors.push(`Author '${authorId}' not found`);
+            return null;
+        }
+        if (authorDAO.isBlocked) {
+            errors.push(`Author '${authorId}' is blocked`);
+            return null;
+        }
+        if (!authorDAO.isAuthor) {
+            errors.push(`Author '${authorId}' is not an author`);
+            return null;
+        }
+        return authorDAO;
     }
     //#endregion
 }

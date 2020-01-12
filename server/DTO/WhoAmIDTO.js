@@ -4,11 +4,13 @@ const BearerDTO = require('./BearerDTO');
 class WhoAmIDTO extends BaseDTO {
     constructor() {
         super("WhoAmI");
-        //Los inicializo para que cuando el user rellene un userForm si algun dato falta al menos hay un valor por defecto en la BD
+        //WhoAmI.Id == BearerDTO.id en MongoDB
+        //From BearerDTO
         this.userId = "";
         this.validUntil = new Date();
         this.lastAccess = new Date();
         
+        //From UserDAO
         this.email = "";
         this.nickName = "";
         this.isAuthor = false;
@@ -16,7 +18,6 @@ class WhoAmIDTO extends BaseDTO {
         this.isAdmin = false;
         this.lastLogin = new Date();
         this.registerDate = new Date();
-        //this.BearerToken ??
     }
 
 }
