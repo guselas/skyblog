@@ -3,9 +3,6 @@ const mongoose = require('mongoose');
 const express = require('express')
 const bodyParser = require('body-parser');
 const useragent = require('express-useragent');
-const https = require('https');
-const fs = require('fs');
-const passport = require('passport');
 //Used for the blogAPI
 const blogApp = express();
 //Used for the crudAPI

@@ -61,7 +61,7 @@ class Validator {
             for (let n = 0; n <= level; n++) {
                 //is word included in the diccionary for each level?
                 if (word in this.badWords[n]) {
-                    badWordsInTense.push(word);
+                    badWordsInTense.push(`${word}:${n}`);
                     break;
                 }
             }

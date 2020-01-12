@@ -170,7 +170,7 @@ class BlogService extends BaseService {
         };
         let badWordsDAO = await this.DAO.BadWordDAO.find(filter);
         if (badWordsDAO) {
-            let result = badWordsDAO.map((item) => item.word);
+            let result = badWordsDAO.map((item) => item.word + " " + item.level);
             return result;
         }
         return null;
