@@ -110,7 +110,7 @@ var blogBearerMW = new BlogBearerMW(blogApp.currentLogins);
 blogApp.use(bodyParser.urlencoded({
     extended: false
 }));
-blogApp.use(blogBearerMW.validate.bind(blogBearerMW));
+// blogApp.use(blogBearerMW.validate.bind(blogBearerMW));
 //#endregion
 
 //#region CrudMW
@@ -144,7 +144,7 @@ const usersAPI = new UsersAPI('/api/V0', crudAppV0, services.services);
 
 //BLOG (blogApp) API
 const BlogAPI = require('./API/BlogAPI');
-const blogAPI = new BlogAPI('/api', blogApp, services.services);
+const blogAPI = new BlogAPI('/api', blogApp, blogBearerMW, services.services);
 
 //#endregion
 

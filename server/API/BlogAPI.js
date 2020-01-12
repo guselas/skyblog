@@ -4,7 +4,7 @@ const {
 } = require('./BaseAPI');
 
 class BlogAPI extends BaseAPI {
-    constructor(uri, app, services) {
+    constructor(uri, app, blogMW, services) {
         super(uri, app, 'Blog');
         this.blogService = services.blogService;
 
@@ -12,7 +12,7 @@ class BlogAPI extends BaseAPI {
         app.get(`${uri}/blog/login/model`, this.loginModel.bind(this));
         app.get(`${uri}/blog/register/model`, this.registerModel.bind(this));
         app.get(`${uri}/blog/whoami/model`, this.whoAmIModel.bind(this));
-        app.get(`${uri}/blog/who/model`, this.whoModel.bind(this));
+        app.get(`${uri}/blog/who/model`, blogMW.isAuthenticated.bind(this), this.whoModel.bind(this));
         app.get(`${uri}/blog/all/model`, this.getAllModel.bind(this));
 
         app.get(`${uri}/blog/model`, this.getBlogModel.bind(this));
@@ -26,20 +26,26 @@ class BlogAPI extends BaseAPI {
 
         app.post(`${uri}/blog/login`, this.login.bind(this));
         app.post(`${uri}/blog/register`, this.register.bind(this));
-        app.put(`${uri}/blog/profile`, this.updateUser.bind(this));
-        app.get(`${uri}/blog/whoami`, this.getLoggedUser.bind(this));
-        app.get(`${uri}/blog/who`, this.getLoggedUsers.bind(this));
+        app.put(`${uri}/blog/profile`, blogMW.isAuthenticated.bind(this), this.updateUser.bind(this));
+        app.get(`${uri}/blog/whoami`, blogMW.isAuthenticated.bind(this), this.getLoggedUser.bind(this));
+        app.get(`${uri}/blog/who`, blogMW.isAdmin.bind(this), this.getLoggedUsers.bind(this));
 
-        app.get(`${uri}/blog/badwords/count`, this.getBadWordsCount.bind(this));
-        app.get(`${uri}/blog/badwords`, this.getBadWords.bind(this));
+
+        app.post(`${uri}/blog/badwords`, blogMW.isAdmin.bind(this), this.addBadWord.bind(this));
+        app.put(`${uri}/blog/badwords/:badwordid`, blogMW.isAdmin.bind(this), this.updateBadWord.bind(this));
+        app.delete(`${uri}/blog/badwords/:badwordid`, blogMW.isAdmin.bind(this), this.deleteBadWord.bind(this));
+
+        app.get(`${uri}/blog/badwords/count`, blogMW.isAdmin.bind(this), this.getBadWordsCount.bind(this));
+        app.get(`${uri}/blog/badwords`, blogMW.isAdmin.bind(this), this.getBadWords.bind(this));
+
         app.get(`${uri}/blog`, this.getAll.bind(this));
         app.get(`${uri}/blog/:blogid`, this.getBlog.bind(this));
 
-        app.post(`${uri}/blog`, this.newBlog.bind(this));
+        app.post(`${uri}/blog`, blogMW.isAuthor.bind(this), this.newBlog.bind(this));
         app.put(`${uri}/blog/:blogid`, this.updateBlog.bind(this));
         app.delete(`${uri}/blog/:blogid`, this.deleteBlog.bind(this));
 
-        app.post(`${uri}/blog/:blogid/comment`, this.newComment.bind(this));
+        app.post(`${uri}/blog/:blogid/comment`, blogMW.isAuthor.bind(this), this.newComment.bind(this));
         app.put(`${uri}/blog/:blogid/comment/:commentid`, this.updateComment.bind(this));
         app.delete(`${uri}/blog/:blogid/comment/:commentid`, this.deleteComment.bind(this));
 
@@ -175,7 +181,7 @@ class BlogAPI extends BaseAPI {
         const filter = this.getFilterFromQuery(req);
         try {
             let errors = [];
-            const totalRecords = await this.blogService.postsCount(level,filter, errors);
+            const totalRecords = await this.blogService.postsCount(level, filter, errors);
             const recordsDTO = await this.blogService.getAll(level, filter, sorter, pageSize, pageIndex, errors);
             if (recordsDTO) {
                 let dataBrowseAPI = new DataBrowseAPI();
@@ -268,6 +274,59 @@ class BlogAPI extends BaseAPI {
             }
         } catch (err) {
             this.sendError(res, this.ST_InternalServerError, "getBadWords()", err.message);
+        };
+    }
+
+    async newBadWord(req, res) {
+        console.log(`API blog addBadWord()`);
+        try {
+            var errors = [];
+            var badWordDTO = new this.blogService.DTO.BadWordDTO();
+            badWordDTO = badWordDTO.postModel();
+            this.loadDTOFromBody(badWordDTO, req.body);
+            badWordDTO = await this.blogService.addBadWord(badWordDTO, errors);
+            if (badWordDTO) {
+                this.sendData(res, badWordDTO)
+            } else {
+                this.sendError(res, this.ST_BadRequest, "addBadWord()", errors);
+            }
+        } catch (err) {
+            this.sendError(res, this.ST_InternalServerError, "addBadWord()", err.message);
+        };
+    }
+
+    async updateBadWord(req, res) {
+        console.log(`API blog updateBadWord()`);
+        const badWordId = req.params.badWordid;
+        try {
+            var errors = [];
+            var badWordDTO = new this.blogService.DTO.BadWordDTO();
+            badWordDTO = badWordDTO.putModel();
+            this.loadDTOFromBody(badWordDTO, req.body);
+            const badWordDTO = await this.blogService.updateBadWord(badWordDTO, badWordId, errors);
+            if (badWordDTO) {
+                this.sendData(res, badWordDTO)
+            } else {
+                this.sendError(res, this.ST_NotFound, "updateBadWord()", errors);
+            }
+        } catch (err) {
+            this.sendError(res, this.ST_InternalServerError, "updateBadWord()", err.message);
+        };
+    }
+
+    async deleteBadWord(req, res) {
+        console.log(`API blog deleteBadWord()`);
+        const badWordId = req.params.badWordid;
+        try {
+            var errors = [];
+            const badWordDTO = await this.blogService.deleteBadWord(badWordId, errors);
+            if (badWordDTO) {
+                this.sendData(res, badWordDTO)
+            } else {
+                this.sendError(res, this.ST_NotFound, "deleteBadWord()", errors);
+            }
+        } catch (err) {
+            this.sendError(res, this.ST_InternalServerError, "deleteBadWord()", err.message);
         };
     }
 
@@ -428,7 +487,7 @@ class BlogAPI extends BaseAPI {
         }
         return filter;
     }
-//#endregion
+    //#endregion
 }
 
 module.exports = BlogAPI;

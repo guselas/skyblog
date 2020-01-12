@@ -30,6 +30,14 @@ class BlogService extends BaseService {
         }
     }
 
+    async checkIsAdmin(userDTO) {
+
+    }
+
+    async checkIsAuthor() {}
+
+    async checkIsNotAuthenticated() {}
+
     async login(loginDTO, description, errors) {
         if (!loginDTO.email) {
             errors.push("email is mandatory");
@@ -114,7 +122,7 @@ class BlogService extends BaseService {
         }
         return count;
     }
-    
+
     async getAll(level, filter, sorter, pageSize, pageIndex, errors) {
         let postsDTO = await this.services.postsService.readAll(filter, sorter, pageSize, pageIndex, errors);
         let blogsDTO = [];
@@ -176,6 +184,18 @@ class BlogService extends BaseService {
         return null;
     }
 
+    async addBadWord(badWordDTO, errors) {
+        return this.services.badWordsService.createOne(badWordDTO, errors);
+    }
+
+    async updateBadWord(badWordDTO, badWordId, errors) {
+        return this.services.badWordsService.updateOne(badWordDTO, badWordId, errors);
+    }
+
+    async deleteBadWord(badWordId, errors) {
+        return this.services.badWordsService.deleteOne(badWordId, errors);
+    }
+
     async getOne(blogId, errors) {
         //we create the result variable
         let blogDTO = new this.DTO.BlogDTO();
@@ -221,8 +241,8 @@ class BlogService extends BaseService {
     }
 
     async newBlog(authorId, blogDTO, errors) {
-        let result = await this.validateText(5,blogDTO.postTitle + " " + blogDTO.postText);
-        if(!result.ok){
+        let result = await this.validateText(5, blogDTO.postTitle + " " + blogDTO.postText);
+        if (!result.ok) {
             errors.push(`Post too offensive: ${result.words.join()}`);
             return null;
         }
@@ -244,8 +264,8 @@ class BlogService extends BaseService {
     }
 
     async updateBlog(updaterId, blogDTO, blogId, errors) {
-        let result = await this.validateText(5,blogDTO.postTitle + " " + blogDTO.postText);
-        if(!result.ok){
+        let result = await this.validateText(5, blogDTO.postTitle + " " + blogDTO.postText);
+        if (!result.ok) {
             errors.push(`Post too offensive: ${result.words.join()}`);
             return null;
         }
@@ -311,8 +331,8 @@ class BlogService extends BaseService {
     }
 
     async newComment(authorId, blogId, blogCommentDTO, errors) {
-        let result = await this.validateText(5,blogCommentDTO.commentText);
-        if(!result.ok){
+        let result = await this.validateText(5, blogCommentDTO.commentText);
+        if (!result.ok) {
             errors.push(`Comment too offensive: ${result.words.join()}`);
             return null;
         }
@@ -344,8 +364,8 @@ class BlogService extends BaseService {
     }
 
     async updateComment(updaterId, blogId, blogCommentDTO, commentId, errors) {
-        let result = await this.validateText(5,blogCommentDTO.commentText);
-        if(!result.ok){
+        let result = await this.validateText(5, blogCommentDTO.commentText);
+        if (!result.ok) {
             errors.push(`Comment too offensive: ${result.words.join()}`);
             return null;
         }
@@ -448,9 +468,9 @@ class BlogService extends BaseService {
                 userId: userId,
                 description: description
             };
-            console.log("filter ",filter.userId, filter.description);
+            console.log("filter ", filter.userId, filter.description);
             var bearersDAO = await this.DAO.BearerDAO.find(filter);
-            console.log("bearersDAO ",bearersDAO);
+            console.log("bearersDAO ", bearersDAO);
             var bearerDAO;
             if (bearersDAO) {
                 if (bearersDAO.length > 0) {
@@ -470,7 +490,7 @@ class BlogService extends BaseService {
             }
             var bearerDTO = new this.DTO.BearerDTO();
             bearerDTO.fromDAO(bearerDAO);
-            console.log("bearerDTO",bearerDTO);
+            console.log("bearerDTO", bearerDTO);
             return bearerDTO;
         } catch (err) {
             errors.push(err.message);

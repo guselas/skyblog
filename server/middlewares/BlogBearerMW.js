@@ -10,6 +10,41 @@ class BlogBearerMW {
         this.ST_Forbidden = 403;
     }
 
+    //TODO: isAuthor
+
+    async isAuthor(req, res, next) {
+        let ok = false;
+
+        if (ok) {
+            next();
+        } else {
+            res.status(this.ST_Forbidden).send("Unauthorized");
+        }
+    }
+
+    async isAdmin(req, res, next) {
+        let ok = false;
+
+
+        if (ok) {
+            next();
+        } else {
+            res.status(this.ST_Forbidden).send("Unauthorized");
+        }
+    }
+
+    async isAuthenticated(req, res, next) {
+        let ok = false;
+
+
+        if (ok) {
+            next();
+        } else {
+            res.status(this.ST_Forbidden).send("Unauthorized");
+        }
+    }
+
+
     async validate(req, res, next) {
         var ok = false;
         if (req.path == "/api/blog/login") {
