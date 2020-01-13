@@ -14,7 +14,7 @@ class BlogBearerMW {
 
     async isAuthor(req, res, next) {
         let ok = false;
-
+        
         if (ok) {
             next();
         } else {

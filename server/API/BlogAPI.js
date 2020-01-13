@@ -277,7 +277,7 @@ class BlogAPI extends BaseAPI {
         };
     }
 
-    async newBadWord(req, res) {
+    async addBadWord(req, res) {
         console.log(`API blog addBadWord()`);
         try {
             var errors = [];
@@ -303,7 +303,7 @@ class BlogAPI extends BaseAPI {
             var badWordDTO = new this.blogService.DTO.BadWordDTO();
             badWordDTO = badWordDTO.putModel();
             this.loadDTOFromBody(badWordDTO, req.body);
-            const badWordDTO = await this.blogService.updateBadWord(badWordDTO, badWordId, errors);
+            badWordDTO = await this.blogService.updateBadWord(badWordDTO, badWordId, errors);
             if (badWordDTO) {
                 this.sendData(res, badWordDTO)
             } else {

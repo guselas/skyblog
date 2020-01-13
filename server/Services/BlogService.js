@@ -10,19 +10,7 @@ class BlogService extends BaseService {
         this.DTO = services.DTO;
         this.validator = null;
     }
-    /*
-            app.get(`${uri}/blog`, this.getAll.bind(this));
-            app.get(`${uri}/blog/:blogid`, this.getOne.bind(this));
 
-            app.post(`${uri}/blog/:authorid`, this.newBlog.bind(this));
-            app.put(`${uri}/blog/:blogid`, this.updateBlog.bind(this));
-            app.delete(`${uri}/blog/:blogid`, this.deleteBlog.bind(this));
-
-            app.post(`${uri}/blog/:blogid/comment/:authorid`, this.newComment.bind(this));
-            app.put(`${uri}/blog/:blogid/comment/:commentid`, this.updateComment.bind(this));
-            app.delete(`${uri}/blog/comment/:commentid`, this.deleteComment.bind(this));
-
-    */
     async checkValidator() {
         if (!this.validator) {
             this.validator = new Validator();
@@ -468,9 +456,7 @@ class BlogService extends BaseService {
                 userId: userId,
                 description: description
             };
-            console.log("filter ", filter.userId, filter.description);
             var bearersDAO = await this.DAO.BearerDAO.find(filter);
-            console.log("bearersDAO ", bearersDAO);
             var bearerDAO;
             if (bearersDAO) {
                 if (bearersDAO.length > 0) {
@@ -490,7 +476,6 @@ class BlogService extends BaseService {
             }
             var bearerDTO = new this.DTO.BearerDTO();
             bearerDTO.fromDAO(bearerDAO);
-            console.log("bearerDTO", bearerDTO);
             return bearerDTO;
         } catch (err) {
             errors.push(err.message);
