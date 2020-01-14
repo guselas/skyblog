@@ -11,8 +11,7 @@ class BlogAPI extends BaseAPI {
         //#region Endpoints Model
         app.get(`${uri}/blog/login/model`, this.loginModel.bind(this));
         app.get(`${uri}/blog/register/model`, this.registerModel.bind(this));
-        app.get(`${uri}/blog/whoami/model`, this.whoAmIModel.bind(this));
-        app.get(`${uri}/blog/who/model`, blogMW.isAuthenticated.bind(this), this.whoModel.bind(this));
+        app.get(`${uri}/blog/profile/model`, this.profileModel.bind(this));
         app.get(`${uri}/blog/all/model`, this.getAllModel.bind(this));
 
         app.get(`${uri}/blog/model`, this.getBlogModel.bind(this));
@@ -26,28 +25,26 @@ class BlogAPI extends BaseAPI {
 
         app.post(`${uri}/blog/login`, this.login.bind(this));
         app.post(`${uri}/blog/register`, this.register.bind(this));
-        app.put(`${uri}/blog/profile`, blogMW.isAuthenticated.bind(this), this.updateUser.bind(this));
-        app.get(`${uri}/blog/whoami`, blogMW.isAuthenticated.bind(this), this.getLoggedUser.bind(this));
-        app.get(`${uri}/blog/who`, blogMW.isAdmin.bind(this), this.getLoggedUsers.bind(this));
+        app.put(`${uri}/blog/profile`, blogMW.isAuthenticated.bind(blogMW), this.updateProfile.bind(this));
+        app.get(`${uri}/blog/profile`, blogMW.isAuthenticated.bind(blogMW), this.getProfile.bind(this));
 
+        app.post(`${uri}/blog/badwords`, blogMW.isAdmin.bind(blogMW), this.addBadWord.bind(this));
+        app.put(`${uri}/blog/badwords/:badwordid`, blogMW.isAdmin.bind(blogMW), this.updateBadWord.bind(this));
+        app.delete(`${uri}/blog/badwords/:badwordid`, blogMW.isAdmin.bind(blogMW), this.deleteBadWord.bind(this));
 
-        app.post(`${uri}/blog/badwords`, blogMW.isAdmin.bind(this), this.addBadWord.bind(this));
-        app.put(`${uri}/blog/badwords/:badwordid`, blogMW.isAdmin.bind(this), this.updateBadWord.bind(this));
-        app.delete(`${uri}/blog/badwords/:badwordid`, blogMW.isAdmin.bind(this), this.deleteBadWord.bind(this));
-
-        app.get(`${uri}/blog/badwords/count`, blogMW.isAdmin.bind(this), this.getBadWordsCount.bind(this));
-        app.get(`${uri}/blog/badwords`, blogMW.isAdmin.bind(this), this.getBadWords.bind(this));
+        app.get(`${uri}/blog/badwords/count`, blogMW.isAdmin.bind(blogMW), this.getBadWordsCount.bind(this));
+        app.get(`${uri}/blog/badwords`, blogMW.isAdmin.bind(blogMW), this.getBadWords.bind(this));
 
         app.get(`${uri}/blog`, this.getAll.bind(this));
         app.get(`${uri}/blog/:blogid`, this.getBlog.bind(this));
 
-        app.post(`${uri}/blog`, blogMW.isAuthor.bind(this), this.newBlog.bind(this));
-        app.put(`${uri}/blog/:blogid`, this.updateBlog.bind(this));
-        app.delete(`${uri}/blog/:blogid`, this.deleteBlog.bind(this));
+        app.post(`${uri}/blog`, blogMW.isAuthor.bind(blogMW), this.newBlog.bind(this));
+        app.put(`${uri}/blog/:blogid`, blogMW.isAuthor.bind(blogMW), this.updateBlog.bind(this));
+        app.delete(`${uri}/blog/:blogid`, blogMW.isAuthor.bind(blogMW), this.deleteBlog.bind(this));
 
-        app.post(`${uri}/blog/:blogid/comment`, blogMW.isAuthor.bind(this), this.newComment.bind(this));
-        app.put(`${uri}/blog/:blogid/comment/:commentid`, this.updateComment.bind(this));
-        app.delete(`${uri}/blog/:blogid/comment/:commentid`, this.deleteComment.bind(this));
+        app.post(`${uri}/blog/:blogid/comment`, blogMW.isAuthor.bind(blogMW), this.newComment.bind(this));
+        app.put(`${uri}/blog/:blogid/comment/:commentid`, blogMW.isAuthor.bind(blogMW), this.updateComment.bind(this));
+        app.delete(`${uri}/blog/:blogid/comment/:commentid`, blogMW.isAuthor.bind(blogMW), this.deleteComment.bind(this));
 
         //#endregion
     }
@@ -63,12 +60,12 @@ class BlogAPI extends BaseAPI {
         this.sendData(res, model.postModel());
     }
 
-    async whoAmIModel(req, res) {
-        this.sendData(res, new this.blogService.DTO.WhoAmIDTO());
+    async profileModel(req, res) {
+        this.sendData(res, new this.blogService.DTO.ProfileDTO());
     }
 
     async whoModel(req, res) {
-        this.sendData(res, [new this.blogService.DTO.WhoAmIDTO()]);
+        this.sendData(res, [new this.blogService.DTO.ProfileDTO()]);
     }
 
     async getAllModel(req, res) {
@@ -109,19 +106,12 @@ class BlogAPI extends BaseAPI {
             agent: req.useragent
         });
         var errors = [];
-        var whoAmIDTO = await this.blogService.login(loginDTO, description, errors);
-        if (whoAmIDTO) {
-            for (let index in req.app.currentLogins) {
-                if (req.app.currentLogins[index].id == whoAmIDTO.id) {
-                    req.app.currentLogins[index] = whoAmIDTO;
-                    console.log('currentLogin updated');
-                }
-            }
+        var tokenJWT = await this.blogService.login(loginDTO, description, errors);
+        if (tokenJWT) {
             this.sendData(res, {
-                Authorization: `Bearer ${whoAmIDTO.id}`
+                Authorization: `Bearer ${tokenJWT}`
             });
         } else {
-            req.currentLogin = null;
             this.sendError(res, this.ST_Conflict, errors);
         }
     }
@@ -141,31 +131,31 @@ class BlogAPI extends BaseAPI {
         }
     }
 
-    async updateUser(req, res) {
+    async updateProfile(req, res) {
         let errors = [];
         let registerDTO = new this.blogService.DTO.RegisterDTO();
         registerDTO.postModel();
         this.loadDTOFromBody(registerDTO, req.body);
-        var userDTO = await this.blogService.updateUser(req.currentLogin.userId, registerDTO, errors);
+        var userDTO = await this.blogService.updateProfile(req.userDAO._id, registerDTO, errors);
         if (userDTO) {
-            req.currentLogin.fromDAO(userDTO);
             this.sendData(res, userDTO);
         } else {
             this.sendError(res, this.ST_Conflict, errors);
         }
     }
 
-    async getLoggedUser(req, res) {
-        this.sendData(res, req.currentLogin);
+    async getProfile(req, res) {
+        let profileDTO = new this.blogService.DTO.ProfileDTO();
+        profileDTO.fromDAO(req.userDAO);
+        this.sendData(res, profileDTO);
     }
 
-    async getLoggedUsers(req, res) {
-        this.sendData(res, req.app.currentLogins);
-    }
     //#endregion
 
     //#region Blog
     async getAll(req, res) {
+        console.log("req", req);
+        console.log("req.body", req.body);
         console.log(`API ${this.nameAPI}: getAll(): `);
         //Normalize filterValues from query
         let level = !req.query.level ? 5 : req.query.level;
@@ -348,7 +338,7 @@ class BlogAPI extends BaseAPI {
 
     async newBlog(req, res) {
         console.log(`API blog newBlog()`);
-        const authorid = req.currentLogin.userId;
+        const authorid = req.userDAO._id;
         let blogDTO = new this.blogService.DTO.BlogDTO();
         blogDTO = blogDTO.postModel();
         this.loadDTOFromBody(blogDTO, req.body);
@@ -367,7 +357,7 @@ class BlogAPI extends BaseAPI {
 
     async updateBlog(req, res) {
         console.log(`API blog updateBlog()`);
-        const updaterId = req.currentLogin.userId;
+        const updaterId = req.userDAO._id;
         const blogId = req.params.blogid;
         let blogDTO = new this.blogService.DTO.BlogDTO();
         blogDTO = blogDTO.putModel();
@@ -387,7 +377,7 @@ class BlogAPI extends BaseAPI {
 
     async deleteBlog(req, res) {
         console.log(`API blog deleteBlog()`);
-        const updaterId = req.currentLogin.userId;
+        const updaterId = req.userDAO._id;
         const blogId = req.params.blogid;
         try {
             const errors = [];
@@ -407,7 +397,7 @@ class BlogAPI extends BaseAPI {
 
     async newComment(req, res) {
         console.log(`API blog newComment()`);
-        const updaterId = req.currentLogin.userId;
+        const updaterId = req.userDAO._id;
         const blogId = req.params.blogid;
         try {
             var errors = [];
@@ -427,7 +417,7 @@ class BlogAPI extends BaseAPI {
 
     async updateComment(req, res) {
         console.log(`API blog updateComment()`);
-        const updaterId = req.currentLogin.userId;
+        const updaterId = req.userDAO._id;
         const blogId = req.params.blogid;
         const commentId = req.params.commentid;
         try {
@@ -448,7 +438,7 @@ class BlogAPI extends BaseAPI {
 
     async deleteComment(req, res) {
         console.log(`API blog removeComment()`);
-        const updaterId = req.currentLogin.userId;
+        const updaterId = req.userDAO._id;
         const blogId = req.params.blogid;
         const commentId = req.params.commentid;
         try {

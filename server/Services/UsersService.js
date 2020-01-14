@@ -5,7 +5,7 @@ const UserDAO = require('../DAO/UserDAO');
 const UserDTO = require('../DTO/UserDTO');
 const FullUserDTO = require('../DTO/Full/FullUserDTO');
 
-// const WhoAmIDTO = require('../DTO/WhoAmIDTO');
+// const profileDTO = require('../DTO/profileDTO');
 
 class UserService extends CrudService {
     constructor(services) {
@@ -57,10 +57,10 @@ class UserService extends CrudService {
                         if (userDAO) {
                             userDAO.lastLogin = new Date();
                             await userDAO.save();
-                            let whoAmIDTO = new this.DTO.WhoAmIDTO();
-                            whoAmIDTO.fromDAO(userDAO);
-                            whoAmIDTO.fromDAO(bearerDTO);
-                            return whoAmIDTO;
+                            let profileDTO = new this.DTO.ProfileDTO();
+                            profileDTO.fromDAO(userDAO);
+                            profileDTO.fromDAO(bearerDTO);
+                            return profileDTO;
                         }
                     }
                 }

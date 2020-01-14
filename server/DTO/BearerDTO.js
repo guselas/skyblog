@@ -1,6 +1,7 @@
 const BaseDTO = require('./BaseDTO');
 
 class BearerDTO extends BaseDTO {
+    //to use only with crudApp
     constructor() {
         super("Bearer");
         this.userId = "";

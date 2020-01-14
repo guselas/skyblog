@@ -74,7 +74,7 @@ services.DTO.FullUserDTO = FullUserDTO;
 const LoginDTO = require('./DTO/LoginDTO');
 const RegisterDTO = require('./DTO/RegisterDTO');
 
-const WhoAmIDTO = require('./DTO/WhoAmIDTO');
+const ProfileDTO = require('./DTO/ProfileDTO');
 const BlogDTO = require('./DTO/BlogDTO');
 const FullBlogDTO = require('./DTO/Full/FullBlogDTO');
 const BlogCommentDTO = require('./DTO/BlogCommentDTO');
@@ -82,7 +82,7 @@ const BlogCommentDTO = require('./DTO/BlogCommentDTO');
 const BlogService = require('./Services/BlogService');
 services.DTO.LoginDTO = LoginDTO;
 services.DTO.RegisterDTO = RegisterDTO;
-services.DTO.WhoAmIDTO = WhoAmIDTO;
+services.DTO.ProfileDTO = ProfileDTO;
 services.DTO.BlogDTO = BlogDTO;
 services.DTO.FullBlogDTO = FullBlogDTO;
 services.DTO.BlogCommentDTO = BlogCommentDTO;
@@ -105,8 +105,6 @@ services.services.blogService = new BlogService(services);
 blogApp.use(bodyParser.json());
 blogApp.use(cors());
 blogApp.use(useragent.express());
-blogApp.currentLogins = [];
-var blogBearerMW = new BlogBearerMW(blogApp.currentLogins);
 blogApp.use(bodyParser.urlencoded({
     extended: false
 }));
@@ -144,6 +142,8 @@ const usersAPI = new UsersAPI('/api/V0', crudAppV0, services.services);
 
 //BLOG (blogApp) API
 const BlogAPI = require('./API/BlogAPI');
+const blogBearerMW = new BlogBearerMW();
+blogApp.use(blogBearerMW.loadUser.bind(blogBearerMW));
 const blogAPI = new BlogAPI('/api', blogApp, blogBearerMW, services.services);
 
 //#endregion

@@ -5,9 +5,7 @@ const {
 
 
 //TODO: use router de express!!
-//TODO: Express REST API Generator & boilerPlate
 //TODO: Use passport for auth
-//TODO: Use BrcyptJs for hashing passwords in db
 //TODO: Use JWT token OR OAuth2
 class CrudAPI extends BaseAPI {
     constructor(uri, app, nameAPI, crudService) {

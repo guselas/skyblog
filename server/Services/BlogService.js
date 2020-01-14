@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+const JWT_KEY = 'secret-key';
 const BaseService = require('./BaseService');
 const Validator = require('../Validator/Validator');
 
@@ -18,14 +20,6 @@ class BlogService extends BaseService {
         }
     }
 
-    async checkIsAdmin(userDTO) {
-
-    }
-
-    async checkIsAuthor() {}
-
-    async checkIsNotAuthenticated() {}
-
     async login(loginDTO, description, errors) {
         if (!loginDTO.email) {
             errors.push("email is mandatory");
@@ -42,19 +36,17 @@ class BlogService extends BaseService {
                 if (!result) {
                     errors.push("invalid password");
                 } else {
-                    var errors = [];
-                    var bearerDTO = await this.createBearer(users[0].id, description, errors);
-                    if (bearerDTO) {
-                        let userDAO = await this.DAO.UserDAO.findById(bearerDTO.userId);
-                        if (userDAO) {
-                            userDAO.lastLogin = new Date();
-                            await userDAO.save();
-                            let whoAmIDTO = new this.DTO.WhoAmIDTO();
-                            whoAmIDTO.fromDAO(userDAO);
-                            whoAmIDTO.fromDAO(bearerDTO);
-                            return whoAmIDTO;
-                        }
+                    let userDAO = await this.DAO.UserDAO.findById(users[0].id);
+                    if (userDAO) {
+                        userDAO.lastLogin = new Date();
+                        await userDAO.save();
                     }
+                    let tokenJWT = jwt.sign({
+                        _id: users[0].id
+                    }, JWT_KEY, {
+                        expiresIn: '24h'
+                    })
+                    return tokenJWT;
                 }
             }
         }
@@ -81,7 +73,7 @@ class BlogService extends BaseService {
         return null;
     }
 
-    async updateUser(userId, registerDTO, errors) {
+    async updateProfile(userId, registerDTO, errors) {
         let userDTO = await this.services.usersService.readOne(userId, errors);
         if (userDTO) {
             userDTO.fromDAO(registerDTO);
@@ -262,6 +254,7 @@ class BlogService extends BaseService {
         if (!updaterDAO) {
             return null;
         }
+
         let postDTO = await this.services.postsService.readOne(blogId, errors);
         if (!postDTO) {
             errors.push(`Blog '${blogId}' not found`);
@@ -334,12 +327,7 @@ class BlogService extends BaseService {
             errors.push(`Blog '${blogId}' not found`);
             return null;
         }
-        if (!authorDAO.isAdmin) {
-            if (authorDAO._id !== postDAO.authorId) {
-                errors.push(`You're not the author of the post '${blogId}'`);
-                return null;
-            }
-        }
+
         let commentDTO = new this.DTO.CommentDTO();
         commentDTO.fromDAO(blogCommentDTO);
         commentDTO.postId = blogId;
@@ -403,10 +391,18 @@ class BlogService extends BaseService {
             errors.push(`This comment '${commentId}' doesn't belong to this post`);
             return null;
         }
+
         if (!updaterDAO.isAdmin) {
             if (updaterDAO._id != commentDTO.userId) {
-                errors.push(`You're not the author of the comment '${commentId}'`);
-                return null;
+                let postDAO = await this.DAO.PostDAO.findById(blogId);
+                if (!postDAO) {
+                    errors.push(`This comment '${commentId}' has no Post`);
+                    return null;
+                }
+                if (updaterId != postDAO.authorId) {
+                    errors.push(`You're not the author of the comment '${commentId}'`);
+                    return null;
+                }
             }
         }
         if (await this.services.commentsService.deleteOne(commentId, errors)) {
@@ -503,4 +499,4 @@ class BlogService extends BaseService {
 }
 
 
-module.exports = BlogService;
+module.exports = BlogService, JWT_KEY;

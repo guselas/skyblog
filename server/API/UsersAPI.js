@@ -20,16 +20,16 @@ class UsersAPI extends CrudAPI {
             agent: req.useragent
         });
         var errors = [];
-        var whoAmIDTO = await this.crudService.login(loginDTO, description, errors);
-        if (whoAmIDTO) {
+        var profileDTO = await this.crudService.login(loginDTO, description, errors);
+        if (profileDTO) {
             for (let index in req.app.currentLogins) {
-                if (req.app.currentLogins[index].id == whoAmIDTO.id) {
-                    req.app.currentLogins[index] = whoAmIDTO;
+                if (req.app.currentLogins[index].id == profileDTO.id) {
+                    req.app.currentLogins[index] = profileDTO;
                     console.log('currentLogin updated');
                 }
             }
             this.sendData(res, {
-                Authorization: `Bearer ${whoAmIDTO.id}`
+                Authorization: `Bearer ${profileDTO.id}`
             });
         } else {
             req.currentLogin = null;

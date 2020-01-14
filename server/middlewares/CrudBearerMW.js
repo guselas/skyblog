@@ -1,7 +1,7 @@
 const BearerDAO = require('../DAO/BearerDAO');
 const UserDAO = require('../DAO/UserDAO');
 
-const WhoAmIDTO = require('../DTO/WhoAmIDTO');
+const profileDTO = require('../DTO/ProfileDTO');
 
 
 class CrudBearerMW {
@@ -49,12 +49,12 @@ class CrudBearerMW {
                             if (!ok) {
                                 var userDAO = await UserDAO.findById(bearerDAO.userId);
                                 if (userDAO) {
-                                    let whoAmIDTO = new WhoAmIDTO();
-                                    whoAmIDTO.fromDAO(userDAO);
-                                    whoAmIDTO.fromDAO(bearerDAO);
-                                    whoAmIDTO.lastAccess = new Date();
-                                    req.currentLogin = whoAmIDTO;
-                                    this.currentLogins.push(whoAmIDTO);
+                                    let profileDTO = new ProfileDTO();
+                                    profileDTO.fromDAO(userDAO);
+                                    profileDTO.fromDAO(bearerDAO);
+                                    profileDTO.lastAccess = new Date();
+                                    req.currentLogin = profileDTO;
+                                    this.currentLogins.push(profileDTO);
                                     ok = true;
                                 }
                             }

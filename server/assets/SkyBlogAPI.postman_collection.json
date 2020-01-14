@@ -115,7 +115,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:3000/api/blog/whoami/model",
+									"raw": "http://localhost:3000/api/blog/profile/model",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -124,7 +124,7 @@
 									"path": [
 										"api",
 										"blog",
-										"whoami",
+										"profile",
 										"model"
 									]
 								}
@@ -472,7 +472,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:3000/api/blog/whoami",
+									"raw": "http://localhost:3000/api/blog/profile",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -481,7 +481,7 @@
 									"path": [
 										"api",
 										"blog",
-										"whoami"
+										"profile"
 									]
 								}
 							},

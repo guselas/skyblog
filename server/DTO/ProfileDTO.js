@@ -1,14 +1,8 @@
 const BaseDTO = require('./BaseDTO');
-const BearerDTO = require('./BearerDTO');
 
-class WhoAmIDTO extends BaseDTO {
+class ProfileDTO extends BaseDTO {
     constructor() {
-        super("WhoAmI");
-        //WhoAmI.Id == BearerDTO.id en MongoDB
-        //From BearerDTO
-        this.userId = "";
-        this.validUntil = new Date();
-        this.lastAccess = new Date();
+        super("Profile");
         
         //From UserDAO
         this.email = "";
@@ -22,4 +16,4 @@ class WhoAmIDTO extends BaseDTO {
 
 }
 
-module.exports = WhoAmIDTO;
+module.exports = ProfileDTO;

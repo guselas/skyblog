@@ -41,11 +41,11 @@
 
   .form-group input {
     border: 1pt solid black;
-    width: 25%;
+    /* width: 25%; */
     margin-left: 5px;
     display: inline;
     text-align: right;
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */
   }
 
   .form-group label {

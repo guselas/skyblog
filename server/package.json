@@ -26,7 +26,9 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-useragent": "^1.0.13",
+    "http-status-codes": "^1.4.0",
     "https": "^1.0.0",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.8.3",
     "node-fetch": "^2.6.0",
     "node.js": "0.0.0"
