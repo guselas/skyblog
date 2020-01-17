@@ -1,24 +1,23 @@
 <template>
   <div id="app">
-    <Login msg="Te logeas o que tron"/>
-    <Register/>
-    <SocialMediaLogos/>
+    <Login/>
+    <!-- <Register/>
+    <SocialMediaLogos/> -->
   </div>
 </template>
 
 <script>
+//TODO: use veautify
 import Login from './components/Login.vue';
-import Register from './components/Register';
-import SocialMediaLogos from './components/SocialMediaLogos';
-
-
+// import Register from './components/Register';
+// import SocialMediaLogos from './components/SocialMediaLogos';
 
 export default {
   name: 'app',
   components: {
-    Login,
-    Register,
-    SocialMediaLogos
+    Login
+    // Register,
+    // SocialMediaLogos
   }
 }
 </script>

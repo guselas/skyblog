@@ -99,6 +99,7 @@ class BlogAPI extends BaseAPI {
 
     //#region Login
     async login(req, res) {
+        console.log(`API ${this.nameAPI}: login(): `);
         let loginDTO = new this.blogService.DTO.LoginDTO();
         this.loadDTOFromBody(loginDTO, req.body);
         const description = JSON.stringify({
@@ -117,6 +118,7 @@ class BlogAPI extends BaseAPI {
     }
 
     async register(req, res) {
+        console.log(`API ${this.nameAPI}: register(): `);
         let registerDTO = new this.blogService.DTO.RegisterDTO();
         this.loadDTOFromBody(registerDTO, req.body);
         var errors = [];
@@ -132,6 +134,7 @@ class BlogAPI extends BaseAPI {
     }
 
     async updateProfile(req, res) {
+        console.log(`API ${this.nameAPI}: updateProfile(): `);
         let errors = [];
         let registerDTO = new this.blogService.DTO.RegisterDTO();
         registerDTO.postModel();
@@ -145,6 +148,7 @@ class BlogAPI extends BaseAPI {
     }
 
     async getProfile(req, res) {
+        console.log(`API ${this.nameAPI}: getProfile(): `);
         let profileDTO = new this.blogService.DTO.ProfileDTO();
         profileDTO.fromDAO(req.userDAO);
         this.sendData(res, profileDTO);
@@ -154,8 +158,6 @@ class BlogAPI extends BaseAPI {
 
     //#region Blog
     async getAll(req, res) {
-        console.log("req", req);
-        console.log("req.body", req.body);
         console.log(`API ${this.nameAPI}: getAll(): `);
         //Normalize filterValues from query
         let level = !req.query.level ? 5 : req.query.level;

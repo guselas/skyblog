@@ -1,33 +1,63 @@
 <template>
   <div>
-    <h1>{{ msg }}</h1>
-
     <h2>Login</h2>
 
     <form id="loginForm">
       <div class="form-group">
         <label for="exampleInputEmail1">Email address</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+        <input v-model="input.email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+          placeholder="Insert an email">
       </div>
       <div class="form-group">
         <label for="exampleInputPassword1">Password</label>
-        <input type="password" class="form-control" id="exampleInputPassword1">
+        <input v-model="input.password" type="password" class="form-control" id="exampleInputPassword1">
       </div>
 
       <div class="form-group">
         <button type="submit" class="btn btn-danger">Cancel</button>
-        <button type="submit" class="btn btn-primary">Sign In</button>
+        <button @click="postLogin(input.email,input.password)" type="submit" class="btn btn-primary">Sign
+          In</button>
       </div>
-    
+
     </form>
+    <hr />
+    <h2>{{response}}</h2>
+
   </div>
 </template>
 
 <script>
+  import axios from "axios";
+
+
   export default {
     name: 'Login',
-    props: {
-      msg: String
+    data: () => {
+      return {
+        input: {
+          email: "fr.ruizf@gmail.com",
+          password: "123"
+        },
+        response: ""
+      }
+    },
+    methods: {
+      postLogin(email, password) {
+        axios({
+            method: "POST",
+            "url": "http://localhost:3000/api/blog/login",
+            "data": this.input,
+            "headers": {
+              "content-type": "application/json"
+            }
+          })
+          .then(result => {
+              this.response = result.data;
+            },
+            error => {
+              alert(error);
+            });
+      }
     }
   }
 </script>
@@ -44,12 +74,11 @@
     /* width: 25%; */
     margin-left: 5px;
     display: inline;
-    text-align: right;
     /* margin-bottom: 10px; */
   }
 
   .form-group label {
     width: 15%;
-    text-align: left;
+    text-align: right;
   }
 </style>

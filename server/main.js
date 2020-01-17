@@ -112,33 +112,33 @@ blogApp.use(bodyParser.urlencoded({
 //#endregion
 
 //#region CrudMW
-crudAppV0.use(bodyParser.json());
-crudAppV0.use(cors());
-crudAppV0.use(useragent.express());
-crudAppV0.currentLogins = [];
-var crudBearerMW = new CrudBearerMW(crudAppV0.currentLogins);
-crudAppV0.use(bodyParser.urlencoded({
-    extended: false
-}));
-crudAppV0.use(crudBearerMW.validate.bind(crudBearerMW));
+// crudAppV0.use(bodyParser.json());
+// crudAppV0.use(cors());
+// crudAppV0.use(useragent.express());
+// crudAppV0.currentLogins = [];
+// var crudBearerMW = new CrudBearerMW(crudAppV0.currentLogins);
+// crudAppV0.use(bodyParser.urlencoded({
+//     extended: false
+// }));
+// crudAppV0.use(crudBearerMW.validate.bind(crudBearerMW));
 //#endregion
 
 //#region APIs
 //CRUDs APIs
-const BadWordsAPI = require('./API/BadWordsAPI');
-const badWordsAPI = new BadWordsAPI('/api/V0', crudAppV0, services.services);
+// const BadWordsAPI = require('./API/BadWordsAPI');
+// const badWordsAPI = new BadWordsAPI('/api/V0', crudAppV0, services.services);
 
-const BearersAPI = require('./API/BearersAPI');
-const bearersAPI = new BearersAPI('/api/V0', crudAppV0, services.services);
+// const BearersAPI = require('./API/BearersAPI');
+// const bearersAPI = new BearersAPI('/api/V0', crudAppV0, services.services);
 
-const CommentsAPI = require('./API/CommentsAPI');
-const commentsAPI = new CommentsAPI('/api/V0', crudAppV0, services.services);
+// const CommentsAPI = require('./API/CommentsAPI');
+// const commentsAPI = new CommentsAPI('/api/V0', crudAppV0, services.services);
 
-const PostsAPI = require('./API/PostsAPI');
-const postsAPI = new PostsAPI('/api/V0', crudAppV0, services.services);
+// const PostsAPI = require('./API/PostsAPI');
+// const postsAPI = new PostsAPI('/api/V0', crudAppV0, services.services);
 
-const UsersAPI = require('./API/UsersAPI');
-const usersAPI = new UsersAPI('/api/V0', crudAppV0, services.services);
+// const UsersAPI = require('./API/UsersAPI');
+// const usersAPI = new UsersAPI('/api/V0', crudAppV0, services.services);
 
 //BLOG (blogApp) API
 const BlogAPI = require('./API/BlogAPI');

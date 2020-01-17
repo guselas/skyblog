@@ -66,7 +66,7 @@ class CrudAPI extends BaseAPI {
         };
     };
 
-    async model(req, res) {
+    async model(req, res) {     
         console.log(`API ${this.nameAPI}: model(): `);
         try {
             const errors = [];
@@ -95,59 +95,6 @@ class CrudAPI extends BaseAPI {
             this.sendError(res, this.ST_InternalServerError, "fullModel()", err.message);
         };
     };
-
-    async seed(req, res) {
-        console.log(`API ${this.nameAPI}: seed(): `);
-        try {
-            const errors = [];
-            const result = await this.crudService.seed();
-            if (result) {
-                this.sendData(res, result)
-            } else {
-                this.sendError(res, this.ST_NotFound, "seed()", errors);
-            }
-        } catch (err) {
-            this.sendError(res, this.ST_InternalServerError, "seed()", err.message);
-        };
-    };
-
-    async unseed(req, res) {
-        console.log(`API ${this.nameAPI}: unseed(): `);
-        try {
-            const errors = [];
-            const result = await this.crudService.unseed();
-            if (result) {
-                this.sendData(res, result)
-            } else {
-                this.sendError(res, this.ST_NotFound, "unseed()", errors);
-            }
-        } catch (err) {
-            this.sendError(res, this.ST_InternalServerError, "unseed()", err.message);
-        };
-    };
-
-    getFilterFromQuery(req) {
-        const filter = {};
-        let recordDAO = new this.crudService.classDAO();
-        for (let prop in req.query) {
-            if (prop in recordDAO) {
-                if (typeof recordDAO[prop] == "string") {
-                    filter[prop] = {
-                        $regex: req.query[prop]
-                    };
-                } else if (recordDAO[prop] instanceof Date) {
-                    try {
-                        var dateDirty = new Date(req.query[prop]);
-                        var dateClean = new Date(dateDirty.getFullYear(), dateDirty.getMonth(), dateDirty.getDay());
-                        filter[prop] = dateClean.toISOString();
-                    } catch (error) {}
-                } else {
-                    filter[prop] = req.query[prop];
-                }
-            }
-        }
-        return filter;
-    }
     //#endregion
 
     //#region CRUD
@@ -335,6 +282,61 @@ class CrudAPI extends BaseAPI {
         } catch (error) {
             this.sendError(res, this.ST_InternalServerError, "deleteOne()", error.message);
         };
+    }
+    //#endregion
+
+    //#region Aux Methods
+    async seed(req, res) {
+        console.log(`API ${this.nameAPI}: seed(): `);
+        try {
+            const errors = [];
+            const result = await this.crudService.seed();
+            if (result) {
+                this.sendData(res, result)
+            } else {
+                this.sendError(res, this.ST_NotFound, "seed()", errors);
+            }
+        } catch (err) {
+            this.sendError(res, this.ST_InternalServerError, "seed()", err.message);
+        };
+    };
+
+    async unseed(req, res) {
+        console.log(`API ${this.nameAPI}: unseed(): `);
+        try {
+            const errors = [];
+            const result = await this.crudService.unseed();
+            if (result) {
+                this.sendData(res, result)
+            } else {
+                this.sendError(res, this.ST_NotFound, "unseed()", errors);
+            }
+        } catch (err) {
+            this.sendError(res, this.ST_InternalServerError, "unseed()", err.message);
+        };
+    };
+
+    getFilterFromQuery(req) {
+        const filter = {};
+        let recordDAO = new this.crudService.classDAO();
+        for (let prop in req.query) {
+            if (prop in recordDAO) {
+                if (typeof recordDAO[prop] == "string") {
+                    filter[prop] = {
+                        $regex: req.query[prop]
+                    };
+                } else if (recordDAO[prop] instanceof Date) {
+                    try {
+                        var dateDirty = new Date(req.query[prop]);
+                        var dateClean = new Date(dateDirty.getFullYear(), dateDirty.getMonth(), dateDirty.getDay());
+                        filter[prop] = dateClean.toISOString();
+                    } catch (error) {}
+                } else {
+                    filter[prop] = req.query[prop];
+                }
+            }
+        }
+        return filter;
     }
     //#endregion
 }
