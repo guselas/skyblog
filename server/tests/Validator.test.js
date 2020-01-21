@@ -20,7 +20,7 @@ test('Validate checks if the word is offensive', () => {
     expect(badWord).not.toBe("");
     let result = validator.validate(5, `this text contains ${badWord} as offensive word`);
     expect(result.ok).not.toBe(true);
-    expect(result.words.join()).toBe("word: "+[badWord.word]+"(level"+[badWord.level]+")");
+    expect("word: "+[result.word]+"(level"+[result.level]+")").toBe("word: "+[badWord.word]+"(level"+[badWord.level]+")");
 
 });
 

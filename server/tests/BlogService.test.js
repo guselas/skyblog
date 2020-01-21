@@ -123,25 +123,6 @@ afterAll(async () => {
     }
 });
 
-test('If no email at login we should receive "email is mandatory" message', async() => {
-    try {
-        await context.execTest(async (context) => {
-            //----------------------------------
-            //code to test
-            //----------------------------------
-            let errros = [];
-            let email = await context.blogService.login()
-
-            //----------------------------------
-            //end code to test
-            //----------------------------------
-        });
-    } finally {
-
-    }
-    context.disconnect();
-});
-
 test('After doing the blogService.seed(), we should have all the bad words lists + count ', async () => {
     let context = new BlogContext("localhost", "skyBlogTest");
     try {
@@ -297,7 +278,7 @@ test('When we insert a comment (not offensive) to a blog entry we can read that 
                         postBlogCommentDTO = blogCommentDTO.postModel();
                         postBlogCommentDTO.commentText = "This is a comment for this test post";
                         let updatedBlogDTO = await context.blogService.newComment(authorDTO.id, newBlogDTO.id, postBlogCommentDTO, errors);
-                        expect(updatedBlogDTO).not.toBe(null);
+                        expect(updatedBlogDTO).not.toBe(undefined);
                         if (updatedBlogDTO) {
                             expect(updatedBlogDTO.comments.length).not.toBe(0);
                             if (updatedBlogDTO.comments.length > 0) {

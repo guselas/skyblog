@@ -18,11 +18,15 @@ class CommentsService extends CrudService {
                 let userDAO = await this.DAO.UserDAO.findById(commentDTO.authorId);
                 if (!userDAO) {
                     ok = false;
-                    errors.push(`AuthorId "${postDTO.authorId}" not found`);
+                    errors.push(`AuthorId "${FullCommentDTO.author}" not found`);
+
+                    // errors.push(`AuthorId "${postDTO.authorId}" not found`);
                 }
             } catch (error) {
                 ok = false;
-                errors.push(`AuthorId "${postDTO.authorId}" invalid: ${error.message}`);
+                errors.push(`AuthorId "${FullCommentDTO.author}" invalid: ${error.message}`);
+
+                // errors.push(`AuthorId "${postDTO.authorId}" invalid: ${error.message}`);
             }
             //check PostId
             try {
