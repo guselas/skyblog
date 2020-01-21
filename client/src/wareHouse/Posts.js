@@ -1,34 +1,63 @@
 import axios from 'axios';
 // import router from '../router/index'
+
+
 const state = {
-    token: localStorage.getItem('token') || '',
-    posts: [],
     status: '',
-    post: []
+
+    bearerToken: '',
+    posts: [],
+    currentPostId: '',
+    currentPost: {}
 };
 const getters = {
-    posts: state => state.posts,
-    post: state => state.post
+        posts: state => state.posts,
+    post: state => {
+        for (let post of state.posts) {
+            if (post.id == state.currentPostId) {
+                return post;
+            }
+        }
+        return null;
+    }
 };
 const actions = {
     // Get all Posts
-    async getAllPosts({commit}) {
+    async getAllPosts({
+        commit
+    }) {
         commit('posts_request');
-        let res = await axios.get('http://localhost:3000/api/blog');
         /* eslint-disable no-console */
-        // console.log("Res", res.data.data[0].postTitle);
-        console.log("Res", res);
+        console.log(this.state);
+        /* eslint-enable no-console */
+        let axiosReqConfig = {};
+        if (this.state.bearerToken) {
+            axiosReqConfig.headers = {
+                'Authorization': "Bearer " + this.state.bearerToken
+            }
+        }
+        let res = await axios.get('http://localhost:3000/api/blog', axiosReqConfig);
+        /* eslint-disable no-console */
 
         /* eslint-enable no-console */
         commit('posts_data', res.data.data)
         return res;
     },
+
     //  Get a specific Post
     async getSpecificPost({
         commit
     }) {
         commit('post_request');
-        let res = await axios.get('http://localhost:3000/api/blog' + window.document.location.pathname);
+        let blogId = this.state.currentBlogId;
+        let axiosReqConfig = {};
+        if (this.state.bearerToken) {
+            axiosReqConfig.headers = {
+                'Authorization': "Bearer " + this.state.bearerToken
+            }
+        }
+
+        let res = await axios.get(`http://localhost:3000/api/blog/${blogId}`, axiosReqConfig);
         /* eslint-disable no-console */
 
         /* eslint-enable no-console */

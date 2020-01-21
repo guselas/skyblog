@@ -116,7 +116,7 @@ class BlogService extends BaseService {
             //Filter passed
             if (ok) {
                 let blogDTO = new this.DTO.BlogDTO();
-                let userDAO = await this.DAO.UserDAO.findById(postDTO.userId);
+                let userDAO = await this.DAO.UserDAO.findById(postDTO.authorId);
                 if (userDAO) {
                     blogDTO.fromDAO(userDAO);
                 }
@@ -179,7 +179,6 @@ class BlogService extends BaseService {
     async getOne(blogId, errors) {
         //we create the result variable
         let blogDTO = new this.DTO.BlogDTO();
-
         //we look for the blogHeader fields
         let postDAO = await this.DAO.PostDAO.findById(blogId);
         if (!postDAO) {
@@ -191,21 +190,21 @@ class BlogService extends BaseService {
                 blogDTO.fromDAO(userDAO);
             }
             //Find Comments
-            var comments = await this.DAO.CommentDAO.find({
+            var commentsDAO = await this.DAO.CommentDAO.find({
                 postId: postDAO._id
             });
-            if (comments) {
-                blogDTO.hasComments = (comments.length > 0);
+            if (commentsDAO) {
+                blogDTO.hasComments = (commentsDAO.length > 0);
                 let blogCommentsDTO = [];
-                for (let comment of comments) {
+                for (let commentDAO of commentsDAO) {
                     let blogCommentDTO = new this.DTO.BlogCommentDTO();
                     //we load the user fields 
-                    userDAO = await this.DAO.UserDAO.findById(comment.userId);
+                    userDAO = await this.DAO.UserDAO.findById(commentDAO.authorId);
                     if (userDAO) {
                         blogCommentDTO.fromDAO(userDAO);
                     }
                     //we load the comment fields
-                    blogCommentDTO.fromDAO(comment);
+                    blogCommentDTO.fromDAO(commentDAO);
                     //we push into result
                     blogCommentsDTO.push(blogCommentDTO);
                 }

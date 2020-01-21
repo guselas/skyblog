@@ -8,7 +8,7 @@
         <div class="row ">
           <div v-for="post in posts" :key="post.id" class="col-md-4 jumbotron">
             <div class="card-header">{{post.postTitle}}</div>
-            <div class="card-body"><!--post.image--></div>
+            <div class="card-body"><!--post.image-->{{post.postText}}</div>
             <div class="card.footer">{{post.nickName}}</div>
             <router-link :to="'/post/' + post.id">
             </router-link>
