@@ -1,25 +1,25 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import Posts from '../wareHouse/Posts';
+import Posts from "../wareHouse/Posts";
+import Auth from "../wareHouse/Auth";
 
 Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
-    status: '',
+    status: "",
 
-    bearerToken: '',
+    bearerToken: "",
     posts: [],
-    currentPostId: '',
+    currentPostId: "",
     currentPost: {}
   },
   mutations: {},
   actions: {},
   modules: {
-    Posts
+    Posts,
+    Auth
   }
 });
 
 export default store;
-
-

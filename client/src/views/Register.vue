@@ -26,40 +26,46 @@
       <label for="exampleInputPassword1">Confirm Password</label>
       <input type="password" class="form-control" id="confirmPasswordInput" />
     </div>
+
     <div class="form-group">
-      <button type="submit" id="cancelBtn" class="btn btn-danger">
-        Cancel
-      </button>
-      <button type="submit" class="btn btn-primary">Register</button>
+      <router-link to="/">
+        <button type="submit" id="cancelBtn" class="btn btn-danger">
+          Cancel
+        </button>
+      </router-link>
+
+      <router-link to="/">
+        <button type="submit" class="btn btn-primary">Register</button>
+      </router-link>
     </div>
   </form>
 </template>
 
 <script>
 /* eslint-disable */
-export default {
-  name: "Register",
-  props: {}
-};
+  export default {
+    name: "Register",
+    props: {}
+  };
 </script>
 
 <style>
-.form-group {
-  width: 50%;
-  margin: 0 auto;
-}
+  .form-group {
+    width: 50%;
+    margin: 0 auto;
+  }
 
-.form-group input {
-  border: 1pt solid black;
-  width: 25%;
-  margin-left: 5px;
-  display: inline;
-  text-align: right;
-  margin-bottom: 10px;
-}
+  .form-group input {
+    border: 1pt solid black;
+    width: 25%;
+    margin-left: 5px;
+    display: inline;
+    text-align: right;
+    margin-bottom: 10px;
+  }
 
-.form-group label {
-  width: 15%;
-  text-align: left;
-}
+  .form-group label {
+    width: 15%;
+    text-align: left;
+  }
 </style>

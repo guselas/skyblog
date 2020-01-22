@@ -16,9 +16,15 @@ export default {
 };
 </script>
 
-<style>
-img {
+<style scoped>
+form img {
   height: 35px;
   margin: 0 10px;
+}
+
+form {
+  position: fixed;
+  bottom: 0;
+  right: 45%;
 }
 </style>
