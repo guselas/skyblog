@@ -8,8 +8,11 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     status: "",
-
-    bearerToken: "",
+    profile: {
+      isAdmin: false,
+      isAuthor: false
+    },
+    authorization: "",
     posts: [],
     currentPostId: "",
     currentPost: {}

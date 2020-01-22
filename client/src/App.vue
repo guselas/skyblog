@@ -1,10 +1,19 @@
 <template>
   <div id="app">
     <div id="nav">
-      <TopMenu />
+      <div class="card">
+        <div class="card-header">
+          <TopMenu />
+        </div>
+        <div class="card-body">
+          <router-view />
+        </div>
+        <div class="card-footer"></div>
+      </div>
     </div>
-    <router-view />
-    <SocialMedia />
+    <div class="appBottom container-fluid">
+      <SocialMedia />
+    </div>
   </div>
 </template>
 
@@ -62,7 +71,7 @@ body {
     rgba(62, 191, 55, 1) 0%,
     rgba(27, 163, 27, 1) 100%
   );
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3ebf37', endColorstr='#1ba31b', GradientType=1 );
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#3ebf37', endColorstr='#1ba31b', GradientType=1);
 }
 
 #nav {
@@ -76,5 +85,12 @@ body {
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+
+.appBottom {
+  height: 43px;
+  position: fixed;
+  bottom: 0;
+  background-color: rgba(62, 191, 55, 1);
 }
 </style>

@@ -2,13 +2,13 @@ import axios from "axios";
 // import router from '../router/index'
 
 const state = {
-  status: "",
+  status : "",
+  posts : [],
+  currentPostId : "",
+  post: {}  
+}
 
-  bearerToken: "",
-  posts: [],
-  currentPostId: "",
-  currentPost: {}
-};
+
 const getters = {
   posts: state => state.posts,
   post: state => {
@@ -28,15 +28,14 @@ const actions = {
 
     /* eslint-enable no-console */
     let axiosReqConfig = {};
-    if (this.state.bearerToken) {
+    if (localStorage.authorization) {
       axiosReqConfig.headers = {
-        Authorization: "Bearer " + this.state.bearerToken
+        Authorization: localStorage.authorization
       };
     }
     let res = await axios.get("http://localhost:3000/api/blog", axiosReqConfig);
     /* eslint-disable no-console */
-    // console.log("postId", res.data.data[0].id);
-    console.log("state.currentPostId", this.state.posts);
+
     /* eslint-enable no-console */
     commit("posts_data", res.data.data);
     return res;
@@ -47,9 +46,9 @@ const actions = {
     commit("post_request");
     let blogId = this.state.currentPostId;
     let axiosReqConfig = {};
-    if (this.state.bearerToken) {
+    if (localStorage.authorization) {
       axiosReqConfig.headers = {
-        Authorization: "Bearer " + this.state.bearerToken
+        Authorization: localStorage.authorization
       };
     }
 
@@ -69,7 +68,10 @@ const actions = {
     try {
       commit("createPost_request");
       let res = await axios.post("http://localhost:3000/api/blog", postData);
-      if (res.data.success !== undefined) {
+      if (
+        localStorage["profile.isAdmin"] ||
+        localStorage["profile.isAuthor"]
+      ) {
         commit("createPost_success");
       }
       return res;
@@ -79,25 +81,34 @@ const actions = {
   }
 };
 const mutations = {
+  //Posts before
   posts_request(state) {
     state.status = "loading";
   },
+  //Posts after
   posts_data(state, posts) {
     state.posts = posts;
   },
+  //Post before
+  post_request(state) {
+    state.status = "loading";
+  },
+  //Post after
   post_data(state, post) {
     state.post = post;
   },
+  //Create Post before
   createPost_request(state) {
-    state.status = "loading";
+    state.status = "creating";
   },
+  //Create Post fater
   createPost_success(state) {
-    state.status = "success";
+    state.status = "post posted";
   }
 };
 export default {
-  state,
   actions,
   mutations,
-  getters
+  getters,
+  state
 };

@@ -1,40 +1,58 @@
 import axios from "axios";
 // import router from '../router/index'
 
-const state = {
-  status: "",
-  bearerToken: "",
-  posts: [],
-  currentPostId: "",
-  currentPost: {}
-};
+
 const actions = {
   // Post Login
   async postLogin({ commit }, user) {
-    commit("post_login");
+    commit("post_login_request");
+    let res_login = await axios.post(
+      "http://localhost:3000/api/blog/login",
+      user
+    );
     /* eslint-disable no-console */
-
+  
     /* eslint-enable no-console */
+    commit("post_login_data", res_login.data.Authorization);
 
-    let res = await axios.post("http://localhost:3000/api/blog/login", user);
-    /* eslint-disable no-console */
-    console.log("Res from login:", res);
+    commit("post_profile_request");
+    if (localStorage.authorization) {
+      let config = {
+        headers: {
+          Authorization: localStorage.authorization
+        }
+      };
+      let res_profile = await axios.get(
+        "http://localhost:3000/api/blog/profile",
+        config
+      );
 
-    /* eslint-enable no-console */
-    commit("post_login_data", res.data);
-    return res;
+      commit("post_profile_data", res_profile.data);
+    }
+
+    return res_login;
   }
 };
+
 const mutations = {
-  posts_request(state) {
+  post_login_request(state) {
     state.status = "login";
   },
-  post_login_data(state, bearerToken) {
-    state.bearerToken = bearerToken;
+  post_login_data(state, authorization) {
+    localStorage.authorization = authorization;
+    state.status = "loged";
+  },
+  post_profile_request(state) {
+    state.status = "profile";
+  },
+  post_profile_data(state, profile) {
+    for(let field in profile){
+      localStorage[`profile.${field}`] = profile[field];  
+    }
+    state.status = "profile OK";
   }
 };
 export default {
-  state,
   actions,
   mutations
 };

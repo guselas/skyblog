@@ -29,8 +29,8 @@ const routes = [
     component: PostDetail
   },
   {
-    path: "/logout",
-    name: "logout",
+    path: "/posts",
+    name: "posts",
     component: Home
   }
 ];

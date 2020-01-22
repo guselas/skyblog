@@ -20,11 +20,9 @@ export default {
 form img {
   height: 35px;
   margin: 0 10px;
+  padding-top: 10px;
 }
 
 form {
-  position: fixed;
-  bottom: 0;
-  right: 45%;
 }
 </style>

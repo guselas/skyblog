@@ -6,17 +6,20 @@
       <div class="form-group">
         <label>Email address</label>
         <input
-          v-model="email"
+          :v-model="email"
           type="email"
           class="form-control"
           aria-describedby="emailHelp"
           placeholder="Insert an email"
+          value="fr.ruizf@gmail.com"
         />
       </div>
 
       <div class="form-group">
-        <label for="exampleInputPassword1" placeholder="Insert a password">Password</label>
-        <input v-model="password" type="password" class="form-control" />
+        <label for="exampleInputPassword1" placeholder="Insert a password"
+          >Password</label
+        >
+        <input :v-model="password" type="password" class="form-control"   value="123" />
       </div>
 
       <div class="form-group">
@@ -43,35 +46,32 @@
     name: "login",
     data() {
       return {
-        email: "",
-        password: ""
+        email: "fr.ruizf@gmail.com",
+        password: "123"
       }
     },
     // props: {
     //   input: {
-    //     email: "",
-    //     password: ""
+    //     email: "fr.ruizf@gmail.com",
+    //     password: "123"
     //   }
     // },
     methods: {
       ...mapActions(['postLogin']),
       login() {
+        /* eslint-disable  no-console*/
+        console.log("Login this : ", this);
+        /* eslint-disable  no-console*/
+
         let user = {
-          email: this.email,
-          password: this.password
+          email: this.$data.email,
+          password: this.$data.password
         };
         this.postLogin(user)
           .then(res => {
             /* eslint-disable  no-console*/
-            console.log("res", res.data.Authorization);
-            // console.log("store: ",store);
-            console.log("window: ",window);
+
             /* eslint-disable  no-console*/
-            let bearerToken = (res.data.Authorization).replace('Bearer', '');
-            console.log("bearerToken: ", bearerToken);
-            if (bearerToken) {
-              this.$router.push('/');
-            }
           })
           .catch(err => {
             /* eslint-disable  no-console*/
