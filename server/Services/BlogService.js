@@ -104,6 +104,25 @@ class BlogService extends BaseService {
         return count;
     }
 
+    async getCategories(errors){
+        let dict = {};
+        let listCategories = [];
+        let itemsDAO = await this.DAO.PostDAO.find({}, {
+            _id : 0,
+            category : 1
+        });
+        if(itemsDAO){
+            for(let item of itemsDAO){
+                dict[item.category] = true;
+            }
+            for(let category in dict){
+                listCategories.push(category);
+            }
+            listCategories.sort();
+        }
+        return listCategories;
+    }
+
     async getAll(level, filter, sorter, pageSize, pageIndex, errors) {
         let postsDTO = await this.services.postsService.readAll(filter, sorter, pageSize, pageIndex, errors);
         let blogsDTO = [];

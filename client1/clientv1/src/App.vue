@@ -5,21 +5,25 @@
       <router-link to="/"
         ><img src="./components/assets/MenuIcons/Home.png"
       /></router-link>
-      |
+      <!-- |
       <router-link to="/postdetail"
         ><img src="./components/assets/MenuIcons/Details.png"
+      /></router-link> -->
+      
+      <router-link v-if="isAuthenticated" to="/profile"
+        >|<img src="./components/assets/MenuIcons/Profile.png"
       /></router-link>
-      |
-      <router-link to="/profile"
-        ><img src="./components/assets/MenuIcons/Profile.png"
+      
+      <router-link v-if="!isAuthenticated" to="/login"
+        >|<img src="./components/assets/MenuIcons/logIn.png"
       /></router-link>
-      |
-      <router-link to="/login"
-        ><img src="./components/assets/MenuIcons/logIn.png"
+
+      <router-link v-if="isAuthenticated"  to="/logout"
+        >|<img src="./components/assets/MenuIcons/logOut.png"
       /></router-link>
-      | <a><img src="./components/assets/MenuIcons/logOut.png"/></a> |
-      <router-link to="/register"
-        ><img src="./components/assets/MenuIcons/Register.png"
+
+      <router-link v-if="!isAuthenticated"  to="/register"
+        >|<img src="./components/assets/MenuIcons/Register.png"
       /></router-link>
     </div>
     <router-view />
@@ -31,9 +35,16 @@
 import SocialMedia from "./components/SocialMedia";
 
 export default {
+
+  computed: {
+    isAuthenticated(){
+      return this.$store.getters.isAuthenticated;
+    }
+  },
   components: {
     SocialMedia
-  }
+  },
+  
 };
 </script>
 

@@ -8,8 +8,50 @@ export default new Vuex.Store({
     authorization: "",
     profile: {},
     posts: [],
+    categories: [],
     currentPostId: "",
     currentPost: {}
+  },
+  getters: {
+    isAuthenticated(state) {
+      return "nickName" in state.profile;
+    },
+    isAuthor(state) {
+      if (this.isAuthenticated) {
+        return state.profile.isAuthor;
+      }
+    },
+    isAdmin(state) {
+      if ("nickName" in state.profile) {
+        return state.profile.isAdmin;
+      }
+    },
+    isBlocked(state) {
+      if ("nickName" in state.profile) {
+        return state.profile.isBlocked;
+      }
+    },
+    nickName(state) {
+      if ("nickName" in state.profile) {
+        return state.profile.nickName;
+      } else {
+        return "anonymous";
+      }
+    },
+    email(state) {
+      if ("nickName" in state.profile) {
+        return state.profile.email;
+      } else {
+        return "anonymous";
+      }
+    },
+    id(state) {
+      if ("nickName" in state.profile) {
+        return state.profile.id;
+      } else {
+        return "";
+      }
+    },
   },
   mutations: {
     //------------------------------------------
@@ -74,11 +116,17 @@ export default new Vuex.Store({
     unsetCurrentPost(state) {
       state.currentPostId = "";
       state.currentPost = {};
-    }
+    },
+    //------------------------------------------
+    setCategories(state, payload) {
+      state.categories = payload;
+    },
   },
   actions: {
     //------------------------------------------
-    setAuthorization({ commit }, payload) {
+    setAuthorization({
+      commit
+    }, payload) {
       /* eslint-disable no-console */
       console.log("setAuthorization()", payload);
       /* eslint-enable no-console */
@@ -90,12 +138,16 @@ export default new Vuex.Store({
       }
     },
     //------------------------------------------
-    unsetAuthorization({ commit }) {
+    unsetAuthorization({
+      commit
+    }) {
       commit("unsetAuthorization");
       delete localStorage["authorization"];
     },
     //------------------------------------------
-    setProfile({ commit }, payload) {
+    setProfile({
+      commit
+    }, payload) {
       if (payload) {
         /* eslint-disable no-console */
         console.log("setProfile()", payload);
@@ -106,7 +158,9 @@ export default new Vuex.Store({
       }
     },
     //------------------------------------------
-    setPosts({ commit }, payload) {
+    setPosts({
+      commit
+    }, payload) {
       if (payload) {
         /* eslint-disable no-console */
         console.log("setPosts()", payload);
@@ -117,16 +171,26 @@ export default new Vuex.Store({
       }
     },
     //------------------------------------------
-    setCurrentPost({ commit }, payload) {
+    setCurrentPost({
+      commit
+    }, payload) {
       if (payload) {
-        /* eslint-disable no-console */
-        console.log("setCurrentPost()", payload);
-        /* eslint-enable no-console */
         commit("setCurrentPost", payload);
       } else {
         commit("unsetCurrentPost");
       }
-    }
+    },
+    //------------------------------------------
+    setCategories({
+      commit
+    }, payload) {
+      if (payload) {
+        /* eslint-disable no-console */
+        console.log("setCategories()", payload);
+        /* eslint-enable no-console */
+        commit("setCategories", payload);
+      }
+    },
   },
   modules: {}
 });

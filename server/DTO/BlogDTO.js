@@ -6,6 +6,7 @@ class BlogDTO extends BaseDTO {
         //Los inicializo para que cuando el Blog rellene un BlogForm si algun dato falta al menos hay un valor por defecto en la BD
         this.postTitle = "";
         this.postText = "";
+        this.category = "";
         this.postDate = new Date();
         this.lastUpdate = new Date();
 

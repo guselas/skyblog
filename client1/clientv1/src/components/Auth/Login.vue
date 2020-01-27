@@ -9,32 +9,16 @@
           <form>
             <div class="form-group">
               <label for="InputEmail1">Email address</label>
-              <input
-                v-model="user.email"
-                @input="user.email"
-                type="email"
-                class="form-control"
-                id="InputEmail1"
-                aria-describedby="emailHelp"
-              />
+              <input v-model="user.email" @input="user.email" type="email" class="form-control" id="InputEmail1"
+                aria-describedby="emailHelp" />
             </div>
             <div class="form-group">
               <label for="InputPassword1">Password</label>
-              <input
-                v-model="user.password"
-                @input="user.password"
-                type="password"
-                class="form-control"
-                id="InputPassword1"
-              />
+              <input v-model="user.password" @input="user.password" type="password" class="form-control"
+                id="InputPassword1" />
             </div>
             <div class="form-group form-check">
-              <input
-                type="checkbox"
-                class="form-check-input"
-                id="Check1"
-                v-model="rememberMe"
-              />
+              <input type="checkbox" class="form-check-input" id="Check1" v-model="rememberMe" />
               <label class="form-check-label" for="Check1">Remember me</label>
             </div>
             <div style="text-align:center">
@@ -51,41 +35,47 @@
 </template>
 
 <script>
-import axios from "axios";
+  import axios from "axios";
 
-export default {
-  data() {
-    return {
-      user: {
-        email: "fr.ruizf@gmail.com",
-        password: "123"
-      },
-      rememberMe: false
-    };
-  },
-  methods: {
-    async submitLoginForm() {
-      let loginDTO = {
-        email: this.user.email,
-        password: this.user.password
+  export default {
+    data() {
+      return {
+        user: {
+          email: "fr.ruizf@gmail.com",
+          password: "123"
+        },
+        rememberMe: false
       };
-      let loginResponse = await axios.post(
-        "http://localhost:3000/api/blog/login",
-        loginDTO
-      );
+    },
+    methods: {
+      async submitLoginForm() {
+        let loginDTO = {
+          email: this.user.email,
+          password: this.user.password
+        };
+        let loginResponse = await axios.post(
+          "http://localhost:3000/api/blog/login",
+          loginDTO
+        );
 
-      let data = loginResponse.data;
-      data.rememberMe = this.rememberMe;
+        let data = loginResponse.data;
+        data.rememberMe = this.rememberMe;
 
-      await this.$store.dispatch("setAuthorization", data);
-      let profileResponse = await axios.get(
-        "http://localhost:3000/api/blog/profile"
-      );
-      await this.$store.dispatch("setProfile", profileResponse.data);
-      this.$router.push("/");
+        await this.$store.dispatch("setAuthorization", data);
+        let config = {
+          headers: {
+            Authorization: data.Authorization
+          }
+        };
+        let profileResponse = await axios.get(
+          "http://localhost:3000/api/blog/profile", config
+
+        );
+        await this.$store.dispatch("setProfile", profileResponse.data);
+        this.$router.push("/");
+      }
     }
-  }
-};
+  };
 </script>
 
 <style></style>

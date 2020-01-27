@@ -1,62 +1,70 @@
 <template>
   <div id="register">
-    <div class="container">
-      <h1>Register Vue</h1>
+    <div class="card">
+      <div class="card-header">
+        <h3>Register Vue</h3>
+      </div>
+      <br />
+      <br />
+      <div class="card-body">
+        <div class="container">
+          <form>
+            <div class="form-group">
+              <label for="InputEmail1">Email address</label>
+              <input
+                v-model="user.email"
+                @input="user.email"
+                type="email"
+                class="form-control"
+                id="InputEmail1"
+                aria-describedby="emailHelp"
+              />
+            </div>
+            <div class="form-group">
+              <label for="InputPassword1">Password</label>
+              <input
+                v-model="user.password"
+                @input="user.password"
+                type="password"
+                class="form-control"
+                id="InputPassword"
+              />
+            </div>
 
-      <br />
-      <br />
-      <mark
-        >Registering to this site you accept all
-        <a
-          href="https://www.termsfeed.com/blog/sample-terms-and-conditions-template/"
-          >terms and conditions</a
-        >*
-      </mark>
-      <br />
-      <br />
-
-      <form>
-        <div class="form-group">
-          <label for="InputEmail1">Email address</label>
-          <input
-            v-model="user.email"
-            @input="user.email"
-            type="email"
-            class="form-control"
-            id="InputEmail1"
-            aria-describedby="emailHelp"
-          />
+            <div class="form-group">
+              <label for="InputPassword1">Nick Name</label>
+              <input
+                v-model="user.nickName"
+                @input="user.nickName"
+                type="text"
+                class="form-control"
+                id="InputnickName"
+              />
+            </div>
+            <div style="text-align:center">
+              <button
+                class="btn btn-primary"
+                @click.prevent="submitRegisterForm"
+              >
+                Register
+              </button>
+              <button class="btn btn-danger">
+                Cancel
+              </button>
+            </div>
+          </form>
+          <br />
+          <div style="text-align:center">
+            <mark
+              >Registering to this site you accept all
+              <a
+                href="https://www.termsfeed.com/blog/sample-terms-and-conditions-template/"
+                >terms and conditions</a
+              >*
+            </mark>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="InputPassword1">Password</label>
-          <input
-            v-model="user.password"
-            @input="user.password"
-            type="password"
-            class="form-control"
-            id="InputPassword"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="InputPassword1">Nick Name</label>
-          <input
-            v-model="user.nickName"
-            @input="user.nickName"
-            type="text"
-            class="form-control"
-            id="InputnickName"
-          />
-        </div>
-        <div style="text-align:center">
-          <button class="btn btn-primary" @click.prevent="submitRegisterForm">
-            Register
-          </button>
-          <button class="btn btn-danger">
-            Cancel
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 </template>

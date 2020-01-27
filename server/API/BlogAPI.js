@@ -35,6 +35,8 @@ class BlogAPI extends BaseAPI {
         app.get(`${uri}/blog/badwords/count`, blogMW.isAdmin.bind(blogMW), this.getBadWordsCount.bind(this));
         app.get(`${uri}/blog/badwords`, blogMW.isAdmin.bind(blogMW), this.getBadWords.bind(this));
 
+        app.get(`${uri}/blog/categories`, this.getCategories.bind(this));
+
         app.get(`${uri}/blog`, this.getAll.bind(this));
         app.get(`${uri}/blog/:blogid`, this.getBlog.bind(this));
 
@@ -157,6 +159,17 @@ class BlogAPI extends BaseAPI {
     //#endregion
 
     //#region Blog
+    async getCategories(req, res) {
+        console.log(`API ${this.nameAPI}: getCategories(): `);
+        let errors = [];
+        const categories = await this.blogService.getCategories(errors);
+        if (categories) {
+            this.sendData(res, categories);
+        } else {
+            this.sendError(res, this.ST_BadRequest, "getCategories()", errors);
+        }
+    }
+
     async getAll(req, res) {
         console.log(`API ${this.nameAPI}: getAll(): `);
         //Normalize filterValues from query

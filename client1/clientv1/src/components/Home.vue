@@ -1,81 +1,47 @@
 <template>
   <div class="home">
     <div class="card">
+      <!-- Posts Nav Bar -->
       <div class="card-header">
         <h3>Posts</h3>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-          <a class="navbar-brand" href="#">Posts</a>
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
+        <div>
+          <b-navbar toggleable="lg" type="dark" variant="dark">
+            <b-navbar-brand href="#">Posts</b-navbar-brand>
 
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item active">
-                <a class="nav-link" href="#"
-                  >DC Comics <span class="sr-only">(current)</span></a
-                >
-              </li>
-              <li class="nav-item active">
-                <a class="nav-link" href="#"
-                  >Marvel Comics <span class="sr-only">(current)</span></a
-                >
-              </li>
-              <li class="nav-item dropdown">
-                <a
-                  class="nav-link dropdown-toggle"
-                  href="#"
-                  id="navbarDropdown"
-                  role="button"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  Filter
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="#">Latest Posts</a>
-                  <a class="dropdown-item" href="#">Most liked</a>
-                  <a class="dropdown-item" href="#">My Posts</a>
-                </div>
-              </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0">
-              <input
-                class="form-control mr-sm-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-              />
-              <button
-                class="btn btn-outline-success my-2 my-sm-0"
-                type="submit"
-              >
-                Search
-              </button>
-            </form>
-          </div>
-        </nav>
+            <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+
+            <b-collapse id="nav-collapse" is-nav>
+              <b-navbar-nav>
+                <b-button v-for="item in categories" :key="item" @click="getPostsByCategory(item)">{{ item }}</b-button>
+              </b-navbar-nav>
+
+              <!-- Right aligned nav items -->
+              <b-navbar-nav class="ml-auto">
+                <b-nav-form>
+                  <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
+                  <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+                </b-nav-form>
+
+                <b-nav-item-dropdown text="Lang" right>
+                  <b-dropdown-item href="#">EN</b-dropdown-item>
+                  <b-dropdown-item href="#">ES</b-dropdown-item>
+                  <b-dropdown-item href="#">RU</b-dropdown-item>
+                  <b-dropdown-item href="#">FA</b-dropdown-item>
+                </b-nav-item-dropdown>
+
+              </b-navbar-nav>
+            </b-collapse>
+          </b-navbar>
+        </div>
       </div>
+      <!-- End Posts Nav Bar -->
       <!-- Posts cards Area -->
       <div class="card-body">
         <div class="row">
-          <div
-            v-for="(post, i) in this.$store.state.posts[0]"
-            :key="post.id"
-            class="col-md-4 jumbotron"
-          >
-            <a href="">
-              <div class="card-header">{{ post.postTitle }} // {{ i }}</div>
-            </a>
+          <div v-for="post in this.$store.state.posts" :key="post.id" class="col-md-4 jumbotron">
+            <router-link :to="{ name: 'postDetail', params: { id: post.id } }">
+              <div class="card-header">{{ post.postTitle }}</div>
+            </router-link>
             <div class="card-body">
               {{ post.postText }}
             </div>
@@ -91,25 +57,52 @@
 </template>
 
 <script>
-import axios from "axios";
-// @ is an alias to /src
+  import axios from "axios";
+  // @ is an alias to /src
 
-export default {
-  name: "home",
+  export default {
+    name: "home",
+    computed: {
+      categories() {
+        return this.$store.state.categories;
+      }
+    },
+    methods: {
+      async getPosts() {
+        let category = this.$route.query.category;
+        let postsResponse;
+        if (category) {
+          category = encodeURI(category);
+          /* eslint-disable no-console */
+          console.log("category: ", category);
+          /* eslint-enable no-console */
 
-  methods: {
-    async getPosts() {
-      let postsResponse = await axios.get("http://localhost:3000/api/blog");
-      this.$store.state.posts.push(postsResponse.data.data);
-      /* eslint-disable no-console */
-      await console.log("this.$store.state.posts", this.$store.state.posts[0]);
-      /* eslint-enable no-console */
-    }
-  },
-  async created() {
-    await this.getPosts();
-  }
-};
+          postsResponse = await axios.get(`http://localhost:3000/api/blog?category=${category}`);
+
+        } else {
+          postsResponse = await axios.get("http://localhost:3000/api/blog");
+        }
+        this.$store.dispatch("setPosts", postsResponse.data.data);
+      },
+      async getPostsByCategory(category) {
+
+        if (category) {
+          category = encodeURI(category);
+                   let postsResponse = await axios.get(`http://localhost:3000/api/blog?category=${category}`);
+          this.$store.dispatch("setPosts", postsResponse.data.data);
+        }
+      },
+
+      async getCategories() {
+        let categoriesResponse = await axios.get("http://localhost:3000/api/blog/categories");
+        this.$store.dispatch("setCategories", categoriesResponse.data);
+      }
+    },
+    async created() {
+      await this.getPosts();
+      await this.getCategories();
+    },
+  };
 </script>
 
 <style></style>

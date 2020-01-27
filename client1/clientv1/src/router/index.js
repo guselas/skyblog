@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Home from "../components/Home.vue";
 import Register from "../components/Auth/Register";
 import Login from "../components/Auth/Login";
+import LogOut from "../components/Auth/LogOut";
 import PostDetail from "../components/PostDetail";
 import Profile from "../components/Auth/Profile";
 
@@ -15,7 +16,7 @@ const routes = [
     component: Home
   },
   {
-    path: "/postdetail",
+    path: "/postdetail/:id",
     name: "postDetail",
     component: PostDetail
   },
@@ -23,6 +24,11 @@ const routes = [
     path: "/login",
     name: "login",
     component: Login
+  },
+  {
+    path: "/logout",
+    name: "logout",
+    component: LogOut
   },
   {
     path: "/register",
