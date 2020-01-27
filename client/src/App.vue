@@ -1,14 +1,14 @@
 <template>
   <div id="app">
+    <a id="blogTittle">- COMICS BLOGAZO -</a>
     <div id="nav">
-      <div class="card">
+      <div class="card cardMain">
         <div class="card-header">
-          <TopMenu />
+          <TopMenu :profile="profile" />
         </div>
         <div class="card-body">
           <router-view />
         </div>
-        <div class="card-footer"></div>
       </div>
     </div>
     <div class="appBottom container-fluid">
@@ -22,6 +22,25 @@ import TopMenu from "../src/components/TopMenu";
 import SocialMedia from "../src/components/SocialMedia";
 
 export default {
+  el: "#app",
+  data() {
+    return {
+      profile: {
+        email: '',
+        nickName: '',
+        userId: '',
+        isAuthor: false,
+        isAdmin: false
+      }
+    };
+  },
+    created() {
+    this.profile.email = localStorage['profile.email'];
+    this.profile.nickName = localStorage['profile.nickName'];
+    this.profile.userId = localStorage['profile.id'];
+    this.profile.isAuthor = localStorage['profile.isAuthor'];
+    this.profile.isAdmin = localStorage['profile.isAdmin'];
+  },
   components: {
     TopMenu,
     SocialMedia
@@ -83,6 +102,17 @@ body {
   color: #2c3e50;
 }
 
+#blogTittle {
+  color: white;
+  align-self: auto;
+  font-family: "Rock Salt", cursive;
+  font-weight: bold;
+  font-size: 20pt;
+  text-shadow: rgb(59, 59, 59) -1px 1px, rgb(95, 95, 95) -2px 2px,
+    rgb(97, 97, 97) -3px 3px, rgb(97, 97, 97) -4px 4px, rgb(97, 97, 97) -5px 5px;
+  letter-spacing: 1px;
+}
+
 #nav a.router-link-exact-active {
   color: #42b983;
 }
@@ -92,5 +122,9 @@ body {
   position: fixed;
   bottom: 0;
   background-color: rgba(62, 191, 55, 1);
+}
+
+.cardMain {
+  border-color: rgba(62, 191, 55, 1);
 }
 </style>

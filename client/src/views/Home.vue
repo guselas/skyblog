@@ -4,15 +4,21 @@
       <div class="card-header bg-secondary text-white">
         <h3>Recent Posts Uploads</h3>
       </div>
-      <div class="card-body">
+
+      <div id="homePostCard" class="card-body">
         <div class="row ">
           <div v-for="post in posts" :key="post.id" class="col-md-4 jumbotron">
-            <div class="card-header">{{ post.postTitle }}</div>
-            <div class="card-body"><!--post.image-->{{ post.postText }}</div>
-            <div class="card-footer">
+            <a href="">
+              <div id="homePostCardHeader" class="card-header">
+                {{ post.postTitle }}
+              </div>
+            </a>
+            <div id="homePostCardBody" class="card-body">
+              <!--post.image-->{{ post.postText }}
+            </div>
+            <div id="homePostCardFooter" class="card-footer">
               {{ post.nickName }} {{ post.email }} {{ post.postDate }}
             </div>
-            <router-link :to="'/postDetail/' + post.id"></router-link>
           </div>
         </div>
       </div>
@@ -41,7 +47,7 @@
   .card-header {
     font-family: 'Bangers', cursive;
     font-size: 18pt;
-    background-color: rgb(0,0,0,0.5);
+    background-color: rgb(0, 0, 0, 0.5);
   }
 
   .card-body {
@@ -57,8 +63,8 @@
     color: white;
   }
 
-  .card-footer{
-    color: rgb(0,0,0,0.5);
+  .card-footer {
+    color: rgb(0, 0, 0, 0.5);
     background-color: transparent;
   }
 </style>

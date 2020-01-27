@@ -1,15 +1,20 @@
-<template>
+<template id="postDetail">
   <div class="postDetail">
     <!-- PostDetails -->
     <div class="card">
       <div class="card-header">
-        <h2>{{ port.title }}</h2>
+        <h2>post.title</h2>
       </div>
       <div class="card-body">
-        <!-- {{ post.image }} -->
+        <img
+          class="imgPostDetail"
+          src="../components/assets/twitter.png"
+          alt="aca no hay imagen"
+        />
+        post.image post.postText
       </div>
       <div class="footer">
-        <p>{{ post.nickName }}</p>
+        <p>post.nickName</p>
       </div>
     </div>
     <!-- End Post Details -->
@@ -18,13 +23,13 @@
     <div class="card">
       <button>Add comment</button>
       <div class="card-header">
-        <h2>{{ post.comment }}</h2>
+        <h2>post.comment</h2>
       </div>
       <div class="card-body">
-        {{ post.commentText }}
+        post.commentText
       </div>
       <div class="footer">
-        <p>{{ post.comments }}</p>
+        <p>post.comments</p>
       </div>
     </div>
     <!-- End Comments Details -->
@@ -32,16 +37,24 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+// import { mapActions, mapGetters } from "vuex";
 export default {
-  computed: mapGetters(["posts"]),
-  methods: {
-    ...mapActions(["getSpecificPost"])
-  },
-  created() {
-    this.getAllPosts();
+  name: "postDetail",
+  data: function() {
+    return {};
   }
+  // computed: mapGetters(["posts"]),
+  // methods: {
+  //   ...mapActions(["getSpecificPost"])
+  // },
+  // created() {
+  //   this.getSpecificPost();
+  // }
 };
 </script>
 
-<style></style>
+<style>
+.imgPostDetail {
+  height: 150px;
+}
+</style>

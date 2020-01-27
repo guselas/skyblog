@@ -1,11 +1,23 @@
 <template>
   <form style="display:inline">
-    <img src="./assets/facebook.png" />
-    <img src="./assets/googleplus.png" />
-    <img src="./assets/twitter.png" />
-    <img src="./assets/instagram.png" />
-    <img src="./assets/pinterest.png" />
-    <img src="./assets/github.png" />
+    <a target="_blank" href="https://es-es.facebook.com/"
+      ><img src="./assets/facebook.png"
+    /></a>
+    <a target="_blank" href="https://aboutme.google.com/"
+      ><img src="./assets/googleplus.png"
+    /></a>
+    <a target="_blank" href="https://twitter.com/"
+      ><img src="./assets/twitter.png"
+    /></a>
+    <a target="_blank" href="https://www.instagram.com"
+      ><img src="./assets/instagram.png"
+    /></a>
+    <a target="_blank" href="https://www.pinterest.ca"
+      ><img src="./assets/pinterest.png"
+    /></a>
+    <a target="_blank" href="https://github.com/"
+      ><img src="./assets/github.png"
+    /></a>
   </form>
 </template>
 
@@ -21,8 +33,5 @@ form img {
   height: 35px;
   margin: 0 10px;
   padding-top: 10px;
-}
-
-form {
 }
 </style>

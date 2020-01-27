@@ -1,8 +1,9 @@
 import axios from "axios";
 // import router from '../router/index'
 
-
 const actions = {
+  async register() {},
+
   // Post Login
   async postLogin({ commit }, user) {
     commit("post_login_request");
@@ -11,7 +12,7 @@ const actions = {
       user
     );
     /* eslint-disable no-console */
-  
+
     /* eslint-enable no-console */
     commit("post_login_data", res_login.data.Authorization);
 
@@ -29,8 +30,16 @@ const actions = {
 
       commit("post_profile_data", res_profile.data);
     }
-
     return res_login;
+  },
+
+  async postLogOut() {
+    delete localStorage.authorization;
+    for (let field in localStorage) {
+      if (field.indexOf("profile.") == 0) {
+        delete localStorage[field];
+      }
+    }
   }
 };
 
@@ -42,12 +51,19 @@ const mutations = {
     localStorage.authorization = authorization;
     state.status = "loged";
   },
+  post_logOut_request(state) {
+    state.status = "!loged";
+  },
+  post_logOut_data(state, authorization) {
+    localStorage.authorization = authorization;
+    state.status = "!loged";
+  },
   post_profile_request(state) {
     state.status = "profile";
   },
   post_profile_data(state, profile) {
-    for(let field in profile){
-      localStorage[`profile.${field}`] = profile[field];  
+    for (let field in profile) {
+      localStorage[`profile.${field}`] = profile[field];
     }
     state.status = "profile OK";
   }

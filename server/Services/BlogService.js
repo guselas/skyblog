@@ -53,6 +53,7 @@ class BlogService extends BaseService {
         return null;
     }
 
+    // TODO: check for same user.mail / user.nickname in db 
     async register(registerDTO, errors) {
         if (!registerDTO.email) {
             errors.push("email is mandatory");

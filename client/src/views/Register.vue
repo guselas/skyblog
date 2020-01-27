@@ -34,7 +34,7 @@
         </button>
       </router-link>
 
-      <router-link to="/">
+      <router-link to="/Register">
         <button type="submit" class="btn btn-primary">Register</button>
       </router-link>
     </div>
@@ -42,10 +42,14 @@
 </template>
 
 <script>
+// import Auth from '../wareHouse/Auth';
 /* eslint-disable */
   export default {
     name: "Register",
-    props: {}
+    props: {},
+    methods: {
+      // ...mapActions(['register']),
+    }
   };
 </script>
 

@@ -2,12 +2,11 @@ import axios from "axios";
 // import router from '../router/index'
 
 const state = {
-  status : "",
-  posts : [],
-  currentPostId : "",
-  post: {}  
-}
-
+  status: "",
+  posts: [],
+  currentPostId: "",
+  post: {}
+};
 
 const getters = {
   posts: state => state.posts,
@@ -68,10 +67,7 @@ const actions = {
     try {
       commit("createPost_request");
       let res = await axios.post("http://localhost:3000/api/blog", postData);
-      if (
-        localStorage["profile.isAdmin"] ||
-        localStorage["profile.isAuthor"]
-      ) {
+      if (localStorage["profile.isAdmin"] || localStorage["profile.isAuthor"]) {
         commit("createPost_success");
       }
       return res;
