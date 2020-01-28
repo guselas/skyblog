@@ -5,26 +5,21 @@
       <router-link to="/"
         ><img src="./components/assets/MenuIcons/Home.png"
       /></router-link>
-      <!-- |
-      <router-link to="/postdetail"
+      <router-link v-if="isAuthenticated" to="/myposts"
         ><img src="./components/assets/MenuIcons/Details.png"
-      /></router-link> -->
-      
+      /></router-link>
       <router-link v-if="isAuthenticated" to="/profile"
-        >|<img src="./components/assets/MenuIcons/Profile.png"
-      /></router-link>
-      
+        ><img src="./components/assets/MenuIcons/Profile.png" />
+      </router-link>
       <router-link v-if="!isAuthenticated" to="/login"
-        >|<img src="./components/assets/MenuIcons/logIn.png"
-      /></router-link>
-
-      <router-link v-if="isAuthenticated"  to="/logout"
-        >|<img src="./components/assets/MenuIcons/logOut.png"
-      /></router-link>
-
-      <router-link v-if="!isAuthenticated"  to="/register"
-        >|<img src="./components/assets/MenuIcons/Register.png"
-      /></router-link>
+        ><img src="./components/assets/MenuIcons/logIn.png" />
+      </router-link>
+      <router-link v-if="isAuthenticated" to="/logout"
+        ><img src="./components/assets/MenuIcons/logOut.png" />
+      </router-link>
+      <router-link v-if="!isAuthenticated" to="/register"
+        ><img src="./components/assets/MenuIcons/Register.png" />
+      </router-link>
     </div>
     <router-view />
     <SocialMedia style="  text-align: center;"></SocialMedia>
@@ -35,16 +30,14 @@
 import SocialMedia from "./components/SocialMedia";
 
 export default {
-
   computed: {
-    isAuthenticated(){
+    isAuthenticated() {
       return this.$store.getters.isAuthenticated;
     }
   },
   components: {
     SocialMedia
-  },
-  
+  }
 };
 </script>
 
@@ -62,7 +55,8 @@ h3 {
 }
 
 #nav {
-  padding: 30px;
+  padding: 50px;
+  text-align: center;
 }
 
 #nav a {
@@ -75,6 +69,7 @@ h3 {
 }
 
 img {
-  height: 25px;
+  height: 45px;
+  margin-right: 15px;
 }
 </style>

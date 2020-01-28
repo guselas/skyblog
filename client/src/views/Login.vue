@@ -66,15 +66,8 @@
         };
         this.postLogin(user)
           .then(res => {
-            /* eslint-disable  no-console*/
-            console.log(res);
-            /* eslint-disable  no-console*/
           })
           .catch(err => {
-            /* eslint-disable  no-console*/
-            console.log(err);
-            /* eslint-disable  no-console*/
-
           })
       }
     }

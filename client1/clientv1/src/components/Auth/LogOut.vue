@@ -1,7 +1,7 @@
-<template> 
-<div>
+<template>
+  <div>
     <h3>You've been disconnected</h3>
-</div>
+  </div>
 </template>
 
 <script>
@@ -10,7 +10,7 @@ export default {
     this.$store.state.profile = {};
     this.$store.state.authorization = "";
     setTimeout(() => {
-            this.$router.push("/");
+      this.$router.push("/");
     }, 1500);
   }
 };

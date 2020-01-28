@@ -82,9 +82,6 @@ export default {
     },
 
     connected: () => {
-      /* eslint-disable  no-console*/
-      console.log("connected() = true if: ", localStorage["profile.id"]);
-      /* eslint-disable  no-console*/
       if (localStorage["profile.id"]) {
         return localStorage["profile.id"];
       } else {

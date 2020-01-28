@@ -280,7 +280,7 @@ class BlogService extends BaseService {
             return null;
         }
         if (!updaterDAO.isAdmin) {
-            if (updaterDAO._id !== postDTO.authorId) {
+            if (updaterDAO._id != postDTO.authorId) {
                 errors.push(`You're not the author of the post '${blogId}'`);
                 return null;
             }

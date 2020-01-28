@@ -37,10 +37,6 @@ let appVue = new Vue({
   render: h => h(App)
 }).$mount("#app");
 
-appVue.component("modal", {
-  template: "#modal-template"
-});
-
 axios.interceptors.request.use(
   config => {
     if (appVue.$store.state.authorization) {

@@ -1,5 +1,11 @@
 <template>
   <div id="register">
+    <!-- Errors Alert Area  -->
+    <b-alert v-model="showDismissibleAlert" variant="danger" dismissible>
+      {{ errorMsg }}
+    </b-alert>
+    <!-- End Errors Alert Area -->
+
     <div class="card">
       <div class="card-header">
         <h3>Register Vue</h3>
@@ -80,9 +86,12 @@ export default {
         email: "blogger1@gmail.com",
         nickName: "Blogger1",
         password: "123"
-      }
+      },
+      errorMsg: "",
+      showDismissibleAlert: false
     };
   },
+
   methods: {
     async submitRegisterForm() {
       try {
@@ -91,29 +100,15 @@ export default {
           nickName: this.user.nickName,
           password: this.user.password
         };
-        let registerResponse = await axios.post(
+        await axios.post(
           "http://localhost:3000/api/blog/register",
           registerDTO
         );
-        /* eslint-disable no-console */
-        console.log("Response", registerResponse);
-        /* eslint-enable no-console */
-        // alert("User created correctly");
-        this.$router.push("login");
+        this.$router.replace("/login");
       } catch (error) {
-        /* eslint-disable no-console */
-        console.log("Error", error);
-        /* eslint-enable no-console */
-        alert("User already exists");
+        this.showDismissibleAlert = true;
+        this.errorMsg = error.response.data.message;
       }
-
-      // let data = loginResponse.data;
-
-      // await this.$store.dispatch("setAuthorization", data);
-      // let profileResponse = await axios.get(
-      //     "http://localhost:3000/api/blog/profile"
-      // );
-      // await this.$store.dispatch("setProfile", profileResponse.data);
     }
   }
 };

@@ -12,14 +12,60 @@
 
             <b-collapse id="nav-collapse" is-nav>
               <b-navbar-nav>
-                <b-button v-for="item in categories" :key="item" @click="getPostsByCategory(item)">{{ item }}</b-button>
+                <b-button
+                  v-for="item in categories"
+                  :key="item"
+                  @click="getPostsByCategory(item)"
+                  >{{ item }}</b-button
+                >
               </b-navbar-nav>
+              <b-button v-if="isAuthor" v-b-modal.modal-sl variant="primary" size="md"
+                >New Post</b-button
+              >
+              <b-modal id="modal-sl" size="lg" title="Post Details">
+                <b-col sm="10">
+                  <label for="textarea-large">Post Title:</label>
+                  <b-form-textarea
+                    id="textarea-large"
+                    size="lg"
+                  ></b-form-textarea>
+                </b-col>
+                <b-col sm="10">
+                  <label for="textarea-large">Post content:</label>
+                  <b-form-textarea id="textarea-large" size="lg">
+                  </b-form-textarea>
+                </b-col>
+                <hr />
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      <input
+                        type="radio"
+                        aria-label="Radio button for following text input"
+                      />
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    readonly
+                    class="form-control"
+                    placeholder="Accept terms and conditions"
+                    aria-label="Text input with radio button"
+                  />
+                </div>
+              </b-modal>
 
               <!-- Right aligned nav items -->
               <b-navbar-nav class="ml-auto">
                 <b-nav-form>
-                  <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
-                  <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+                  <b-form-input
+                    size="sm"
+                    class="mr-sm-2"
+                    placeholder="Search"
+                  ></b-form-input>
+                  <b-button size="sm" class="my-2 my-sm-0" type="submit"
+                    >Search</b-button
+                  >
                 </b-nav-form>
 
                 <b-nav-item-dropdown text="Lang" right>
@@ -28,7 +74,6 @@
                   <b-dropdown-item href="#">RU</b-dropdown-item>
                   <b-dropdown-item href="#">FA</b-dropdown-item>
                 </b-nav-item-dropdown>
-
               </b-navbar-nav>
             </b-collapse>
           </b-navbar>
@@ -38,7 +83,11 @@
       <!-- Posts cards Area -->
       <div class="card-body">
         <div class="row">
-          <div v-for="post in this.$store.state.posts" :key="post.id" class="col-md-4 jumbotron">
+          <div
+            v-for="post in posts"
+            :key="post.id"
+            class="col-md-4 jumbotron"
+          >
             <router-link :to="{ name: 'postDetail', params: { id: post.id } }">
               <div class="card-header">{{ post.postTitle }}</div>
             </router-link>
@@ -46,7 +95,7 @@
               {{ post.postText }}
             </div>
             <div class="card-footer">
-              {{ post.nickName }} // {{ post.postDate }} // Likes
+              {{ post.nickName }} // {{ post.postDate }}  //{{ post.email }} // Likes
             </div>
           </div>
         </div>
@@ -57,52 +106,58 @@
 </template>
 
 <script>
-  import axios from "axios";
-  // @ is an alias to /src
+import axios from "axios";
+// @ is an alias to /src
 
-  export default {
-    name: "home",
-    computed: {
-      categories() {
-        return this.$store.state.categories;
-      }
+export default {
+  name: "home",
+  computed: {
+    categories() {
+      return this.$store.state.categories;
     },
-    methods: {
-      async getPosts() {
-        let category = this.$route.query.category;
-        let postsResponse;
-        if (category) {
-          category = encodeURI(category);
-          /* eslint-disable no-console */
-          console.log("category: ", category);
-          /* eslint-enable no-console */
-
-          postsResponse = await axios.get(`http://localhost:3000/api/blog?category=${category}`);
-
-        } else {
-          postsResponse = await axios.get("http://localhost:3000/api/blog");
-        }
+    posts(){
+      return this.$store.state.posts;
+    },
+    isAuthor(){
+      return this.$store.getters.isAuthor;
+    }
+  },
+  methods: {
+    async getPosts() {
+      let category = this.$route.query.category;
+      let postsResponse;
+      if (category) {
+        category = encodeURI(category);
+        postsResponse = await axios.get(
+          `http://localhost:3000/api/blog?category=${category}`
+        );
+      } else {
+        postsResponse = await axios.get("http://localhost:3000/api/blog");
+      }
+      this.$store.dispatch("setPosts", postsResponse.data.data);
+    },
+    async getPostsByCategory(category) {
+      if (category) {
+        category = encodeURI(category);
+        let postsResponse = await axios.get(
+          `http://localhost:3000/api/blog?category=${category}`
+        );
         this.$store.dispatch("setPosts", postsResponse.data.data);
-      },
-      async getPostsByCategory(category) {
-
-        if (category) {
-          category = encodeURI(category);
-                   let postsResponse = await axios.get(`http://localhost:3000/api/blog?category=${category}`);
-          this.$store.dispatch("setPosts", postsResponse.data.data);
-        }
-      },
-
-      async getCategories() {
-        let categoriesResponse = await axios.get("http://localhost:3000/api/blog/categories");
-        this.$store.dispatch("setCategories", categoriesResponse.data);
       }
     },
-    async created() {
-      await this.getPosts();
-      await this.getCategories();
-    },
-  };
+
+    async getCategories() {
+      let categoriesResponse = await axios.get(
+        "http://localhost:3000/api/blog/categories"
+      );
+      this.$store.dispatch("setCategories", categoriesResponse.data);
+    }
+  },
+  async mounted() {
+    await this.getPosts();
+    await this.getCategories();
+  }
+};
 </script>
 
 <style></style>

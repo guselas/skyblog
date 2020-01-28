@@ -14,6 +14,7 @@ class PostService extends CrudService {
         if (ok) {
             //check UserId
             try {
+                ok= true;
                 let userDAO = await this.DAO.UserDAO.findById(postDTO.authorId);
                 if (!userDAO) {
                     ok = false;

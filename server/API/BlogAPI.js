@@ -37,9 +37,9 @@ class BlogAPI extends BaseAPI {
 
         app.get(`${uri}/blog/categories`, this.getCategories.bind(this));
 
+        app.get(`${uri}/blog/myposts`, this.getMyPosts.bind(this));    
         app.get(`${uri}/blog`, this.getAll.bind(this));
         app.get(`${uri}/blog/:blogid`, this.getBlog.bind(this));
-
         app.post(`${uri}/blog`, blogMW.isAuthor.bind(blogMW), this.newBlog.bind(this));
         app.put(`${uri}/blog/:blogid`, blogMW.isAuthor.bind(blogMW), this.updateBlog.bind(this));
         app.delete(`${uri}/blog/:blogid`, blogMW.isAuthor.bind(blogMW), this.deleteBlog.bind(this));
@@ -203,6 +203,43 @@ class BlogAPI extends BaseAPI {
             }
         } catch (err) {
             this.sendError(res, this.ST_InternalServerError, "getAll()", err.message);
+        };
+    }
+
+    async getMyPosts(req,res){
+        console.log(`API ${this.nameAPI}: getMyPosts(): `);
+        //Normalize filterValues from query
+        let level = !req.query.level ? 5 : req.query.level;
+        let pageSize = !req.query.pageSize ? 10 : req.query.pageSize;
+        let pageIndex = !req.query.pageIndex ? 0 : req.query.pageIndex;
+        let sorter = {};
+        if (req.query.orderBy) {
+            sorter[req.query.orderBy] = 1;
+        }
+        if (req.query.orderByDesc) {
+            sorter[req.query.orderByDesc] = -1;
+        }
+        const filter = this.getFilterFromQuery(req);
+        filter.authorId = req.userDAO._id;
+        try {
+            let errors = [];
+            const totalRecords = await this.blogService.postsCount(level, filter, errors);
+            const recordsDTO = await this.blogService.getAll(level, filter, sorter, pageSize, pageIndex, errors);
+            if (recordsDTO) {
+                let dataBrowseAPI = new DataBrowseAPI();
+                dataBrowseAPI.level = level;
+                dataBrowseAPI.filter = filter;
+                dataBrowseAPI.sorter = sorter;
+                dataBrowseAPI.pageSize = pageSize;
+                dataBrowseAPI.pageIndex = pageIndex;
+                dataBrowseAPI.totalRecords = totalRecords;
+                dataBrowseAPI.data = recordsDTO;
+                this.sendData(res, dataBrowseAPI);
+            } else {
+                this.sendError(res, this.ST_BadRequest, "getMyPosts()", errors);
+            }
+        } catch (err) {
+            this.sendError(res, this.ST_InternalServerError, "getMyPosts()", err.message);
         };
     }
 
