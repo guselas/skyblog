@@ -18,7 +18,7 @@ export default {
 </script>
 
 <style>
-#textContent{
-      font-family: 'Sedgwick Ave', cursive;
+#textContent {
+  font-family: "Sedgwick Ave", cursive;
 }
 </style>

@@ -7,6 +7,7 @@ import LogOut from "../components/Auth/LogOut";
 import PostDetail from "../components/PostDetail";
 import Profile from "../components/Auth/Profile";
 import MyPosts from "../components/MyPosts";
+import BadWordsManager from '../components/BadWordsManager';
 
 Vue.use(VueRouter);
 
@@ -46,7 +47,11 @@ const routes = [
     name: "myposts",
     component: MyPosts
   },
-
+  {
+    path: "/badwordsmanager",
+    name: "badwordsmanager",
+    component: BadWordsManager
+  }
 ];
 
 const router = new VueRouter({

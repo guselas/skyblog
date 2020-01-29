@@ -112,7 +112,7 @@ export default {
 </script>
 
 <style>
-#registerTitle{
-      font-family: 'Sedgwick Ave', cursive;
+#registerTitle {
+  font-family: "Sedgwick Ave", cursive;
 }
 </style>

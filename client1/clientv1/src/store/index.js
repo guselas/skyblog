@@ -11,7 +11,9 @@ export default new Vuex.Store({
     categories: [],
     currentPostId: "",
     currentPost: {},
-    myPosts: []
+    myPosts: [],
+    badwords : [],
+    currentBadword : {}
   },
   getters: {
     isAuthenticated(state) {
@@ -129,7 +131,15 @@ export default new Vuex.Store({
     //------------------------------------------
     setCategories(state, payload) {
       state.categories = payload;
-    }
+    },
+    //------------------------------------------
+    setBadwords(state, payload) {
+      state.badwords = payload;
+    },
+     //------------------------------------------
+     unsetBadwords(state) {
+      state.badwords = [];
+    },
   },
   actions: {
     //------------------------------------------
@@ -205,7 +215,18 @@ export default new Vuex.Store({
         /* eslint-enable no-console */
         commit("setCategories", payload);
       }
-    }
+    },
+     //------------------------------------------
+     setBadwords({ commit }, payload) {
+      if (payload) {
+        /* eslint-disable no-console */
+        // console.log("setPosts()", payload);
+        /* eslint-enable no-console */
+        commit("setBadwords", payload);
+      } else {
+        commit("unsetBadwords");
+      }
+    },
   },
   modules: {}
 });

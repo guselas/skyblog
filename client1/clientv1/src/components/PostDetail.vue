@@ -1,5 +1,8 @@
 <template>
     <div>
+        <!-- Comment Alert Error Messages -->
+        <b-alert v-model="showDismissibleAlert" :variant="variant" dismissible>{{errorMsg}}</b-alert>
+        <!--End Comment Alert Error Messages -->
         <div class="row">
             <div class="col-11">
                 <!-- Posts cards Area -->
@@ -37,7 +40,8 @@
                 <div>
                     <b-button v-b-modal.modal-sl block pill variant="primary" size="lg" @click="openModal">New Comment
                     </b-button>
-                    <b-modal @ok="newComment()" id="modal-sl" size="lg" title="Comment Details">
+                    <b-modal @ok="newComment()" ref="my-deletedPost" id="modal-sl" size="lg" title="Comment Details">
+                        <b-alert v-model="showDismissibleError" :variant="variant" dismissible>{{errorMsg}}</b-alert>
                         <b-col sm="2">
                             <label for="textarea-large">Post content:</label>
                         </b-col>
@@ -110,8 +114,8 @@
                         </div>
                     </b-modal>
                     <!-- <button class="btn btn-info" @click="refreshPost()">Refresh</button> -->
-                    <b-button v-if="isAdmin || isAuthor" v-b-modal.modal-delete block pill variant="danger" size="lg"
-                        class="b-button">
+                    <b-button @ok="handleDeleteOk()" v-if="isAdmin || isAuthor" v-b-modal.modal-delete block pill
+                        variant="danger" size="lg" class="b-button">
                         Delete Post
                     </b-button>
                     <b-modal id="modal-delete" title="Confirmation needed" size="xl"> Are you sure you want to
@@ -119,21 +123,22 @@
                         this
                         post ?
                         <p class="my-4">
-                            <p> This posts por has these comments associated:
+                            <p> This posts has these comments associated:
                                 <ul>
-                                    <li>
-                                        Comment.Id || Comment.commentText || Comment.lastUpdate
+                                    <li v-for="comment in currentPost.comments" :key="comment">
+                                        {{comment.commentText}} || {{comment.lastUpdate}}
                                     </li>
                                 </ul>
                             </p>
                             <template v-slot:modal-footer="{ ok, cancel }">
                                 <!-- Emulate built in modal footer ok and cancel button actions -->
-                                <b-button size="sm" variant="success" @click="ok()">
-                                    Submit
-                                </b-button>
-                                <b-button size="sm" variant="danger" @click="cancel()">
+                                <b-button size="sm" variant="secondary" @click="cancel()">
                                     Cancel
                                 </b-button>
+                                <b-button size="sm" variant="danger" @click="deletePost()">
+                                    Delete
+                                </b-button>
+
                             </template>
                     </b-modal>
                     <b-button v-b-modal.modal-report block pill variant="warning" size="lg" class="b-button">
@@ -182,7 +187,12 @@
                         name: 'Lack of content'
                     },
                 ],
-                commentText: ""
+                commentText: "",
+                errorMsg: "",
+                variant: "danger",
+                showDismissibleAlert: false,
+                showDismissibleError: false
+
             }
         },
         computed: {
@@ -208,39 +218,81 @@
                 let currentPostResponse = await axios.get(`http://localhost:3000/api/blog/${id}`);
                 this.$store.dispatch('setCurrentPost', currentPostResponse.data);
             },
+            showPostError(message) {
+                this.errorMsg = message;
+                this.variant = "danger";
+                this.showDismissibleError = true;
+            },
+            showError(message) {
+                this.errorMsg = message;
+                this.variant = "danger";
+                this.showDismissibleAlert = true;
+            },
+            showSuccess(message) {
+                this.errorMsg = message;
+                this.variant = "success";
+                this.showDismissibleAlert = true;
+            },
+            showWarning(message) {
+                this.errorMsg = message;
+                this.variant = "warning";
+                this.showDismissibleAlert = true;
+            },
+            handleDeleteOk(bvModalEvt) {
+                // Prevent modal from closing
+                bvModalEvt.preventDefault()
+                // Trigger submit handler
+                this.deletePost()
+            },
             async refreshPost() {
                 await this.getCurrentPost(this.currentPostId);
             },
+            async handleOk(bvModalEvt) {
+                // Prevent modal from closing
+                bvModalEvt.preventDefault()
+                // Trigger submit handler
+                await this.newComment()
+            },
             async newComment() {
                 try {
-                let newCommentDTO = {
-                    commentText : this.commentText
-                };
-                let postId = this.$store.state.currentPost.id;
-                /* eslint-disable no-console */
-                console.log("this.$store.state.currentPost.id: ", this.$store.state.currentPost.id);
-                console.log("newCommentDTO: ", newCommentDTO.commentText);
-                /* eslint-enable no-console */
+                    let newCommentDTO = {
+                        commentText: this.commentText
+                    };
+                    let postId = this.$store.state.currentPost.id;
 
-                let commentResponse = await axios.post(`http://localhost:3000/api/blog/${postId}/comment`,
-                    newCommentDTO);
-                /* eslint-disable no-console */
-                console.log("this.$store.state.currentPost: ", this.$store.state.currentPost);
-                console.log("commentResponse: ", commentResponse);
-                /* eslint-enable no-console */
-                await this.refreshPost();                
- 
+                    await axios.post(`http://localhost:3000/api/blog/${postId}/comment`,
+                        newCommentDTO);
+                    this.showSuccess("comment correctly posted!")
+                    await this.refreshPost();
+                    this.$nextTick(() => {
+                        this.$bvModal.hide('modal-delete')
+                    })
+
                 } catch (error) {
-                /* eslint-disable no-console */
-                console.log("error at newComment(): ", error);
-                /* eslint-enable no-console */
+                    this.showError(error.response.data.message);
                 }
+            },
+            async deletePost() {
+                try {
+                    let postId = this.currentPostId;
+                    await axios.delete(`http://localhost:3000/api/blog/${postId}`);
+
+                    this.$nextTick(() => {
+                        this.$bvModal.hide('modal-delete');
+                    })
+                    this.showWarning("Post deleted!");
+                    setTimeout(() => {
+                        this.$router.replace('/');
+                    }, 2000);
+                } catch (error) {
+
+                    this.showError(error.response);
+                }
+
             },
             openModal(bvModalEvt) {
                 bvModalEvt.preventDefault();
                 // Trigger submit handler
-                //  this.newComment();
-
             }
         },
 

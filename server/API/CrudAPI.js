@@ -11,6 +11,7 @@ class CrudAPI extends BaseAPI {
     constructor(uri, app, nameAPI, crudService) {
         super(uri, app, nameAPI);
         this.crudService = crudService;
+        this.PAGESIZE = 50;
 
         //#region Aux endPoints
         app.post(`${this.uri}/seed`, this.seed.bind(this));
@@ -140,7 +141,7 @@ class CrudAPI extends BaseAPI {
         //Normalize filterValues from query
         const filter = {};
         let recordDAO = new this.crudService.classDAO();
-        let pageSize = !req.query.pageSize ? 10 : req.query.pageSize;
+        let pageSize = !req.query.pageSize ? this.PAGESIZE : req.query.pageSize;
         let pageIndex = !req.query.pageIndex ? 0 : req.query.pageIndex;
         let sorter = {};
         if (req.query.orderBy) {

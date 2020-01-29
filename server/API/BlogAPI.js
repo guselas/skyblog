@@ -7,6 +7,7 @@ class BlogAPI extends BaseAPI {
     constructor(uri, app, blogMW, services) {
         super(uri, app, 'Blog');
         this.blogService = services.blogService;
+        this.PAGESIZE = 50;
 
         //#region Endpoints Model
         app.get(`${uri}/blog/login/model`, this.loginModel.bind(this));
@@ -36,8 +37,8 @@ class BlogAPI extends BaseAPI {
         app.get(`${uri}/blog/badwords`, blogMW.isAdmin.bind(blogMW), this.getBadWords.bind(this));
 
         app.get(`${uri}/blog/categories`, this.getCategories.bind(this));
-
-        app.get(`${uri}/blog/myposts`, this.getMyPosts.bind(this));    
+        app.get(`${uri}/blog/search`, this.getBySearch.bind(this));
+        app.get(`${uri}/blog/myposts`, this.getMyPosts.bind(this));
         app.get(`${uri}/blog`, this.getAll.bind(this));
         app.get(`${uri}/blog/:blogid`, this.getBlog.bind(this));
         app.post(`${uri}/blog`, blogMW.isAuthor.bind(blogMW), this.newBlog.bind(this));
@@ -174,7 +175,7 @@ class BlogAPI extends BaseAPI {
         console.log(`API ${this.nameAPI}: getAll(): `);
         //Normalize filterValues from query
         let level = !req.query.level ? 5 : req.query.level;
-        let pageSize = !req.query.pageSize ? 10 : req.query.pageSize;
+        let pageSize = !req.query.pageSize ? this.PAGESIZE : req.query.pageSize;
         let pageIndex = !req.query.pageIndex ? 0 : req.query.pageIndex;
         let sorter = {};
         if (req.query.orderBy) {
@@ -206,7 +207,7 @@ class BlogAPI extends BaseAPI {
         };
     }
 
-    async getMyPosts(req,res){
+    async getMyPosts(req, res) {
         console.log(`API ${this.nameAPI}: getMyPosts(): `);
         //Normalize filterValues from query
         let level = !req.query.level ? 5 : req.query.level;
@@ -240,6 +241,64 @@ class BlogAPI extends BaseAPI {
             }
         } catch (err) {
             this.sendError(res, this.ST_InternalServerError, "getMyPosts()", err.message);
+        };
+    }
+
+    async getBySearch(req, res) {
+        console.log(`API ${this.nameAPI}: getBySearch(): `);
+        //Normalize filterValues from query
+        let level = !req.query.level ? 5 : req.query.level;
+        let pageSize = !req.query.pageSize ? 10 : req.query.pageSize;
+        let pageIndex = !req.query.pageIndex ? 0 : req.query.pageIndex;
+        let sorter = {};
+
+        if (req.query.orderBy) {
+            sorter[req.query.orderBy] = 1;
+        }
+        if (req.query.orderByDesc) {
+            sorter[req.query.orderByDesc] = -1;
+        }
+        
+        
+        let filter = {};
+        if ("textsearch" in req.query) {
+            let textSearch = req.query.textsearch.trim().toLowerCase();
+            filter["$or"] = [{
+                    "postTitle": {
+                        $regex: new RegExp(textSearch, "i")
+                    }
+                },
+                {
+                    "postText": {
+                        $regex: new RegExp(textSearch, "i")
+                    }
+                },
+                {
+                    "category": {
+                        $regex: new RegExp(textSearch, "i")
+                    }
+                },
+            ];
+        };
+        try {
+            let errors = [];
+            const totalRecords = await this.blogService.postsCount(level, filter, errors);
+            const recordsDTO = await this.blogService.getAll(level, filter, sorter, pageSize, pageIndex, errors);
+            if (recordsDTO) {
+                let dataBrowseAPI = new DataBrowseAPI();
+                dataBrowseAPI.level = level;
+                dataBrowseAPI.filter = filter;
+                dataBrowseAPI.sorter = sorter;
+                dataBrowseAPI.pageSize = pageSize;
+                dataBrowseAPI.pageIndex = pageIndex;
+                dataBrowseAPI.totalRecords = totalRecords;
+                dataBrowseAPI.data = recordsDTO;
+                this.sendData(res, dataBrowseAPI);
+            } else {
+                this.sendError(res, this.ST_BadRequest, "getBySearch()", errors);
+            }
+        } catch (err) {
+            this.sendError(res, this.ST_InternalServerError, "getBySearch()", err.message);
         };
     }
 
@@ -339,7 +398,7 @@ class BlogAPI extends BaseAPI {
 
     async updateBadWord(req, res) {
         console.log(`API blog updateBadWord()`);
-        const badWordId = req.params.badWordid;
+        const badWordId = req.params.badwordid;
         try {
             var errors = [];
             var badWordDTO = new this.blogService.DTO.BadWordDTO();
@@ -358,7 +417,7 @@ class BlogAPI extends BaseAPI {
 
     async deleteBadWord(req, res) {
         console.log(`API blog deleteBadWord()`);
-        const badWordId = req.params.badWordid;
+        const badWordId = req.params.badwordid;
         try {
             var errors = [];
             const badWordDTO = await this.blogService.deleteBadWord(badWordId, errors);

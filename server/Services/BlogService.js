@@ -176,10 +176,18 @@ class BlogService extends BaseService {
         filter.level = {
             $lte: level
         };
-        let badWordsDAO = await this.DAO.BadWordDAO.find(filter);
+        let sorter = {
+            word : 1
+        };
+        let badWordsDAO = await this.DAO.BadWordDAO.find(filter).sort(sorter);
         if (badWordsDAO) {
-            let result = badWordsDAO.map((item) => item.word + " " + item.level);
-            return result;
+            let badwordsDTO = [];
+            for(let badwordDAO of badWordsDAO){
+                let badwordDTO = new this.DTO.BadWordDTO();
+                badwordDTO.fromDAO(badwordDAO);
+                badwordsDTO.push(badwordDTO);
+            }
+            return badwordsDTO;
         }
         return null;
     }

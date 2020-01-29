@@ -1,7 +1,9 @@
 <template>
   <div id="login">
     <!-- Login Alert Errors Messages -->
-    <b-alert v-model="showDismissibleAlert" variant="danger" dismissible>{{ errorMsg }}</b-alert>
+    <b-alert v-model="showDismissibleAlert" variant="danger" dismissible>{{
+      errorMsg
+    }}</b-alert>
     <!--End Login Alert Errors Messages -->
 
     <div class="card">
@@ -32,11 +34,18 @@
               />
             </div>
             <div class="form-group form-check">
-              <input type="checkbox" class="form-check-input" id="Check1" v-model="rememberMe" />
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="Check1"
+                v-model="rememberMe"
+              />
               <label class="form-check-label" for="Check1">Remember me</label>
             </div>
             <div style="text-align:center">
-              <button class="btn btn-primary" @click.prevent="submitLoginForm">Submit</button>
+              <button class="btn btn-primary" @click.prevent="submitLoginForm">
+                Submit
+              </button>
             </div>
           </form>
         </div>
@@ -91,13 +100,6 @@ export default {
       } catch (error) {
         this.showDismissibleAlert = true;
         this.errorMsg = error.response.data.error;
-
-        /* eslint-disable no-console */
-        // console.log(error.response.data);
-        // console.log(error.response.status);
-        // console.log(error.response.headers);
-        // console.log(JSON.stringify(error));
-        /* eslint-disable no-console */
       }
     }
   }
@@ -105,11 +107,11 @@ export default {
 </script>
 
 <style scoped>
-#card{
-  background-color: #939C9E;
+#card {
+  background-color: #939c9e;
 }
 
-#loginTitle{
-      font-family: 'Sedgwick Ave', cursive;
+#loginTitle {
+  font-family: "Sedgwick Ave", cursive;
 }
 </style>

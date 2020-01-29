@@ -88,6 +88,7 @@ class BaseAPI {
         this.uri = uri;
         this.app = app;
         this.nameAPI = nameAPI;
+        this.PAGESIZE = 50;
     }
 
     async model(req, res) {
@@ -159,7 +160,7 @@ class ErrorEventAPI {
 
 class DataBrowseAPI {
     constructor() {
-        this.pageSize = 10;
+        this.pageSize = 50;
         this.pageNumber = 0;
         this.totalRecords = 0;
         this.sorter = {};
