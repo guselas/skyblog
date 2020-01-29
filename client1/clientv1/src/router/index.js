@@ -7,7 +7,6 @@ import LogOut from "../components/Auth/LogOut";
 import PostDetail from "../components/PostDetail";
 import Profile from "../components/Auth/Profile";
 import MyPosts from "../components/MyPosts";
-import ModalTest from '../components/ModalTest';
 
 Vue.use(VueRouter);
 
@@ -47,12 +46,7 @@ const routes = [
     name: "myposts",
     component: MyPosts
   },
-  {
-    path: "/modaltest",
-    name: "ModalTest",
-    component: ModalTest
-  },
-  
+
 ];
 
 const router = new VueRouter({

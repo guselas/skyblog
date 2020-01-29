@@ -8,7 +8,7 @@
 
     <div class="card">
       <div class="card-header">
-        <h3>Register Vue</h3>
+        <h3 id="registerTitle">Register</h3>
       </div>
       <br />
       <br />
@@ -19,7 +19,6 @@
               <label for="InputEmail1">Email address</label>
               <input
                 v-model="user.email"
-                @input="user.email"
                 type="email"
                 class="form-control"
                 id="InputEmail1"
@@ -30,7 +29,6 @@
               <label for="InputPassword1">Password</label>
               <input
                 v-model="user.password"
-                @input="user.password"
                 type="password"
                 class="form-control"
                 id="InputPassword"
@@ -41,7 +39,6 @@
               <label for="InputPassword1">Nick Name</label>
               <input
                 v-model="user.nickName"
-                @input="user.nickName"
                 type="text"
                 class="form-control"
                 id="InputnickName"
@@ -114,4 +111,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+#registerTitle{
+      font-family: 'Sedgwick Ave', cursive;
+}
+</style>

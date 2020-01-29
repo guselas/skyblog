@@ -1,25 +1,63 @@
 <template>
   <div id="app">
-    <h3>Comics Blog</h3>
-    <div id="nav">
-      <router-link to="/"
-        ><img src="./components/assets/MenuIcons/Home.png"
-      /></router-link>
-      <router-link v-if="isAuthenticated" to="/myposts"
-        ><img src="./components/assets/MenuIcons/Details.png"
-      /></router-link>
-      <router-link v-if="isAuthenticated" to="/profile"
-        ><img src="./components/assets/MenuIcons/Profile.png" />
-      </router-link>
-      <router-link v-if="!isAuthenticated" to="/login"
-        ><img src="./components/assets/MenuIcons/logIn.png" />
-      </router-link>
-      <router-link v-if="isAuthenticated" to="/logout"
-        ><img src="./components/assets/MenuIcons/logOut.png" />
-      </router-link>
-      <router-link v-if="!isAuthenticated" to="/register"
-        ><img src="./components/assets/MenuIcons/Register.png" />
-      </router-link>
+    <h3 id="appTitle">Comics Blog</h3>
+    <h3 v-if="user">Welcome {{ user }}</h3>
+    <div id="nav-menu">
+      <b-button v-b-popover.hover.top="'Home'" variant="info">
+        <router-link to="/"
+          ><img src="./components/assets/MenuIcons/Home.png"
+        /></router-link>
+      </b-button>
+
+      <b-button
+        v-b-popover.hover.top="'My posts'"
+        v-if="isAuthenticated"
+        variant="info"
+      >
+        <router-link to="/myposts"
+          ><img src="./components/assets/MenuIcons/Details.png"
+        /></router-link>
+      </b-button>
+
+      <b-button
+        v-b-popover.hover.top="'Profile'"
+        v-if="isAuthenticated"
+        variant="info"
+      >
+        <router-link to="/profile"
+          ><img src="./components/assets/MenuIcons/Profile.png" />
+        </router-link>
+      </b-button>
+
+      <b-button
+        v-b-popover.hover.top="'Log In'"
+        v-if="!isAuthenticated"
+        variant="info"
+      >
+        <router-link to="/login"
+          ><img src="./components/assets/MenuIcons/logIn.png" />
+        </router-link>
+      </b-button>
+
+      <b-button
+        v-b-popover.hover.top="'Log Out'"
+        v-if="isAuthenticated"
+        variant="info"
+      >
+        <router-link to="/logout"
+          ><img src="./components/assets/MenuIcons/logOut.png" />
+        </router-link>
+      </b-button>
+
+      <b-button
+        v-b-popover.hover.top="'Register'"
+        v-if="!isAuthenticated"
+        variant="info"
+      >
+        <router-link to="/register"
+          ><img src="./components/assets/MenuIcons/Register.png" />
+        </router-link>
+      </b-button>
     </div>
     <router-view />
     <SocialMedia style="  text-align: center;"></SocialMedia>
@@ -33,6 +71,9 @@ export default {
   computed: {
     isAuthenticated() {
       return this.$store.getters.isAuthenticated;
+    },
+    user() {
+      return this.$store.getters.nickName;
     }
   },
   components: {
@@ -50,13 +91,20 @@ export default {
   color: #2c3e50;
 }
 
+#appTitle{
+  font-family: 'Rock Salt', cursive;
+  color: black;
+  font-size: 45pt;
+}
 h3 {
   text-align: center;
 }
 
-#nav {
+#nav-menu {
   padding: 50px;
   text-align: center;
+  /* background-color: #6c757d; */
+  background-color: #D8E1E1;
 }
 
 #nav a {
@@ -64,9 +112,7 @@ h3 {
   color: #2c3e50;
 }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
+
 
 img {
   height: 45px;

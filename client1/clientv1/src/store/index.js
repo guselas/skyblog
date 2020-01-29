@@ -67,14 +67,14 @@ export default new Vuex.Store({
         state.authorization = "";
       }
       /* eslint-disable no-console */
-      console.log(' commit("setAuthorization"): ', state.authorization);
+      // console.log(' commit("setAuthorization"): ', state.authorization);
       /* eslint-enable no-console */
     },
     //------------------------------------------
     unsetAuthorization(state) {
       state.authorization = "";
       /* eslint-disable no-console */
-      console.log(' commit("unsetAuthorization"): ', state.authorization);
+      // console.log(' commit("unsetAuthorization"): ', state.authorization);
       /* eslint-enable no-console */
     },
     //------------------------------------------
@@ -85,14 +85,14 @@ export default new Vuex.Store({
         state.profile = {};
       }
       /* eslint-disable no-console */
-      console.log(' commit("setProfile"): ', state.profile);
+      // console.log(' commit("setProfile"): ', state.profile);
       /* eslint-enable no-console */
     },
     //------------------------------------------
     unsetProfile(state) {
       state.profile = {};
       /* eslint-disable no-console */
-      console.log(' commit("unsetProfile"): ', state.profile);
+      // console.log(' commit("unsetProfile"): ', state.profile);
       /* eslint-enable no-console */
     },
     //------------------------------------------
@@ -105,6 +105,10 @@ export default new Vuex.Store({
     },
     //------------------------------------------
     setMyPosts(state, payload) {
+      state.myPosts = payload;
+    },
+    //------------------------------------------
+    deleteMyPost(state, payload) {
       state.myPosts = payload;
     },
     //------------------------------------------
@@ -131,7 +135,7 @@ export default new Vuex.Store({
     //------------------------------------------
     setAuthorization({ commit }, payload) {
       /* eslint-disable no-console */
-      console.log("setAuthorization()", payload);
+      // console.log("setAuthorization()", payload);
       /* eslint-enable no-console */
       commit("setAuthorization", payload);
       if (payload.rememberMe) {
@@ -149,7 +153,7 @@ export default new Vuex.Store({
     setProfile({ commit }, payload) {
       if (payload) {
         /* eslint-disable no-console */
-        console.log("setProfile()", payload);
+        // console.log("setProfile()", payload);
         /* eslint-enable no-console */
         commit("setProfile", payload);
       } else {
@@ -160,7 +164,7 @@ export default new Vuex.Store({
     setPosts({ commit }, payload) {
       if (payload) {
         /* eslint-disable no-console */
-        console.log("setPosts()", payload);
+        // console.log("setPosts()", payload);
         /* eslint-enable no-console */
         commit("setPosts", payload);
       } else {
@@ -171,9 +175,18 @@ export default new Vuex.Store({
     setMyPosts({ commit }, payload) {
       if (payload) {
         /* eslint-disable no-console */
-        console.log("setMyPosts()", payload);
+        // console.log("setMyPosts()", payload);
         /* eslint-enable no-console */
         commit("setMyPosts", payload);
+      }
+    },
+    //------------------------------------------
+    deleteMyPost({ commit }, payload) {
+      if (payload) {
+        /* eslint-disable no-console */
+        // console.log("deleteMyPost()", payload);
+        /* eslint-enable no-console */
+        commit("deleteMyPost", payload);
       }
     },
     //------------------------------------------
@@ -188,7 +201,7 @@ export default new Vuex.Store({
     setCategories({ commit }, payload) {
       if (payload) {
         /* eslint-disable no-console */
-        console.log("setCategories()", payload);
+        // console.log("setCategories()", payload);
         /* eslint-enable no-console */
         commit("setCategories", payload);
       }

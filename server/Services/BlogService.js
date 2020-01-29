@@ -350,7 +350,7 @@ class BlogService extends BaseService {
         let commentDTO = new this.DTO.CommentDTO();
         commentDTO.fromDAO(blogCommentDTO);
         commentDTO.postId = blogId;
-        commentDTO.userId = authorId;
+        commentDTO.authorId = authorId;
         commentDTO = await this.services.commentsService.createOne(commentDTO, errors);
         if (!commentDTO) {
             return null;

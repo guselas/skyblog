@@ -1,14 +1,12 @@
 <template>
   <div id="login">
     <!-- Login Alert Errors Messages -->
-    <b-alert v-model="showDismissibleAlert" variant="danger" dismissible>
-      {{ errorMsg }}
-    </b-alert>
+    <b-alert v-model="showDismissibleAlert" variant="danger" dismissible>{{ errorMsg }}</b-alert>
     <!--End Login Alert Errors Messages -->
 
     <div class="card">
       <div class="card-header">
-        <h3>Login Vue</h3>
+        <h3 id="loginTitle">Login</h3>
       </div>
       <div class="card-body">
         <div class="container">
@@ -17,7 +15,6 @@
               <label for="InputEmail1">Email address</label>
               <input
                 v-model="user.email"
-                @input="user.email"
                 type="email"
                 class="form-control"
                 id="InputEmail1"
@@ -35,18 +32,11 @@
               />
             </div>
             <div class="form-group form-check">
-              <input
-                type="checkbox"
-                class="form-check-input"
-                id="Check1"
-                v-model="rememberMe"
-              />
+              <input type="checkbox" class="form-check-input" id="Check1" v-model="rememberMe" />
               <label class="form-check-label" for="Check1">Remember me</label>
             </div>
             <div style="text-align:center">
-              <button class="btn btn-primary" @click.prevent="submitLoginForm">
-                Submit
-              </button>
+              <button class="btn btn-primary" @click.prevent="submitLoginForm">Submit</button>
             </div>
           </form>
         </div>
@@ -63,7 +53,7 @@ export default {
   data() {
     return {
       user: {
-        email: "fr.ruizf@gmail.com",
+        email: "admin@gmail.com",
         password: "123"
       },
       rememberMe: false,
@@ -103,10 +93,10 @@ export default {
         this.errorMsg = error.response.data.error;
 
         /* eslint-disable no-console */
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-        console.log(JSON.stringify(error));
+        // console.log(error.response.data);
+        // console.log(error.response.status);
+        // console.log(error.response.headers);
+        // console.log(JSON.stringify(error));
         /* eslint-disable no-console */
       }
     }
@@ -114,4 +104,12 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+#card{
+  background-color: #939C9E;
+}
+
+#loginTitle{
+      font-family: 'Sedgwick Ave', cursive;
+}
+</style>
