@@ -1,6 +1,3 @@
-//TODO: use espress.router
-//TODO: take out bearerDTO
-
 //#region Generic module dependencies
 const mongoose = require('mongoose');
 const express = require('express')

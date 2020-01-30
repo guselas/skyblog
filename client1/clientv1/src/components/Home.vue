@@ -14,6 +14,7 @@
         size="lg"
         @ok="savePost()"
       >
+        <!-- End Modals Area -->
         <!-- Post Edit Alert Errors Messages -->
         <b-alert v-model="showDismissibleAlert" variant="danger" dismissible>
           {{ errorMsg }}
@@ -134,7 +135,8 @@
                 <b-badge variant="info">Postter email</b-badge> {{ post.email }}
               </div>
               <div>
-                <b-badge variant="info">Post date</b-badge> {{ post.postDate }}
+                <b-badge variant="info">Post date</b-badge>
+                {{ moment(post.postDate).format("LL") }}
               </div>
               <div>
                 <b-badge variant="info">Category</b-badge> {{ post.category }}
@@ -150,6 +152,7 @@
 
 <script>
 import axios from "axios";
+import moment from "moment";
 // @ is an alias to /src
 
 export default {
@@ -167,7 +170,9 @@ export default {
       nameState: null,
       errorMsg: "",
       variant: "danger",
-      showDismissibleAlert: false
+      showDismissibleAlert: false,
+
+      moment: moment
     };
   },
   computed: {
@@ -242,10 +247,7 @@ export default {
           category: this.dataCategory,
           postDate: new Date()
         };
-        await axios.post(
-          "http://localhost:3000/api/blog",
-          postDTO
-        );
+        await axios.post("http://localhost:3000/api/blog", postDTO);
 
         await this.getPosts();
         this.showSuccess("Post correctly posted!");

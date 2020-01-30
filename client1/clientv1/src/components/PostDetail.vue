@@ -25,7 +25,8 @@
                                     <b-badge variant="info">Postter NickName</b-badge> {{currentPost.nickName}}
                                 </div>
                                 <div class="col-4">
-                                    <b-badge variant="info">Post date</b-badge> {{ currentPost.postDate }}
+                                    <b-badge variant="info">Post date</b-badge>
+                                    {{ moment(currentPost.postDate).format('LLL') }}
                                 </div>
                                 <div class="col-4">
                                     <b-badge variant="info">Category</b-badge> {{ currentPost.category }}
@@ -71,7 +72,9 @@
                         {{comment.commentText}}
                     </div>
                     <div class="card-footer">
-                        {{comment.nickName}} || {{  comment.commentDate}} || {{ comment.lastUpdate }} || likes
+                        <b-badge variant="info">Author</b-badge> {{comment.nickName}} || <b-badge variant="info">Comment
+                            Date</b-badge> {{  moment(comment.commentDate).format('LLL')}} || <b-badge variant="info">
+                            Last updated</b-badge> {{ moment(comment.lastUpdate).format('LLL') }} || likes
                     </div>
                     <hr>
                 </div>
@@ -114,7 +117,7 @@
                         </div>
                     </b-modal>
                     <!-- <button class="btn btn-info" @click="refreshPost()">Refresh</button> -->
-                    <b-button @ok="handleDeleteOk()" v-if="isAdmin || isAuthor" v-b-modal.modal-delete block pill
+                    <b-button @ok="handleDeleteOk()" v-if="isAdmin || (isAuthor == this.$store.state.profile.userId)" v-b-modal.modal-delete block pill
                         variant="danger" size="lg" class="b-button">
                         Delete Post
                     </b-button>
@@ -126,7 +129,7 @@
                             <p> This posts has these comments associated:
                                 <ul>
                                     <li v-for="comment in currentPost.comments" :key="comment">
-                                        {{comment.commentText}} || {{comment.lastUpdate}}
+                                        {{comment.commentText}} || {{ moment(comment.lastUpdate).format('LLL')}}
                                     </li>
                                 </ul>
                             </p>
@@ -163,6 +166,7 @@
 
 <script>
     import axios from "axios";
+    import moment from 'moment';
 
     export default {
 
@@ -191,7 +195,9 @@
                 errorMsg: "",
                 variant: "danger",
                 showDismissibleAlert: false,
-                showDismissibleError: false
+                showDismissibleError: false,
+
+                moment: moment
 
             }
         },
@@ -285,8 +291,7 @@
                         this.$router.replace('/');
                     }, 2000);
                 } catch (error) {
-
-                    this.showError(error.response);
+                    this.showError(error.response.data.message);
                 }
 
             },

@@ -1,0 +1,38 @@
+[
+    {
+        "email": "admin@gmail.com",
+        "nickName": "admin",
+        "normalizedNickName": "admin",
+        "password": "123",
+        "isAuthor": true,
+        "isCommentator": true,
+        "isBlocked": false,
+        "isAdmin": true,
+        "lastLogin": "2020-01-30T18:03:33.772Z",
+        "registerDate":"2020-01-30T18:03:33.772Z"    
+    },
+    {
+        "email": "author1@gmail.com",
+        "nickName": "author1",
+        "normalizedNickName": "author1",
+        "password": "123",
+        "isAuthor": true,
+        "isCommentator": true,
+        "isBlocked": false,
+        "isAdmin": false,
+        "lastLogin": "2020-01-30T18:03:33.772Z",
+        "registerDate":"2020-01-30T18:03:33.772Z"        
+    },
+    {
+        "email": "blogger1@gmail.com",
+        "nickName": "blogger1",
+        "normalizedNickName": "blogger1",
+        "password": "123",
+        "isAuthor": true,
+        "isCommentator": true,
+        "isBlocked": false,
+        "isAdmin": false,
+        "lastLogin": "2020-01-30T18:03:33.772Z",
+        "registerDate":"2020-01-30T18:03:33.772Z"        
+    }
+]

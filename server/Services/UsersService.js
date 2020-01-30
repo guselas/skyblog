@@ -12,7 +12,6 @@ class UserService extends CrudService {
         super('UserService', UserDAO, UserDTO, FullUserDTO, services);
         this.verifyUsers = true;
     }
-
     async seed() {
         let usersDAO = await UserDAO.find({
             email: 'fr.ruizf@gmail.com'
@@ -32,8 +31,6 @@ class UserService extends CrudService {
             }
         }
     }
-
-
     async login(loginDTO, description, errors) {
         if (!loginDTO.email) {
             errors.push("email is mandatory");
@@ -68,11 +65,9 @@ class UserService extends CrudService {
         }
         return null;
     }
-
     async readAll(filter, errors) {
         return super.readAll(filter, errors);
     }
-
     //#region Virtual method 
     async fillFieldsFullDTO(fullUserDTO, errors) {
         fullUserDTO.posts = await this.loadUserPosts(fullUserDTO.id);

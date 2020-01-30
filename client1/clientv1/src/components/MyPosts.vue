@@ -1,5 +1,9 @@
 <template>
   <div>
+        <!-- Post Alert Error Messages -->
+        <b-alert v-model="showDismissibleAlert" :variant="variant" dismissible>{{errorMsg}}</b-alert>
+        <!--End Post Alert Error Messages -->
+
     <div class="container">
       <!-- Modals Area -->
       <b-modal id="modal-delete">
@@ -84,7 +88,7 @@
                     v-b-modal.modal-delete
                     prevent-closing
                     variant="danger"
-                    @click="deletePost()"
+                    @click="deletePost(index)"
                     >Delete
                   </b-button>
                   <b-button
@@ -115,11 +119,11 @@ export default {
     return {
       currentPost: null,
       postId: "",
-      postEditTitleInput: "Default Text",
-      postEditTextInput: "Default Content Text",
+      postEditTitleInput: "",
+      postEditTextInput: "",
       postDateUpdate: new Date(),
       postLastUpdate: new Date(),
-      category: "Marvel",
+      category: "",
       nameState: null,
       errorMsg: "",
       showDismissibleAlert: false
@@ -139,6 +143,10 @@ export default {
         "http://localhost:3000/api/blog/myposts"
       );
       this.$store.dispatch("setMyPosts", myPostsResponse.data.data);
+      /* eslint-disable no-console */
+      console.log(" myPostsResponse.data.data", myPostsResponse.data.data);
+      console.log(" this.$store.state.myPosts", this.$store.state.myPosts);
+      /* eslint-enable no-console */
     },
     loadPostInfo(index) {
       this.currentPost = this.myPosts[index];
@@ -149,10 +157,10 @@ export default {
       this.postDateUpdate = this.currentPost.postDate;
       this.postLastUpdate = this.currentPost.lastUpdate;
     },
-    async deletePost() {
+    async deletePost(index) {
       try {
         let postDTO = {
-          id: this.currentPost.id
+          id: index
         };
         let deletePostResponse = await axios.delete(
           `http://localhost:3000/api/blog/${postDTO.id}`
@@ -187,7 +195,6 @@ export default {
       this.handleSubmit();
     },
     async handleSubmit() {
-      // Exit when the form isn't valid
       try {
         let postDTO = {
           id: this.currentPost.id,
@@ -208,11 +215,13 @@ export default {
         this.showDismissibleAlert = true;
         this.errorMsg = error.response.data.message;
       }
-      // Push the name to submitted names
     }
   },
   async created() {
     await this.getMyPosts();
+    /* eslint-disable no-console */
+    console.log(" this.$store.state.myPosts ", this.$store.state.myPosts);
+    /* eslint-enable no-console */
   }
 };
 </script>

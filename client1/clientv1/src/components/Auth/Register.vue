@@ -80,9 +80,9 @@ export default {
   data() {
     return {
       user: {
-        email: "blogger1@gmail.com",
-        nickName: "Blogger1",
-        password: "123"
+        email: "",
+        nickName: "",
+        password: ""
       },
       errorMsg: "",
       showDismissibleAlert: false

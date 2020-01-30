@@ -4,9 +4,6 @@ const {
 } = require('./BaseAPI');
 
 
-//TODO: use router de express!!
-//TODO: Use passport for auth
-//TODO: Use JWT token OR OAuth2
 class CrudAPI extends BaseAPI {
     constructor(uri, app, nameAPI, crudService) {
         super(uri, app, nameAPI);

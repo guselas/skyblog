@@ -20,6 +20,11 @@ class BlogService extends BaseService {
         }
     }
 
+    async reloadValidator(){
+        this.validator = null;
+        await this.checkValidator();
+    }
+
     async login(loginDTO, description, errors) {
         if (!loginDTO.email) {
             errors.push("email is mandatory");
@@ -53,7 +58,6 @@ class BlogService extends BaseService {
         return null;
     }
 
-    // TODO: check for same user.mail / user.nickname in db 
     async register(registerDTO, errors) {
         if (!registerDTO.email) {
             errors.push("email is mandatory");
@@ -193,15 +197,23 @@ class BlogService extends BaseService {
     }
 
     async addBadWord(badWordDTO, errors) {
-        return this.services.badWordsService.createOne(badWordDTO, errors);
+        let result = this.services.badWordsService.createOne(badWordDTO, errors);
+        await this.reloadValidator();
+        return result;
     }
 
     async updateBadWord(badWordDTO, badWordId, errors) {
-        return this.services.badWordsService.updateOne(badWordDTO, badWordId, errors);
+        let result = this.services.badWordsService.updateOne(badWordDTO, badWordId, errors);
+        await this.reloadValidator();
+        return result;
+
     }
 
     async deleteBadWord(badWordId, errors) {
-        return this.services.badWordsService.deleteOne(badWordId, errors);
+        let result = this.services.badWordsService.deleteOne(badWordId, errors);
+        await this.reloadValidator();
+        return result;
+
     }
 
     async getOne(blogId, errors) {
@@ -313,7 +325,8 @@ class BlogService extends BaseService {
             errors.push(`Blog '${blogId}' not found`);
             return null;
         }
-        if (!updaterDAO.isAdmin) {
+        // if (!updaterDAO.isAdmin || updaterDAO.isAuthor) {
+            if (!updaterDAO.isAuthor) {
             if (updaterDAO._id !== blogDTO.authorId) {
                 errors.push(`You're not the author of the post '${blogId}'`);
                 return null;
@@ -440,7 +453,7 @@ class BlogService extends BaseService {
 
     //#region Aux methods
     async seedBadWords() {
-        //if the database is empty we load badwords from assets/badwords2.json
+        //if the database is empty we load badwords from assets/badwords.json
         let badWordsDAO = await this.DAO.BadWordDAO.find({}).limit(1);
         if (badWordsDAO) {
             if (badWordsDAO.length == 0) {
@@ -450,6 +463,44 @@ class BlogService extends BaseService {
                     badWordDAO.word = item.word.trim().toLowerCase();
                     badWordDAO.level = item.level;
                     await badWordDAO.save();
+                }
+            }
+        }
+        //seed de users
+        let userDAO = await this.DAO.UserDAO.find({}).limit(1);
+        if(userDAO){
+            if(userDAO.length == 0){
+                var data = require('../assets/users.json');
+                for(let item in data){
+                    let userDAO = new this.DAO.UserDAO();
+                    userDAO.email = item.email.trim().toLowerCase();
+                    userDAO.nickName = item.nickName.trim().toLowerCase();
+                    userDAO.normalizedNickName = item.normalizedNickName.trim().toLowerCase();
+                    userDAO.password = item.password;
+                    userDAO.isAuthor = item.isAuthor;
+                    userDAO.isCommentator = item.isCommentator;
+                    userDAO.isBlocked = item.isBlocked;
+                    userDAO.isAdmin = item.isAdmin;
+                    userDAO.lastLogin = item.lastLogin;
+                    userDAO.registerDate = item.registerDate;   
+                    await userDAO.save();                 
+                }
+            }
+        }
+        let postDAO = await this.DAO.PostDAO.find({}).limit(1);
+        if(postDAO){
+            if(postDAO.length == 0){
+                var data = require('../assets/posts.json');
+                for(let item in data){
+                    let postDAO = new this.DAO.PostDAO();
+                    postDAO.postTitle = item.postTitle;
+                    postDAO.postText = item.postText;
+                    postDAO.category = item.category;
+                    postDAO.authorId = item.authorId;
+                    postDAO.postDate = item.postDate;
+                    postDAO.lastUpdate = item.lastUpdate;
+                    
+                    await postDAO.save();                 
                 }
             }
         }
