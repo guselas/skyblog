@@ -54,7 +54,11 @@
       <thead>
         <tr class="d-flex">
           <th class="col-5">
-            <input type="text" v-model="newBadword" placeholder="Insert a new BadWord" />
+            <input
+              type="text"
+              v-model="newBadword"
+              placeholder="Insert a new BadWord"
+            />
             <label for="newLevel">Level</label>
             <input type="number" v-model="newLevel" min="1" max="5" />
 

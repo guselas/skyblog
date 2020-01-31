@@ -151,7 +151,7 @@ const blogAPI = new BlogAPI('/api', blogApp, blogBearerMW, services.services);
 async function crudAppInit() {
     console.log("CrudApp Server listening on port 3001");
     await crudAppV0.listen(3001);
-    crudAppV0._router.stack.forEach(function (r) {
+     crudAppV0._router.stack.forEach(function (r) {
         if (r.route && r.route.path) {
             console.log(`${r.route.stack[0].method}:${r.route.path}`);
         }

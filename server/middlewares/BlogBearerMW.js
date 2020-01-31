@@ -32,7 +32,21 @@ class BlogBearerMW {
         if (ok) {
             next();
         } else {
-            res.status(HttpStatus.FORBIDDEN).send("Unauthorized: not author");
+            res.status(HttpStatus.FORBIDDEN).send("Unauthorized: not an author");
+        }
+    }
+
+    isCommentator(req, res, next) {
+        let ok = false;
+        if (req.userDAO) {
+            if (req.userDAO.isCommentator) {
+                ok = true;
+            }
+        }
+        if (ok) {
+            next();
+        } else {
+            res.status(HttpStatus.FORBIDDEN).send("Unauthorized: not a Commentator");
         }
     }
 

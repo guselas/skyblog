@@ -37,15 +37,15 @@ class BlogAPI extends BaseAPI {
         app.get(`${uri}/blog/badwords`, blogMW.isAdmin.bind(blogMW), this.getBadWords.bind(this));
 
         app.get(`${uri}/blog/categories`, this.getCategories.bind(this));
+        app.get(`${uri}/blog/myposts`,/* blogMW.isAuthor.bind(blogMW),*/ this.getMyPosts.bind(this));
         app.get(`${uri}/blog/search`, this.getBySearch.bind(this));
-        app.get(`${uri}/blog/myposts`, this.getMyPosts.bind(this));
         app.get(`${uri}/blog`, this.getAll.bind(this));
         app.get(`${uri}/blog/:blogid`, this.getBlog.bind(this));
         app.post(`${uri}/blog`, blogMW.isAuthor.bind(blogMW), this.newBlog.bind(this));
         app.put(`${uri}/blog/:blogid`, blogMW.isAuthor.bind(blogMW), this.updateBlog.bind(this));
         app.delete(`${uri}/blog/:blogid`, blogMW.isAuthor.bind(blogMW), this.deleteBlog.bind(this));
 
-        app.post(`${uri}/blog/:blogid/comment`, blogMW.isAuthor.bind(blogMW), this.newComment.bind(this));
+        app.post(`${uri}/blog/:blogid/comment`, blogMW.isCommentator.bind(blogMW), this.newComment.bind(this));
         app.put(`${uri}/blog/:blogid/comment/:commentid`, blogMW.isAuthor.bind(blogMW), this.updateComment.bind(this));
         app.delete(`${uri}/blog/:blogid/comment/:commentid`, blogMW.isAuthor.bind(blogMW), this.deleteComment.bind(this));
 
@@ -222,26 +222,28 @@ class BlogAPI extends BaseAPI {
         }
         const filter = this.getFilterFromQuery(req);
         filter.authorId = req.userDAO._id;
-        try {
-            let errors = [];
-            const totalRecords = await this.blogService.postsCount(level, filter, errors);
-            const recordsDTO = await this.blogService.getAll(level, filter, sorter, pageSize, pageIndex, errors);
-            if (recordsDTO) {
-                let dataBrowseAPI = new DataBrowseAPI();
-                dataBrowseAPI.level = level;
-                dataBrowseAPI.filter = filter;
-                dataBrowseAPI.sorter = sorter;
-                dataBrowseAPI.pageSize = pageSize;
-                dataBrowseAPI.pageIndex = pageIndex;
-                dataBrowseAPI.totalRecords = totalRecords;
-                dataBrowseAPI.data = recordsDTO;
-                this.sendData(res, dataBrowseAPI);
-            } else {
-                this.sendError(res, this.ST_BadRequest, "getMyPosts()", errors);
-            }
-        } catch (err) {
-            this.sendError(res, this.ST_InternalServerError, "getMyPosts()", err.message);
-        };
+        if (filter.authorId == req.userDAO._id) {
+            try {
+                let errors = [];
+                const totalRecords = await this.blogService.postsCount(level, filter, errors);
+                const recordsDTO = await this.blogService.getAll(level, filter, sorter, pageSize, pageIndex, errors);
+                if (recordsDTO) {
+                    let dataBrowseAPI = new DataBrowseAPI();
+                    dataBrowseAPI.level = level;
+                    dataBrowseAPI.filter = filter;
+                    dataBrowseAPI.sorter = sorter;
+                    dataBrowseAPI.pageSize = pageSize;
+                    dataBrowseAPI.pageIndex = pageIndex;
+                    dataBrowseAPI.totalRecords = totalRecords;
+                    dataBrowseAPI.data = recordsDTO;
+                    this.sendData(res, dataBrowseAPI);
+                } else {
+                    this.sendError(res, this.ST_BadRequest, "getMyPosts()", errors);
+                }
+            } catch (err) {
+                this.sendError(res, this.ST_InternalServerError, "getMyPosts()", err.message);
+            };
+        }
     }
 
     async getBySearch(req, res) {
@@ -258,8 +260,8 @@ class BlogAPI extends BaseAPI {
         if (req.query.orderByDesc) {
             sorter[req.query.orderByDesc] = -1;
         }
-        
-        
+
+
         let filter = {};
         if ("textsearch" in req.query) {
             let textSearch = req.query.textsearch.trim().toLowerCase();

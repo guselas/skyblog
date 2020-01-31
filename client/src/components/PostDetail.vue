@@ -4,7 +4,7 @@
         <b-alert v-model="showDismissibleAlert" :variant="variant" dismissible>{{errorMsg}}</b-alert>
         <!--End Comment Alert Error Messages -->
         <div class="row">
-            <div class="col-11">
+            <div class="col-10">
                 <!-- Posts cards Area -->
                 <div>
                     <h3>{{ currentPost.title }}</h3>
@@ -22,7 +22,7 @@
                         <div class="card-footer" style="text-align:center">
                             <div class="row">
                                 <div class="col-4">
-                                    <b-badge variant="info">Postter NickName</b-badge> {{currentPost.nickName}}
+                                    <b-badge variant="info">Author NickName</b-badge> {{currentPost.nickName}}
                                 </div>
                                 <div class="col-4">
                                     <b-badge variant="info">Post date</b-badge>
@@ -39,7 +39,7 @@
                 <!--End Posts cards Area -->
                 <!-- Comments buttons Area -->
                 <div>
-                    <b-button v-b-modal.modal-sl block pill variant="primary" size="lg" @click="openModal">New Comment
+                    <b-button v-b-modal.modal-sl block pill variant="primary" size="lg" @click="openModal" v-if="isAuthor || isAdmin" >New Comment
                     </b-button>
                     <b-modal @ok="newComment()" ref="my-deletedPost" id="modal-sl" size="lg" title="Comment Details">
                         <b-alert v-model="showDismissibleError" :variant="variant" dismissible>{{errorMsg}}</b-alert>
@@ -74,7 +74,7 @@
                     <div class="card-footer">
                         <b-badge variant="info">Author</b-badge> {{comment.nickName}} || <b-badge variant="info">Comment
                             Date</b-badge> {{  moment(comment.commentDate).format('LLL')}} || <b-badge variant="info">
-                            Last updated</b-badge> {{ moment(comment.lastUpdate).format('LLL') }} || likes
+                            Last updated</b-badge> {{ moment(comment.lastUpdate).format('LLL') }} 
                     </div>
                     <hr>
                 </div>
@@ -82,7 +82,7 @@
             </div>
 
             <!-- Nav bar Commands Area -->
-            <div class="col-1">
+            <div class="col-2">
 
                 <b-button-group vertical>
                     <!-- <b-button v-b-modal.modal-create block pill variant="primary" size="lg" class="b-button">New

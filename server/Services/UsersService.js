@@ -12,25 +12,26 @@ class UserService extends CrudService {
         super('UserService', UserDAO, UserDTO, FullUserDTO, services);
         this.verifyUsers = true;
     }
-    async seed() {
-        let usersDAO = await UserDAO.find({
-            email: 'fr.ruizf@gmail.com'
-        }).limit(1);
-        if (usersDAO) {
-            if (usersDAO.length == 0) {
-                let userDAO = new UserDAO();
-                userDAO.email = 'fr.ruizf@gmail.com';
-                userDAO.nickName = "Guselas";
-                userDAO.password = '123';
-                userDAO.isAuthor = true;
-                userDAO.isBlocked = false;
-                userDAO.isAdmin = true;
-                userDAO.lastLogin = new Date();
-                userDAO.registerDate = new Date();
-                await userDAO.save();
-            }
-        }
-    }
+    // async seed() {
+    //     let usersDAO = await UserDAO.find({
+    //         email: 'fr.ruizf@gmail.com'
+    //     }).limit(1);
+    //     if (usersDAO) {
+    //         if (usersDAO.length == 0) {
+    //             let userDAO = new UserDAO();
+    //             userDAO.email = 'fr.ruizf@gmail.com';
+    //             userDAO.nickName = "Guselas";
+    //             userDAO.password = '123';
+    //             userDAO.isAuthor = true;
+    //             userDAO.isBlocked = false;
+    //             userDAO.isAdmin = true;
+    //             userDAO.lastLogin = new Date();
+    //             userDAO.registerDate = new Date();
+    //             await userDAO.save();
+    //         }
+    //     }
+    // }
+
     async login(loginDTO, description, errors) {
         if (!loginDTO.email) {
             errors.push("email is mandatory");

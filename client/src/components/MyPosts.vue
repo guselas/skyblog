@@ -1,8 +1,10 @@
 <template>
   <div>
-        <!-- Post Alert Error Messages -->
-        <b-alert v-model="showDismissibleAlert" :variant="variant" dismissible>{{errorMsg}}</b-alert>
-        <!--End Post Alert Error Messages -->
+    <!-- Post Alert Error Messages -->
+    <b-alert v-model="showDismissibleAlert" :variant="variant" dismissible>{{
+      errorMsg
+    }}</b-alert>
+    <!--End Post Alert Error Messages -->
 
     <div class="container">
       <!-- Modals Area -->
@@ -56,9 +58,9 @@
           :state="nameState"
           required
         ></b-form-textarea>
-        <p>{{ postDateUpdate }}</p>
-        <p>{{ postLastUpdate }}</p>
-        <button @click="handleSubmit()">SAVE</button>
+        <p><b-badge variant="primary"> Post Date </b-badge> {{ moment(postDateUpdate).format('LLL') }}</p>
+        <p><b-badge variant="primary"> Post Updated </b-badge> {{ moment(postLastUpdate).format('LLL') }}</p>
+        <!-- <button @click="handleSubmit()">SAVE</button> -->
       </b-modal>
 
       <!-- End Modals Area -->
@@ -67,7 +69,7 @@
         <div v-for="(post, index) in myPosts" :key="post.Id">
           <div class="card">
             <div class="card-header" style="text-align:center;">
-              {{ post.postTitle }} // {{ index }}
+              {{ post.postTitle }} // {{ index }} 
             </div>
             <div class="card-body">
               {{ post.postText }}
@@ -113,6 +115,7 @@
 
 <script>
 import axios from "axios";
+import moment from 'moment';
 
 export default {
   data() {
@@ -126,7 +129,8 @@ export default {
       category: "",
       nameState: null,
       errorMsg: "",
-      showDismissibleAlert: false
+      showDismissibleAlert: false,
+      moment:moment
     };
   },
   computed: {
@@ -158,9 +162,10 @@ export default {
       this.postLastUpdate = this.currentPost.lastUpdate;
     },
     async deletePost(index) {
+     let postId = this.myPosts[index].id;
       try {
         let postDTO = {
-          id: index
+          id: postId
         };
         let deletePostResponse = await axios.delete(
           `http://localhost:3000/api/blog/${postDTO.id}`
@@ -168,6 +173,7 @@ export default {
         this.$store.dispatch("deleteMyPost", deletePostResponse.data.data);
         this.hideModal();
         this.$nextTick(() => {});
+        await this.getMyPosts();
       } catch (error) {
         this.showDismissibleAlert = true;
         this.errorMsg = error.response.data.message;

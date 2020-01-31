@@ -1,7 +1,9 @@
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const JWT_KEY = 'secret-key';
 const BaseService = require('./BaseService');
 const Validator = require('../Validator/Validator');
+
 
 class BlogService extends BaseService {
     constructor(services) {
@@ -20,7 +22,7 @@ class BlogService extends BaseService {
         }
     }
 
-    async reloadValidator(){
+    async reloadValidator() {
         this.validator = null;
         await this.checkValidator();
     }
@@ -108,18 +110,18 @@ class BlogService extends BaseService {
         return count;
     }
 
-    async getCategories(errors){
+    async getCategories(errors) {
         let dict = {};
         let listCategories = [];
         let itemsDAO = await this.DAO.PostDAO.find({}, {
-            _id : 0,
-            category : 1
+            _id: 0,
+            category: 1
         });
-        if(itemsDAO){
-            for(let item of itemsDAO){
+        if (itemsDAO) {
+            for (let item of itemsDAO) {
                 dict[item.category] = true;
             }
-            for(let category in dict){
+            for (let category in dict) {
                 listCategories.push(category);
             }
             listCategories.sort();
@@ -181,12 +183,12 @@ class BlogService extends BaseService {
             $lte: level
         };
         let sorter = {
-            word : 1
+            word: 1
         };
         let badWordsDAO = await this.DAO.BadWordDAO.find(filter).sort(sorter);
         if (badWordsDAO) {
             let badwordsDTO = [];
-            for(let badwordDAO of badWordsDAO){
+            for (let badwordDAO of badWordsDAO) {
                 let badwordDTO = new this.DTO.BadWordDTO();
                 badwordDTO.fromDAO(badwordDAO);
                 badwordsDTO.push(badwordDTO);
@@ -300,7 +302,8 @@ class BlogService extends BaseService {
             return null;
         }
         if (!updaterDAO.isAdmin) {
-            if (updaterDAO._id != postDTO.authorId) {
+            // if (updaterDAO._id !== postDTO.authorId) {
+            if (!(updaterDAO._id).equals(postDTO.authorId)) {
                 errors.push(`You're not the author of the post '${blogId}'`);
                 return null;
             }
@@ -326,7 +329,7 @@ class BlogService extends BaseService {
             return null;
         }
         // if (!updaterDAO.isAdmin || updaterDAO.isAuthor) {
-            if (!updaterDAO.isAuthor) {
+        if (!updaterDAO.isAuthor) {
             if (updaterDAO._id !== blogDTO.authorId) {
                 errors.push(`You're not the author of the post '${blogId}'`);
                 return null;
@@ -357,9 +360,9 @@ class BlogService extends BaseService {
             errors.push(`Comment too offensive: ${result.words.join()}`);
             return null;
         }
-        //Check author
-        let authorDAO = await this.checkAuthor(authorId, errors);
-        if (!authorDAO) {
+        //Check commentator
+        let commentatorDAO = await this.checkCommentator(authorId, errors);
+        if (!commentatorDAO) {
             return null;
         }
         let postDAO = await this.DAO.PostDAO.findById(blogId);
@@ -467,43 +470,54 @@ class BlogService extends BaseService {
             }
         }
         //seed de users
-        let userDAO = await this.DAO.UserDAO.find({}).limit(1);
-        if(userDAO){
-            if(userDAO.length == 0){
-                var data = require('../assets/users.json');
-                for(let item in data){
+        let usersDAO = await this.DAO.UserDAO.find({}).limit(1);
+        if (usersDAO) {
+            if (usersDAO.length == 0) {
+                var usersBase = require('../assets/users.json');
+                for (let item of usersBase) {
                     let userDAO = new this.DAO.UserDAO();
                     userDAO.email = item.email.trim().toLowerCase();
-                    userDAO.nickName = item.nickName.trim().toLowerCase();
-                    userDAO.normalizedNickName = item.normalizedNickName.trim().toLowerCase();
-                    userDAO.password = item.password;
+                    userDAO.nickName = item.nickName;
+                    userDAO.normalizedNickName = item.nickName.trim().toLowerCase();
+                    userDAO.password = bcrypt.hashSync(item.password);
                     userDAO.isAuthor = item.isAuthor;
                     userDAO.isCommentator = item.isCommentator;
                     userDAO.isBlocked = item.isBlocked;
                     userDAO.isAdmin = item.isAdmin;
                     userDAO.lastLogin = item.lastLogin;
-                    userDAO.registerDate = item.registerDate;   
-                    await userDAO.save();                 
+                    userDAO.registerDate = item.registerDate;
+                    await userDAO.save();
                 }
             }
         }
-        let postDAO = await this.DAO.PostDAO.find({}).limit(1);
-        if(postDAO){
-            if(postDAO.length == 0){
-                var data = require('../assets/posts.json');
-                for(let item in data){
-                    let postDAO = new this.DAO.PostDAO();
-                    postDAO.postTitle = item.postTitle;
-                    postDAO.postText = item.postText;
-                    postDAO.category = item.category;
-                    postDAO.authorId = item.authorId;
-                    postDAO.postDate = item.postDate;
-                    postDAO.lastUpdate = item.lastUpdate;
-                    
-                    await postDAO.save();                 
+
+        usersDAO = await this.DAO.UserDAO.find({
+            "nickName": "author1"
+        }).limit(1);
+        if (usersDAO) {
+            if (usersDAO.length > 0) {
+                let authorDAO = usersDAO[0];
+
+                let postsDAO = await this.DAO.PostDAO.find({}).limit(1);
+                if (postsDAO) {
+                    if (postsDAO.length == 0) {
+                        var postsBase = require('../assets/posts.json');
+                        for (let item of postsBase) {
+                            let postDAO = new this.DAO.PostDAO();
+                            postDAO.postTitle = item.postTitle;
+                            postDAO.postText = item.postText;
+                            postDAO.category = item.category;
+                            postDAO.authorId = authorDAO.id;
+                            postDAO.postDate = item.postDate;
+                            postDAO.lastUpdate = item.lastUpdate;
+                            await postDAO.save();
+                        }
+                    }
                 }
+
             }
         }
+
     }
 
     async seed() {
@@ -572,6 +586,23 @@ class BlogService extends BaseService {
             return null;
         }
         return authorDAO;
+    }
+
+    async checkCommentator(authorId, errors) {
+        let commentatorDAO = await this.DAO.UserDAO.findById(authorId);
+        if (!commentatorDAO) {
+            errors.push(`Commentator '${commentatorId}' not found`);
+            return null;
+        }
+        if (commentatorDAO.isBlocked) {
+            errors.push(`Commentator '${commentatorId}' is blocked`);
+            return null;
+        }
+        if (!commentatorDAO.isCommentator) {
+            errors.push(`Commentator '${commentatorId}' is not a commentator`);
+            return null;
+        }
+        return commentatorDAO;
     }
     //#endregion
 }

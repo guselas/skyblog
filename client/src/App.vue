@@ -1,48 +1,95 @@
 <template>
   <div id="app">
-    <a id="blogTittle">- COMICS BLOGAZO -</a>
-    <div id="nav">
-      <div class="card cardMain">
-        <div class="card-header">
-          <TopMenu :profile="profile" />
-        </div>
-        <div class="card-body">
-          <router-view />
-        </div>
-      </div>
+    <h3 id="appTitle">Comics Blog</h3>
+    <h3 v-if="user">Welcome {{ user }}</h3>
+    <div id="nav-menu">
+      <b-button
+        v-if="isAdmin"
+        v-b-popover.hover.top="'BadWords'"
+        variant="info"
+      >
+        <router-link to="/badwordsmanager"
+          ><img src="./components/assets/MenuIcons/Badwords.png"
+        /></router-link>
+      </b-button>
+
+      <b-button v-b-popover.hover.top="'Home'" variant="info">
+        <router-link to="/"
+          ><img src="./components/assets/MenuIcons/Home.png"
+        /></router-link>
+      </b-button>
+
+      <b-button
+        v-b-popover.hover.top="'My posts'"
+        v-if="isAuthenticated"
+        variant="info"
+      >
+        <router-link to="/myposts"
+          ><img src="./components/assets/MenuIcons/Details.png"
+        /></router-link>
+      </b-button>
+
+      <b-button
+        v-b-popover.hover.top="'Profile'"
+        v-if="isAuthenticated"
+        variant="info"
+      >
+        <router-link to="/profile"
+          ><img src="./components/assets/MenuIcons/Profile.png" />
+        </router-link>
+      </b-button>
+
+      <b-button
+        v-b-popover.hover.top="'Log In'"
+        v-if="!isAuthenticated"
+        variant="info"
+      >
+        <router-link to="/login"
+          ><img src="./components/assets/MenuIcons/logIn.png" />
+        </router-link>
+      </b-button>
+
+      <b-button
+        v-b-popover.hover.top="'Log Out'"
+        v-if="isAuthenticated"
+        variant="info"
+      >
+        <router-link to="/logout"
+          ><img src="./components/assets/MenuIcons/logOut.png" />
+        </router-link>
+      </b-button>
+
+      <b-button
+        v-b-popover.hover.top="'Register'"
+        v-if="!isAuthenticated"
+        variant="info"
+      >
+        <router-link to="/register"
+          ><img src="./components/assets/MenuIcons/Register.png" />
+        </router-link>
+      </b-button>
     </div>
-    <div class="appBottom container-fluid">
-      <SocialMedia />
-    </div>
+    <router-view />
+    <SocialMedia style="  text-align: center;"></SocialMedia>
   </div>
 </template>
 
 <script>
-import TopMenu from "../src/components/TopMenu";
-import SocialMedia from "../src/components/SocialMedia";
+import SocialMedia from "./components/SocialMedia";
 
 export default {
-  el: "#app",
-  data() {
-    return {
-      profile: {
-        email: '',
-        nickName: '',
-        userId: '',
-        isAuthor: false,
-        isAdmin: false
-      }
-    };
-  },
-    created() {
-    this.profile.email = localStorage['profile.email'];
-    this.profile.nickName = localStorage['profile.nickName'];
-    this.profile.userId = localStorage['profile.id'];
-    this.profile.isAuthor = localStorage['profile.isAuthor'];
-    this.profile.isAdmin = localStorage['profile.isAdmin'];
+  computed: {
+    isAdmin() {
+      return this.$store.getters.isAdmin;
+    },
+    isAuthenticated() {
+      return this.$store.getters.isAuthenticated;
+    },
+    user() {
+      return this.$store.getters.nickName;
+    }
   },
   components: {
-    TopMenu,
     SocialMedia
   }
 };
@@ -53,48 +100,25 @@ export default {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-align: left;
+  color: #2c3e50;
+}
+
+#appTitle {
+  font-family: "Rock Salt", cursive;
+  color: black;
+  font-size: 45pt;
+}
+
+h3 {
   text-align: center;
-  color: white;
 }
 
-body {
-  background: rgba(62, 191, 55, 1);
-  background: -moz-linear-gradient(
-    -45deg,
-    rgba(62, 191, 55, 1) 0%,
-    rgba(27, 163, 27, 1) 100%
-  );
-  background: -webkit-gradient(
-    left top,
-    right bottom,
-    color-stop(0%, rgba(62, 191, 55, 1)),
-    color-stop(100%, rgba(27, 163, 27, 1))
-  );
-  background: -webkit-linear-gradient(
-    -45deg,
-    rgba(62, 191, 55, 1) 0%,
-    rgba(27, 163, 27, 1) 100%
-  );
-  background: -o-linear-gradient(
-    -45deg,
-    rgba(62, 191, 55, 1) 0%,
-    rgba(27, 163, 27, 1) 100%
-  );
-  background: -ms-linear-gradient(
-    -45deg,
-    rgba(62, 191, 55, 1) 0%,
-    rgba(27, 163, 27, 1) 100%
-  );
-  background: linear-gradient(
-    135deg,
-    rgba(62, 191, 55, 1) 0%,
-    rgba(27, 163, 27, 1) 100%
-  );
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#3ebf37', endColorstr='#1ba31b', GradientType=1);
-}
-
-#nav {
-  padding: 30px;
+#nav-menu {
+  padding: 50px;
+  text-align: center;
+  /* background-color: #6c757d; */
+  background-color: #d8e1e1;
 }
 
 #nav a {
@@ -102,29 +126,8 @@ body {
   color: white;
 }
 
-#blogTittle {
-  color: white;
-  align-self: auto;
-  font-family: "Rock Salt", cursive;
-  font-weight: bold;
-  font-size: 20pt;
-  text-shadow: rgb(59, 59, 59) -1px 1px, rgb(95, 95, 95) -2px 2px,
-    rgb(97, 97, 97) -3px 3px, rgb(97, 97, 97) -4px 4px, rgb(97, 97, 97) -5px 5px;
-  letter-spacing: 1px;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-
-.appBottom {
-  height: 43px;
-  position: fixed;
-  bottom: 0;
-  background-color: rgba(62, 191, 55, 1);
-}
-
-.cardMain {
-  border-color: rgba(62, 191, 55, 1);
+img {
+  height: 45px;
+  margin-right: 15px;
 }
 </style>

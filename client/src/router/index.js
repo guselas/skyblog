@@ -1,42 +1,56 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "../views/Home.vue";
-import Login from "../views/Login.vue";
-import Register from "../views/Register.vue";
-import PostDetail from "../views/PostDetail.vue";
+import Home from "../components/Home.vue";
+import Register from "../components/Auth/Register";
+import Login from "../components/Auth/Login";
+import LogOut from "../components/Auth/LogOut";
+import PostDetail from "../components/PostDetail";
+import Profile from "../components/Auth/Profile";
+import MyPosts from "../components/MyPosts";
+import BadWordsManager from "../components/BadWordsManager";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    name: "Home",
+    name: "home",
     component: Home
+  },
+  {
+    path: "/postdetail/:id",
+    name: "postDetail",
+    component: PostDetail
   },
   {
     path: "/login",
-    name: "Login",
+    name: "login",
     component: Login
   },
   {
+    path: "/logout",
+    name: "logout",
+    component: LogOut
+  },
+  {
     path: "/register",
-    name: "Register",
+    name: "register",
     component: Register
   },
   {
-    path: "/postDetail",
-    name: "PostDetail",
-    component: PostDetail
+    path: "/profile",
+    name: "profile",
+    component: Profile
   },
   {
-    path: "/posts",
-    name: "Posts",
-    component: Home
+    path: "/myposts",
+    name: "myposts",
+    component: MyPosts
   },
   {
-    path: "/postdetail",
-    name: "PostDetail",
-    component: PostDetail
+    path: "/badwordsmanager",
+    name: "badwordsmanager",
+    component: BadWordsManager
   }
 ];
 
