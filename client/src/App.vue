@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <h3 id="appTitle">Comics Blog</h3>
-    <h3 v-if="user">Welcome {{ user }}</h3>
+    <h3 id="welcome" v-if="user">Welcome {{ user }}</h3>
     <div id="nav-menu">
       <b-button
         v-if="isAdmin"
@@ -129,5 +129,10 @@ h3 {
 img {
   height: 45px;
   margin-right: 15px;
+}
+
+#welcome{
+  color: rgb(83, 79, 79);
+  font-family: 'Permanent Marker', cursive;
 }
 </style>

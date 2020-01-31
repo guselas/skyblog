@@ -4,12 +4,13 @@
         <b-alert v-model="showDismissibleAlert" :variant="variant" dismissible>{{errorMsg}}</b-alert>
         <!--End Comment Alert Error Messages -->
         <div class="row">
-            <div class="col-10">
+            <div class="col-11">
                 <!-- Posts cards Area -->
                 <div>
                     <h3>{{ currentPost.title }}</h3>
                 </div>
                 <!-- Post Info -->
+                <br>
                 <div class="card">
                     <h3 id="postDetailsTitle">Post Details</h3>
                     <div class="col jumbotron">
@@ -82,7 +83,7 @@
             </div>
 
             <!-- Nav bar Commands Area -->
-            <div class="col-2">
+            <div class="col-1">
 
                 <b-button-group vertical>
                     <!-- <b-button v-b-modal.modal-create block pill variant="primary" size="lg" class="b-button">New
@@ -129,7 +130,7 @@
                             <p> This posts has these comments associated:
                                 <ul>
                                     <li v-for="comment in currentPost.comments" :key="comment">
-                                        {{comment.commentText}} || {{ moment(comment.lastUpdate).format('LLL')}}
+                                     <b-badge variant="info">Comment Text</b-badge>{{comment.commentText}} || <b-badge variant="info">Last updated</b-badge> {{ moment(comment.lastUpdate).format('LLL')}} || <b-badge variant="info">Author</b-badge> {{ comment.nickName }}
                                     </li>
                                 </ul>
                             </p>

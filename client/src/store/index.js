@@ -38,14 +38,14 @@ export default new Vuex.Store({
       if ("nickName" in state.profile) {
         return state.profile.nickName;
       } else {
-        return "anonymous";
+        return "Mr/Miss anonymous";
       }
     },
     email(state) {
       if ("nickName" in state.profile) {
         return state.profile.email;
       } else {
-        return "anonymous";
+        return "Mr/Miss anonymous";
       }
     },
     id(state) {
@@ -68,16 +68,10 @@ export default new Vuex.Store({
       } else {
         state.authorization = "";
       }
-      /* eslint-disable no-console */
-      // console.log(' commit("setAuthorization"): ', state.authorization);
-      /* eslint-enable no-console */
     },
     //------------------------------------------
     unsetAuthorization(state) {
       state.authorization = "";
-      /* eslint-disable no-console */
-      // console.log(' commit("unsetAuthorization"): ', state.authorization);
-      /* eslint-enable no-console */
     },
     //------------------------------------------
     setProfile(state, payload) {
@@ -86,16 +80,10 @@ export default new Vuex.Store({
       } else {
         state.profile = {};
       }
-      /* eslint-disable no-console */
-      // console.log(' commit("setProfile"): ', state.profile);
-      /* eslint-enable no-console */
     },
     //------------------------------------------
     unsetProfile(state) {
       state.profile = {};
-      /* eslint-disable no-console */
-      // console.log(' commit("unsetProfile"): ', state.profile);
-      /* eslint-enable no-console */
     },
     //------------------------------------------
     setPosts(state, payload) {
@@ -144,9 +132,6 @@ export default new Vuex.Store({
   actions: {
     //------------------------------------------
     setAuthorization({ commit }, payload) {
-      /* eslint-disable no-console */
-      // console.log("setAuthorization()", payload);
-      /* eslint-enable no-console */
       commit("setAuthorization", payload);
       if (payload.rememberMe) {
         localStorage["authorization"] = payload.Authorization;
@@ -162,9 +147,6 @@ export default new Vuex.Store({
     //------------------------------------------
     setProfile({ commit }, payload) {
       if (payload) {
-        /* eslint-disable no-console */
-        // console.log("setProfile()", payload);
-        /* eslint-enable no-console */
         commit("setProfile", payload);
       } else {
         commit("unsetProfile");
@@ -173,9 +155,6 @@ export default new Vuex.Store({
     //------------------------------------------
     setPosts({ commit }, payload) {
       if (payload) {
-        /* eslint-disable no-console */
-        // console.log("setPosts()", payload);
-        /* eslint-enable no-console */
         commit("setPosts", payload);
       } else {
         commit("unsetPosts");
@@ -184,18 +163,12 @@ export default new Vuex.Store({
     //------------------------------------------
     setMyPosts({ commit }, payload) {
       if (payload) {
-        /* eslint-disable no-console */
-        // console.log("setMyPosts()", payload);
-        /* eslint-enable no-console */
         commit("setMyPosts", payload);
       }
     },
     //------------------------------------------
     deleteMyPost({ commit }, payload) {
       if (payload) {
-        /* eslint-disable no-console */
-        // console.log("deleteMyPost()", payload);
-        /* eslint-enable no-console */
         commit("deleteMyPost", payload);
       }
     },
@@ -210,18 +183,12 @@ export default new Vuex.Store({
     //------------------------------------------
     setCategories({ commit }, payload) {
       if (payload) {
-        /* eslint-disable no-console */
-        // console.log("setCategories()", payload);
-        /* eslint-enable no-console */
         commit("setCategories", payload);
       }
     },
     //------------------------------------------
     setBadwords({ commit }, payload) {
       if (payload) {
-        /* eslint-disable no-console */
-        // console.log("setPosts()", payload);
-        /* eslint-enable no-console */
         commit("setBadwords", payload);
       } else {
         commit("unsetBadwords");

@@ -6,4 +6,7 @@ Hay 3 perfiles de usuarios:
 ## -El author que tiene derecho a ecribir nuevos posts y comentarios pero solo puede borrar y editar los posts que le pertenecen.
 ## -Lectores que tienen derechos unicamente de lectura. Estos son los usuarios no registrados. 
 
+PostMan link: https://www.getpostman.com/collections/0173282468b89d894e54
+
+
 En funcion de cada unos de estos tipos de usuarios se mostrará una vista diferente con diferentes funcionalidades. 
