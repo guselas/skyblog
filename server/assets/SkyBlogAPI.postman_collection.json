@@ -6,11 +6,6 @@
 	},
 	"item": [
 		{
-			"name": "CRUD API",
-			"item": [],
-			"protocolProfileBehavior": {}
-		},
-		{
 			"name": "Blog API",
 			"item": [
 				{
@@ -27,7 +22,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "5e0f72653a779143c32ede2c",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTMzZTc2ODNjNjQ3MTFkNDM4ZDViMzgiLCJpYXQiOjE1ODA0NjkyMDIsImV4cCI6MTU4MDU1NTYwMn0.t0wkT6JXcan6Gb8HVGwHcc5t-Uvr27Q92GyrZVccoCU",
 											"type": "string"
 										}
 									]
@@ -51,18 +46,93 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:3001/api/V0/login/model",
+									"raw": "http://localhost:3000/api/blog/login/model",
 									"protocol": "http",
 									"host": [
 										"localhost"
 									],
-									"port": "3001",
+									"port": "3000",
 									"path": [
 										"api",
-										"V0",
+										"blog",
 										"login",
 										"model"
 									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Profile",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "5e0f72653a779143c32ede2c",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:3000/api/blog/profile/model",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"blog",
+										"profile",
+										"model"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "All models",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTMzZTc2ODNjNjQ3MTFkNDM4ZDViMzgiLCJpYXQiOjE1ODA0NjkyMDIsImV4cCI6MTU4MDU1NTYwMn0.t0wkT6JXcan6Gb8HVGwHcc5t-Uvr27Q92GyrZVccoCU",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:3000/api/blog/all/model",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"blog",
+										"all",
+										"model"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Blog",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": ""
 								}
 							},
 							"response": []
@@ -95,113 +165,6 @@
 										"register",
 										"model"
 									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Who am I",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "5e0f72653a779143c32ede2c",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:3000/api/blog/profile/model",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"api",
-										"blog",
-										"profile",
-										"model"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Who",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "5e0f72653a779143c32ede2c",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:3000/api/blog/who/model",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"api",
-										"blog",
-										"who",
-										"model"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "All models",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "5e0f72653a779143c32ede2c",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:3000/api/blog/all/model",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"api",
-										"blog",
-										"all",
-										"model"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Blog",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": ""
 								}
 							},
 							"response": []
@@ -310,7 +273,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "5e0f72653a779143c32ede2c",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTMzZTc2ODNjNjQ3MTFkNDM4ZDViMzgiLCJpYXQiOjE1ODA0NjkyMDIsImV4cCI6MTU4MDU1NTYwMn0.t0wkT6JXcan6Gb8HVGwHcc5t-Uvr27Q92GyrZVccoCU",
 											"type": "string"
 										}
 									]
@@ -343,53 +306,6 @@
 				{
 					"name": "EndPoints",
 					"item": [
-						{
-							"name": "Login",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "\n{\n    \"email\": \"blogger1@gmail.com\",\n    \"password\": \"123\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:3001/api/V0/login",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "3001",
-									"path": [
-										"api",
-										"V0",
-										"login"
-									]
-								}
-							},
-							"response": []
-						},
 						{
 							"name": "Register",
 							"request": {
@@ -438,33 +354,30 @@
 							"response": []
 						},
 						{
-							"name": "Who am I",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
+							"name": "CurrentUser",
 							"request": {
 								"auth": {
 									"type": "bearer",
 									"bearer": [
 										{
 											"key": "token",
-											"value": "5e145e0937fcca20855a2a08",
+											"value": "5e162f7a2fdd03303d1b197b",
 											"type": "string"
 										}
 									]
 								},
-								"method": "GET",
+								"method": "PUT",
 								"header": [
 									{
 										"key": "Content-Type",
 										"name": "Content-Type",
-										"type": "text",
-										"value": "application/json"
+										"value": "application/json",
+										"type": "text"
 									}
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"blogger1@gmail.com\",\n    \"nickName\": \"Blogger1\",\n    \"password\": \"123\"\n}",
+									"raw": "{\n\t\n    \"email\": \"fr.ruizf@skyblog.com\",\n    \"nickName\": \"Guselillos\",\n    \"password\": \"123\"\n\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -488,33 +401,30 @@
 							"response": []
 						},
 						{
-							"name": "Who",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
+							"name": "Login",
 							"request": {
 								"auth": {
 									"type": "bearer",
 									"bearer": [
 										{
 											"key": "token",
-											"value": "5e145e0937fcca20855a2a08",
+											"value": "",
 											"type": "string"
 										}
 									]
 								},
-								"method": "GET",
+								"method": "POST",
 								"header": [
 									{
 										"key": "Content-Type",
 										"name": "Content-Type",
-										"type": "text",
-										"value": "application/json"
+										"value": "application/json",
+										"type": "text"
 									}
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"blogger1@gmail.com\",\n    \"nickName\": \"Blogger1\",\n    \"password\": \"123\"\n}",
+									"raw": "\n{\n    \"email\": \"blogger1@gmail.com\",\n    \"password\": \"123\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -522,23 +432,23 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:3000/api/blog/who",
+									"raw": "http://localhost:3001/api/V0/login",
 									"protocol": "http",
 									"host": [
 										"localhost"
 									],
-									"port": "3000",
+									"port": "3001",
 									"path": [
 										"api",
-										"blog",
-										"who"
+										"V0",
+										"login"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Bad words Count",
+							"name": "Profile",
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
 							},
@@ -548,7 +458,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "5e145e0937fcca20855a2a08",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTFjOWI3NWQwZWI0ODE1Y2M5MjY2NzciLCJpYXQiOjE1NzkwMzA4NTAsImV4cCI6MTU3OTExNzI1MH0.Su7jIZIdETfXOE4Cv_4qngRWRdVtbDCHNKZ9oPtITr4",
 											"type": "string"
 										}
 									]
@@ -564,7 +474,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"blogger1@gmail.com\",\n    \"nickName\": \"Blogger1\",\n    \"password\": \"123\"\n}",
+									"raw": "",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -572,7 +482,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:3000/api/blog/badwords/count",
+									"raw": "http://localhost:3000/api/blog/profile",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -581,30 +491,26 @@
 									"path": [
 										"api",
 										"blog",
-										"badwords",
-										"count"
+										"profile"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Bad words List",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
+							"name": "Profile",
 							"request": {
 								"auth": {
 									"type": "bearer",
 									"bearer": [
 										{
 											"key": "token",
-											"value": "5e145e0937fcca20855a2a08",
+											"value": "5e16e3f9d518b936217182d7",
 											"type": "string"
 										}
 									]
 								},
-								"method": "GET",
+								"method": "PUT",
 								"header": [
 									{
 										"key": "Content-Type",
@@ -615,7 +521,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"blogger1@gmail.com\",\n    \"nickName\": \"Blogger1\",\n    \"password\": \"123\"\n}",
+									"raw": "",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -623,7 +529,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:3000/api/blog/badwords",
+									"raw": "http://localhost:3000/api/blog/profile",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -632,7 +538,7 @@
 									"path": [
 										"api",
 										"blog",
-										"badwords"
+										"profile"
 									]
 								}
 							},
@@ -640,6 +546,20 @@
 						},
 						{
 							"name": "Posts List",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "57068926-056b-4aa2-97d8-afbfffc74196",
+										"exec": [
+											"pm.test(\"Status test\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
 							},
@@ -665,7 +585,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"blogger1@gmail.com\",\n    \"nickName\": \"Blogger1\",\n    \"password\": \"123\"\n}",
+									"raw": "",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -673,7 +593,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:3000/api/blog/badwords",
+									"raw": "http://localhost:3000/api/blog",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -681,8 +601,70 @@
 									"port": "3000",
 									"path": [
 										"api",
-										"blog",
-										"badwords"
+										"blog"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Post Categories",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "57068926-056b-4aa2-97d8-afbfffc74196",
+										"exec": [
+											"pm.test(\"Status test\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "5e145e0937fcca20855a2a08",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/blog",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"blog"
 									]
 								}
 							},
@@ -746,7 +728,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "5e0f24e5262e6a1a5b053e88",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTFiNjNmMzY4YzA2ZDE2YjEyMWEwNGEiLCJpYXQiOjE1NzkwMzczNzcsImV4cCI6MTU3OTEyMzc3N30.24lS5mCtHHqakvIWFn5E1SRNf4NJ028t4AaeCPBa8Os",
 											"type": "string"
 										}
 									]
@@ -762,7 +744,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"postTitle\": \"ScubaDiving Post\",\n    \"postText\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"\n}",
+									"raw": "{\n    \"postTitle\": \"Climbing Post\",\n    \"postText\": \"hey asshole abbo abuse \",\n    \"category\":\"Marvel\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -879,6 +861,20 @@
 						},
 						{
 							"name": "Post with NO offensive words",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ef19dfa1-e977-43cb-a043-3ab7945088f4",
+										"exec": [
+											"pm.test(\"Status test\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -901,7 +897,54 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"id\": \"5e0e5e188469a543511e44c2\",\n    \"rowVersion\": 0,\n    \"postTitle\": \"Climbing Post\",\n    \"postText\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\",\n    \"postDate\": \"2020-01-07T10:21:37.577Z\"\n}",
+									"raw": "{\n    \"id\": \"5e0e5e188469a543511e44c2\",\n    \"rowVersion\": 3,\n    \"postTitle\": \"Climbing Post\",\n    \"postText\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\",\n    \"postDate\": \"2020-01-07T10:21:37.577Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/blog/5e1466c7325e7524097f04a0",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"blog",
+										"5e1466c7325e7524097f04a0"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Post",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "5e0f24e5262e6a1a5b053e88",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -925,7 +968,7 @@
 							"response": []
 						},
 						{
-							"name": "Post",
+							"name": "Post Search",
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -1213,6 +1256,284 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "MyPosts",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": ""
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "BadWords",
+					"item": [
+						{
+							"name": "Bad words List",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "5e145e0937fcca20855a2a08",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"blogger1@gmail.com\",\n    \"nickName\": \"Blogger1\",\n    \"password\": \"123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/blog/badwords",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"blog",
+										"badwords"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Bad words Count",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "5e145e0937fcca20855a2a08",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"blogger1@gmail.com\",\n    \"nickName\": \"Blogger1\",\n    \"password\": \"123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/blog/badwords/count",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"blog",
+										"badwords",
+										"count"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Bad word",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "5e145e0937fcca20855a2a08",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"blogger1@gmail.com\",\n    \"nickName\": \"Blogger1\",\n    \"password\": \"123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/blog/badwords/count",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"blog",
+										"badwords",
+										"count"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Bad word",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "5e145e0937fcca20855a2a08",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"blogger1@gmail.com\",\n    \"nickName\": \"Blogger1\",\n    \"password\": \"123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/blog/badwords/:id",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"blog",
+										"badwords",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Bad word",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "5e145e0937fcca20855a2a08",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"blogger1@gmail.com\",\n    \"nickName\": \"Blogger1\",\n    \"password\": \"123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/blog/badwords/:id",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"blog",
+										"badwords",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"protocolProfileBehavior": {},
@@ -1224,4 +1545,3 @@
 	],
 	"protocolProfileBehavior": {}
 }
-
