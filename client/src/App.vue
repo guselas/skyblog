@@ -40,6 +40,7 @@
       </b-button>
 
       <b-button
+        id="loginBtn"
         v-b-popover.hover.top="'Log In'"
         v-if="!isAuthenticated"
         variant="info"
@@ -131,8 +132,8 @@ img {
   margin-right: 15px;
 }
 
-#welcome{
+#welcome {
   color: rgb(83, 79, 79);
-  font-family: 'Permanent Marker', cursive;
+  font-family: "Permanent Marker", cursive;
 }
 </style>

@@ -43,7 +43,7 @@
               <label class="form-check-label" for="Check1">Remember me</label>
             </div>
             <div style="text-align:center">
-              <button class="btn btn-primary" @click.prevent="submitLoginForm">
+              <button id="loginSubmit" class="btn btn-primary" @click.prevent="submitLoginForm">
                 Submit
               </button>
             </div>
@@ -62,8 +62,8 @@ export default {
   data() {
     return {
       user: {
-        email: "admin@gmail.com",
-        password: "123"
+        email: "",
+        password: ""
       },
       rememberMe: false,
       errorMsg: "",

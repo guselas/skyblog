@@ -25,14 +25,14 @@
           <label for="textarea-large">Post Title:</label>
           <b-form-textarea
             v-model="dataPostTitle"
-            id="textarea-large"
+            id="textarea-large-postTitle"
             size="lg"
           ></b-form-textarea>
         </b-col>
         <hr />
         <b-col sm="10">
           <label for="textarea-large">Post content:</label>
-          <b-form-textarea v-model="dataPostText" id="textarea-large" size="lg">
+          <b-form-textarea v-model="dataPostText" id="textarea-large-postContent" size="lg">
           </b-form-textarea>
         </b-col>
         <hr />
@@ -83,6 +83,7 @@
                 >
               </b-navbar-nav>
               <b-button
+                id="newPostBtn"
                 v-if="isAuthor"
                 v-b-modal.modal-create
                 variant="primary"
@@ -118,8 +119,8 @@
       <div class="card">
         <div class="row">
           <div v-for="post in posts" :key="post.id" class="col-md-4 jumbotron">
-            <router-link :to="{ name: 'postDetail', params: { id: post.id } }">
-              <div class="card-header" style="text-align:center">
+            <router-link  :to="{ name: 'postDetail', params: { id: post.id } }" >
+              <div class="card-header" style="text-align:center" :id="post.id">
                 {{ post.postTitle }}
               </div>
             </router-link>

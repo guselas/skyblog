@@ -40,7 +40,7 @@
                 <!--End Posts cards Area -->
                 <!-- Comments buttons Area -->
                 <div>
-                    <b-button v-b-modal.modal-sl block pill variant="primary" size="lg" @click="openModal" v-if="isAuthor || isAdmin" >New Comment
+                    <b-button v-b-modal.modal-sl block pill variant="primary" id="newCommentBtn" size="lg" @click="openModal" v-if="isAuthor || isAdmin" >New Comment
                     </b-button>
                     <b-modal @ok="newComment()" ref="my-deletedPost" id="modal-sl" size="lg" title="Comment Details">
                         <b-alert v-model="showDismissibleError" :variant="variant" dismissible>{{errorMsg}}</b-alert>
@@ -55,7 +55,7 @@
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <div class="input-group-text">
-                                    <input type="radio" aria-label="Radio button for following text input">
+                                    <input id="commentTextInput" type="radio" aria-label="Radio button for following text input">
                                 </div>
                             </div>
                             <input type="text" readonly class="form-control" placeholder="Accept terms and conditions"
