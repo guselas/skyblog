@@ -4,6 +4,9 @@ This is a blog where users can leave posts, comments and react to other user's p
 
 ## Installation 
 1. Clone the repository
+
+![git clone](/public/gitScreenShoots/gitClone.png)
+
 2. In a terminal do *git clone + git repository web URL*
 3. Access the folder with *cd skyblog*
 
