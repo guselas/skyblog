@@ -1,0 +1,18 @@
+<br>
+<!-- <button class="btn btn-primary" (click)="onGetPosts()">Get all Posts</button> -->
+<hr>
+<div class="container-fluid">
+  <div *ngFor="let post of (posts$ | async)">
+    <div class="card">
+      <div class="card-header">
+        <p>{{ post.postTitle }}</p>
+      </div>
+      <div class="card-body">
+        <p>{{ post.postText.substring(0,200) }}</p>
+      </div>
+      <div class="card-footer">
+      </div>
+      <br>
+    </div>
+  </div>
+</div>

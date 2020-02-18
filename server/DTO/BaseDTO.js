@@ -30,7 +30,6 @@ class BaseDTO {
         }
     }
 
-
     fromDAO(recordDAO) {
         this.setId(recordDAO);
         for (let prop in recordDAO) {
@@ -76,10 +75,8 @@ class BaseDTO {
             } else {
                 //Garantizar que tenemos la propierty en el DTO y en el DAO
                 if (property in this) {
-
                     //actualizamos la propiedad  si o si
                     recordDAO[property] = this[property];
-
                 }
             }
         }
